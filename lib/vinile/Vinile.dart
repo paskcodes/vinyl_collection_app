@@ -1,5 +1,4 @@
 import 'dart:core';
-import 'dart:ffi';
 import 'dart:ui';
 
 import 'package:vinyl_collection_app/vinile/Condizione.dart';

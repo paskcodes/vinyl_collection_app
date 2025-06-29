@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:vinyl_collection_app/screen/schermatacollezione.dart';
 import 'screen/homepage.dart';
 import 'screen/ricerca.dart';
 //import 'screen/collection.dart';
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const HomeScreen(),
         '/search': (context) => const SearchScreen(),
-        //'/collection': (context) => const CollectionScreen(),
+        '/collection': (context) => const schermatacollezione(),
       },
     );
   }

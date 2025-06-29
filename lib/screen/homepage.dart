@@ -19,6 +19,10 @@ class HomeScreen extends StatelessWidget {
               onPressed: () => Navigator.pushNamed(context, '/collection'),
               child: const Text('La mia collezione'),
             ),
+            ElevatedButton(
+              onPressed: () => Navigator.pushNamed(context, '/collection'),
+              child: const Text('Collezione'),
+            ),
           ],
         ),
       ),

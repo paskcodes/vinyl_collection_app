@@ -1,6 +1,7 @@
 import 'dart:core';
 import 'package:vinyl_collection_app/vinile/condizione.dart';
 import 'package:vinyl_collection_app/vinile/genere.dart';
+import 'package:flutter/material.dart';
 
 class Vinile{
   final String titolo;
@@ -10,7 +11,7 @@ class Vinile{
   final String etichettaDiscografica;
   final int quantita;
   final Condizione condizione;
-  final String immagine;
+  final Image immagine;
   final bool preferito;
 
   Vinile({
@@ -19,12 +20,12 @@ class Vinile{
     required this.anno,
     required this.genere, 
     required this.etichettaDiscografica,
-    required  this.quantita, 
+    required this.quantita,
     required this.condizione,
-    required this.immagine,
+    required String urlImmagine,
     this.preferito = false
     }
-  );
+  ) : immagine = Image.network(urlImmagine);
 
 Map<String, Object?> toMap() {
     return {
@@ -49,7 +50,7 @@ Map<String, Object?> toMap() {
       etichettaDiscografica: map['etichetta_discografica'],
       quantita: map['quantita'],
       condizione: Condizione.values[map['condizione']],
-      immagine: map['immagine'],
+      urlImmagine: (map['immagine']),
       preferito: map['preferito'] == 1,
     );
   }

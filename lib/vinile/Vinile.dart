@@ -13,6 +13,7 @@ class Vinile{
   final Condizione condizione;
   final Image immagine;
   final bool preferito;
+  int ?id;
 
   Vinile({
     required this.titolo,
@@ -23,12 +24,13 @@ class Vinile{
     required this.quantita,
     required this.condizione,
     required String urlImmagine,
-    this.preferito = false
+    this.preferito = false, int? id
     }
   ) : immagine = Image.network(urlImmagine);
 
 Map<String, Object?> toMap() {
     return {
+      'id' : id,
       'titolo': titolo,
       'nomeArtista': nomeArtista,
       'anno': anno,
@@ -43,6 +45,7 @@ Map<String, Object?> toMap() {
 
   factory Vinile.fromMap(Map<String, dynamic> map) {
     return Vinile(
+      id: map['id'],
       titolo: map['titolo'],
       nomeArtista: map['nome_artista'],
       anno: map['anno'],

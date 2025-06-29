@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vinyl_collection_app/database/dbvinili.dart';
 import 'package:vinyl_collection_app/vinile/Vinile.dart';
 
 class schermatacollezione extends StatefulWidget {
@@ -8,13 +9,18 @@ class schermatacollezione extends StatefulWidget {
   State<schermatacollezione> createState() => _schermatacollezioneState();
 }
 
+
+
 class _schermatacollezioneState extends State<schermatacollezione> {
-  List<Vinile> _listaVinili=[];
+  late List<Vinile> _listaVinili=[];
 
   @override
   void initState() {
     super.initState();
     _caricaVinili();
+    //Vinile vinile1=Vinile(titolo:"Femmn", nomeArtista:"gigi d'alessio",anno: 1990,genere: Genere.rock,
+    //etichettaDiscografica: "The squallors",quantita:  1,condizione: Condizione.nuovo,urlImmagine:"https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.wildtierdruck.de%2Fit%2Fproducts%2Ftieraufsteller-uhu-outdoor-set%3Fsrsltid%3DAfmBOorKMEXDrnxpvgrkqrjMa3XgR6HoLurqFq9yKZyzbBzYbiyoTNr2&psig=AOvVaw3CUw-B3mbLzyqgCUcLa6BO&ust=1751313078041000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCOD0suGzl44DFQAAAAAdAAAAABAE",
+    //);
   }
 
   void _aggiungiVinile() async {
@@ -25,15 +31,15 @@ class _schermatacollezioneState extends State<schermatacollezione> {
   }
 
   Future<void> _caricaVinili() async{ //carica la lista di vinili tramite lo state(cosi rifà il render)
-   // final listaVinili=getVinili();
-   // setState(() {
-   //   _listaVinili=listaVinili;
-   // });
+    final listaVinili=await DatabaseHelper.instance.getCollezione();
+
+      setState(() {
+      _listaVinili=listaVinili;
+    });
   }
 
-  Future<void> _rimuoviVinile(Vinile vinile) async{
-  //  await eliminaVinile(vinile);
-  //  await _caricaVinili();
+  Future<bool> _rimuoviVinile(Vinile vinile) async{
+      return await DatabaseHelper.instance.eliminaVinile(vinile);
   }
 
   void _modificaVinile(Vinile vinile) async {
@@ -95,5 +101,4 @@ class _schermatacollezioneState extends State<schermatacollezione> {
           ),
     );
   }
-
 }

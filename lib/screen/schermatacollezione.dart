@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:vinyl_collection_app/database/dbvinili.dart';
 import 'package:vinyl_collection_app/vinile/Vinile.dart';
 
-class schermatacollezione extends StatefulWidget {
-  const schermatacollezione({super.key});
+class SchermataCollezione extends StatefulWidget {
+  const SchermataCollezione({super.key});
 
   @override
-  State<schermatacollezione> createState() => _schermatacollezioneState();
+  State<SchermataCollezione> createState() => _SchermataCollezioneState();
 }
 
 
 
-class _schermatacollezioneState extends State<schermatacollezione> {
+class _SchermataCollezioneState extends State<SchermataCollezione> {
   late List<Vinile> _listaVinili=[];
 
   @override

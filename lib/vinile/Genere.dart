@@ -1,5 +1,5 @@
 enum Genere{
-  ROCK,ELECTRONIC,POP,FOLK_WORLD_COUNTRY,JAZZ,FUNK_SOUL,
-  CLASSICAL,HIPHOP,LATIN,STAGE_SCREEN,REGGAE,
-  BLUES,NON_MUSIC,CHILDRENS,BRASS_MILITARY;
+  rock, electronic, pop, folkWorldCountry, jazz, funkSoul,
+  classical, hiphop, latin, stageScreen, reggae,
+  blues, nonMusic, childrens, brassMilitary;
 }

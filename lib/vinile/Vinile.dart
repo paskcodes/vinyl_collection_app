@@ -1,5 +1,7 @@
 import 'dart:core';
 import 'dart:ui';
+import 'package:flutter/material.dart';
+
 
 import 'package:vinyl_collection_app/vinile/Condizione.dart';
 import 'package:vinyl_collection_app/vinile/Genere.dart';
@@ -9,17 +11,20 @@ class Vinile{
   String _nomeArtista;
   int _anno;
   Genere _genere;
-  String _etichetta_discografica;
+  String _etichettaDiscografica;
   int _quantita;
   Condizione _condizione;
-  Image? _immagine;
+  Image _immagine;
+  bool _preferito;
 
   Vinile(
       this._titolo, this._nomeArtista, this._anno,
-      this._genere, this._etichetta_discografica,
+      this._genere, this._etichettaDiscografica,
       this._quantita, this._condizione,
-      [Image? immagine]  // parametro opzionale
-  ) : _immagine = immagine;
+      String urlImmagine,
+      {bool preferito=false}
+      ) : _immagine = Image.network(urlImmagine),
+          _preferito = preferito;
 
 
   Condizione get condizione => _condizione;
@@ -34,10 +39,10 @@ class Vinile{
     _quantita = value;
   }
 
-  String get etichetta_discografica => _etichetta_discografica;
+  String get etichetta_discografica => _etichettaDiscografica;
 
   set etichetta_discografica(String value) {
-    _etichetta_discografica = value;
+    _etichettaDiscografica = value;
   }
 
   Genere get genere => _genere;
@@ -66,8 +71,9 @@ class Vinile{
 
   Image? get immagine => _immagine;
 
-  set immagine(Image? immagine) {
-    _immagine = immagine;
+  set preferito(bool preferito){
+    _preferito=preferito;
   }
 
+  bool get preferito => _preferito;
 }

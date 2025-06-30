@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vinyl_collection_app/database/dbvinili.dart';
-import 'package:vinyl_collection_app/vinile/Vinile.dart';
+import 'package:vinyl_collection_app/vinile/vinile.dart';
 
 class SchermataCollezione extends StatefulWidget {
   const SchermataCollezione({super.key});
@@ -76,11 +76,11 @@ class _SchermataCollezioneState extends State<SchermataCollezione> {
                   leading: SizedBox(
                     width: 50,
                     height: 50,
-                    child: vinile.immagine,
+                    child: vinile.coverWidget,  // <-- qui!
                   ),
 
                   title: Text(vinile.titolo),
-                  subtitle: Text('${vinile.nomeArtista} (${vinile.anno})'),
+                  subtitle: Text('${vinile.artista} (${vinile.anno})'),
 
                   trailing: PopupMenuButton<String>(
                     onSelected: (scelta) {

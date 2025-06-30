@@ -24,7 +24,7 @@ class _SchermataCollezioneState extends State<SchermataCollezione> {
   }
 
   void _aggiungiVinile() async {
-    final aggiunto = await Navigator.pushNamed(context, '/add');
+    final aggiunto = await Navigator.pushNamed(context, '/aggiunta');
     print("Aggiungi: $aggiunto" );
     if (aggiunto == true) {
       await _caricaVinili();

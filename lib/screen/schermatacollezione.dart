@@ -18,9 +18,6 @@ class _SchermataCollezioneState extends State<SchermataCollezione> {
   void initState() {
     super.initState();
     _caricaVinili();
-    //Vinile vinile1=Vinile(titolo:"Femmn", nomeArtista:"gigi d'alessio",anno: 1990,genere: Genere.rock,
-    //etichettaDiscografica: "The squallors",quantita:  1,condizione: Condizione.nuovo,urlImmagine:"https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.wildtierdruck.de%2Fit%2Fproducts%2Ftieraufsteller-uhu-outdoor-set%3Fsrsltid%3DAfmBOorKMEXDrnxpvgrkqrjMa3XgR6HoLurqFq9yKZyzbBzYbiyoTNr2&psig=AOvVaw3CUw-B3mbLzyqgCUcLa6BO&ust=1751313078041000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCOD0suGzl44DFQAAAAAdAAAAABAE",
-    //);
   }
 
   void _aggiungiVinile() async {

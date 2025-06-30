@@ -26,6 +26,11 @@ class _MainScaffoldState extends State<MainScaffold> {
         index: _currentIndex,
         children: _pages,
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.pushNamed(context, '/aggiunta'),
+        tooltip: 'Aggiungi nuovo vinile',
+        child: const Icon(Icons.add),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         backgroundColor: Colors.black,

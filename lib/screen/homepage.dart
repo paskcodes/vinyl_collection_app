@@ -49,11 +49,6 @@ class HomeScreen extends StatelessWidget {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pushNamed(context, '/aggiunta'),
-        tooltip: 'Aggiungi nuovo vinile',
-        child: const Icon(Icons.add),
-      ),
     );
   }
 

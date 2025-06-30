@@ -15,7 +15,7 @@ class DatabaseHelper {
 
   Future<Database> _initDatabase() async {
     return openDatabase(
-      join(await getDatabasesPath(), 'mio_database.db'),
+      join(await getDatabasesPath(), 'vinili.db'),
       onCreate: (db, version) {
         return db.execute(
           'CREATE TABLE collezioneVinili(id INTEGER PRIMARY KEY AUTOINCREMENT,titolo TEXT NOT NULL,artista TEXT NOT NULL,anno INTEGER NOT NULL,genere INTEGER,etichetta_discografica TEXT,quantita INTEGER,condizione INTEGER,immagine TEXT,preferito INTEGER)',

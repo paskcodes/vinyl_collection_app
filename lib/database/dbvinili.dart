@@ -47,7 +47,7 @@ class DatabaseHelper {
       final db= await DatabaseHelper.instance.database;
       final result= await db.query('collezioneVinili',
       where: 'titolo = ? AND artista = ? AND anno =?',
-      whereArgs:[vinile.titolo,vinile.nomeArtista,vinile.anno],
+      whereArgs:[vinile.titolo,vinile.artista,vinile.anno],
       );
 
       return result.isNotEmpty;
@@ -69,7 +69,7 @@ class DatabaseHelper {
     final db = await DatabaseHelper.instance.database;
     final result = await db.delete('collezionevinili',
       where: 'titolo = ? AND artista = ? AND anno = ?',
-      whereArgs: [vinile.titolo,vinile.nomeArtista,vinile.anno],
+      whereArgs: [vinile.titolo,vinile.artista,vinile.anno],
     );
     return result > 0;
   }

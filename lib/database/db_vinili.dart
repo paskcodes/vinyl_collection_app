@@ -34,7 +34,7 @@ class VinileDatabase {
     final existing = await db.query(
       'vinyls',
       where: 'titolo = ? AND nome_artista = ? AND anno = ?',
-      whereArgs: [vinile.titolo, vinile.nomeArtista, vinile.anno],
+      whereArgs: [vinile.titolo, vinile.artista, vinile.anno],
     );
 
     if (existing.isNotEmpty) {

@@ -76,11 +76,11 @@ class _SchermataCollezioneState extends State<SchermataCollezione> {
                   leading: SizedBox(
                     width: 50,
                     height: 50,
-                    child: vinile.immagine,
+                    child: vinile.coverWidget,  // <-- qui!
                   ),
 
                   title: Text(vinile.titolo),
-                  subtitle: Text('${vinile.nomeArtista} (${vinile.anno})'),
+                  subtitle: Text('${vinile.artista} (${vinile.anno})'),
 
                   trailing: PopupMenuButton<String>(
                     onSelected: (scelta) {

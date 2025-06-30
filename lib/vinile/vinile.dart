@@ -1,60 +1,75 @@
-import 'dart:core';
+library vinile_model;
+
+import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:vinyl_collection_app/vinile/condizione.dart';
 import 'package:vinyl_collection_app/vinile/genere.dart';
-import 'package:flutter/material.dart';
 
-class Vinile{
+class Vinile {
+  /* ---------- campi ---------- */
+  final int? id;                    // PK autoincrement
   final String titolo;
-  final String nomeArtista;
+  final String artista;             // ex “nomeArtista”
   final int anno;
-  final Genere genere;
-  final String etichettaDiscografica;
-  final int quantita;
-  final Condizione condizione;
-  final Image immagine;
+  final Genere? genere;             // FK verso tabella generi (può essere null)
+  final String? etichettaDiscografica;
+  final int? quantita;
+  final Condizione? condizione;
+  final String? immagine;           // path locale o URL
   final bool preferito;
-  int ?id;
+  final String? createdAt;          // ISO‑8601 (“2025‑06‑30T14:05:00”)
 
-  Vinile({
+  /* ---------- costruttore ---------- */
+  const Vinile({
+    this.id,
     required this.titolo,
-    required this.nomeArtista,
+    required this.artista,
     required this.anno,
-    required this.genere, 
-    required this.etichettaDiscografica,
-    required this.quantita,
-    required this.condizione,
-    required String urlImmagine,
-    this.preferito = false, int? id
-    }
-  ) : immagine = Image.network(urlImmagine);
+    this.genere,
+    this.etichettaDiscografica,
+    this.quantita,
+    this.condizione,
+    this.immagine,
+    this.preferito = false,
+    this.createdAt,
+  });
 
-Map<String, Object?> toMap() {
-    return {
-      'id' : id,
-      'titolo': titolo,
-      'nomeArtista': nomeArtista,
-      'anno': anno,
-      'genere': genere.index, // enum → int
-      'etichettaDiscografica': etichettaDiscografica,
-      'quantita': quantita,
-      'condizione': condizione.index, // enum → int
-      'immagineUrl': immagine,
-      'preferito': preferito ? 1 : 0,
-    };
-  }
+  /* ---------- helper per la UI ---------- */
+  /// Restituisce un widget immagine da usare ovunque (Network o File).
+  Widget get coverWidget => immagine != null
+      ? (immagine!.startsWith('http')
+      ? Image.network(immagine!, fit: BoxFit.cover)
+      : Image.file(File(immagine!), fit: BoxFit.cover))
+      : const Icon(Icons.album, size: 40);
 
-  factory Vinile.fromMap(Map<String, dynamic> map) {
-    return Vinile(
-      id: map['id'],
-      titolo: map['titolo'],
-      nomeArtista: map['nome_artista'],
-      anno: map['anno'],
-      genere: Genere.values[map['genere']],
-      etichettaDiscografica: map['etichetta_discografica'],
-      quantita: map['quantita'],
-      condizione: Condizione.values[map['condizione']],
-      urlImmagine: (map['immagine']),
-      preferito: map['preferito'] == 1,
-    );
-  }
+  /* ---------- serializzazione ---------- */
+  Map<String, Object?> toMap() => {
+    'id': id,
+    'titolo': titolo,
+    'artista': artista,
+    'anno': anno,
+    'genere': genere?.index,
+    'etichetta_discografica': etichettaDiscografica,
+    'quantita': quantita,
+    'condizione': condizione?.index,
+    'immagine': immagine,
+    'preferito': preferito ? 1 : 0,
+    'created_at': createdAt,
+  };
+
+  factory Vinile.fromMap(Map<String, dynamic> m) => Vinile(
+    id: m['id'] as int?,
+    titolo: m['titolo'] as String,
+    artista: m['artista'] as String,
+    anno: m['anno'] as int,
+    genere: m['genere'] != null ? Genere.values[m['genere'] as int] : null,
+    etichettaDiscografica: m['etichetta_discografica'] as String?,
+    quantita: m['quantita'] as int?,
+    condizione: m['condizione'] != null
+        ? Condizione.values[m['condizione'] as int]
+        : null,
+    immagine: m['immagine'] as String?,
+    preferito: (m['preferito'] as int? ?? 0) == 1,
+    createdAt: m['created_at'] as String?,
+  );
 }

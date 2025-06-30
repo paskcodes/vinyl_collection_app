@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:vinyl_collection_app/screen/schermataaggiungi.dart';
-import 'package:vinyl_collection_app/screen/schermatacollezione.dart';
-import 'screen/homepage.dart';
-import 'screen/ricerca.dart';
-//import 'screen/collection.dart';
+import '../screen/mainscaffold.dart'; // importa la nuova schermata radice
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,13 +17,11 @@ class MyApp extends StatelessWidget {
       title: 'Vinyl Collector',
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
+        scaffoldBackgroundColor: Colors.black,
       ),
-      initialRoute: '/',
+      home: const MainScaffold(),  // <-- usa questa
       routes: {
-        '/': (context) => const HomeScreen(),
-        '/search': (context) => const SearchScreen(),
-        '/collection': (context) => const SchermataCollezione(),
-        '/add': (context) => SchermataAggiungi(),
+        // le rotte secondarie per dettaglio, aggiunta, ecc.
       },
     );
   }

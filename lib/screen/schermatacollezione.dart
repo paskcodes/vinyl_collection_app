@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vinyl_collection_app/database/dbvinili.dart';
-import 'package:vinyl_collection_app/vinile/Vinile.dart';
+import 'package:vinyl_collection_app/vinile/vinile.dart';
 
 class SchermataCollezione extends StatefulWidget {
   const SchermataCollezione({super.key});
@@ -24,7 +24,8 @@ class _SchermataCollezioneState extends State<SchermataCollezione> {
   }
 
   void _aggiungiVinile() async {
-    final aggiunto = await Navigator.pushNamed(context, '/schermataaggiungi');
+    final aggiunto = await Navigator.pushNamed(context, '/add');
+    print("Aggiungi: $aggiunto" );
     if (aggiunto == true) {
       await _caricaVinili();
     }
@@ -32,7 +33,6 @@ class _SchermataCollezioneState extends State<SchermataCollezione> {
 
   Future<void> _caricaVinili() async{ //carica la lista di vinili tramite lo state(cosi rifà il render)
     final listaVinili=await DatabaseHelper.instance.getCollezione();
-
       setState(() {
       _listaVinili=listaVinili;
     });

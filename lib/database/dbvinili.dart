@@ -2,7 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 
-import '../vinile/Vinile.dart';
+import '../vinile/vinile.dart';
 
 class DatabaseHelper {
   DatabaseHelper._privateConstructor();

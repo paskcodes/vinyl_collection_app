@@ -28,18 +28,15 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  image_picker: 1.1.2
   flutter:
     sdk: flutter
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-
   flutter_dotenv: ^5.0.2
-
   http: ^0.13.6
   sqflite: ^2.4.2
   path: ^1.9.1
+
 
 
 

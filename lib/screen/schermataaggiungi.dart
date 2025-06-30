@@ -95,6 +95,7 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
         print("Sto per tornare indietro con true");
         await DatabaseHelper.instance.aggiungiVinile(nuovoVinile);
         Navigator.pop(context,true); // torna indietro
+
       }
     }
   }

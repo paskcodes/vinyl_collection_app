@@ -54,7 +54,7 @@ class Vinile {
     'condizione': condizione?.index,
     'immagine': immagine,
     'preferito': preferito ? 1 : 0,
-    'createdAt': createdAt,
+    "createdAt" : createdAt,
   };
 
   factory Vinile.fromMap(Map<String, dynamic> m) => Vinile(
@@ -70,6 +70,6 @@ class Vinile {
         : null,
     immagine: m['immagine'] as String?,
     preferito: (m['preferito'] as int? ?? 0) == 1,
-    createdAt: m['createdAt'] as String?,
+    createdAt: m["createdAt"] as String?,
   );
 }

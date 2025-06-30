@@ -97,7 +97,15 @@ class DatabaseHelper {
   Future<List<Vinile>> getCollezione() async {
     final db = await database;
     final maps = await db.query('collezioneVinili');
-    return maps.map(Vinile.fromMap).toList();
+    List<Vinile> lista= maps.map(Vinile.fromMap).toList();
+    if(lista.isEmpty){
+      print("è vuota!\n\n\n");
+    }
+    else
+      {
+        print("La lista è : ${lista.length} + ${lista.toString()} ");
+      }
+    return lista;
   }
 
   /// ultimi N vinili ordinati per data di inserimento (default 10)
@@ -105,7 +113,7 @@ class DatabaseHelper {
     final db = await database;
     final maps = await db.query(
       'collezioneVinili',
-      orderBy: 'datetime(createdAt) DESC',
+      orderBy: 'datetime("createdAt") DESC',
       limit: limit,
     );
     return maps.map(Vinile.fromMap).toList();

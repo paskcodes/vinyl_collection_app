@@ -6,21 +6,29 @@ class SchermataCollezione extends StatefulWidget {
   const SchermataCollezione({super.key});
 
   @override
-  State<SchermataCollezione> createState() => _SchermataCollezioneState();
+  State<SchermataCollezione> createState() => SchermataCollezioneState();
 }
 
 
 
-class _SchermataCollezioneState extends State<SchermataCollezione> {
+class SchermataCollezioneState extends State<SchermataCollezione> {
   late List<Vinile> _listaVinili=[];
+
+  Future<void> aggiornaCollezione() async {
+    print(' SchermataCollezione: aggiorna');
+    await _caricaVinili();
+  }
+
 
   @override
   void initState() {
     super.initState();
+    print("carico l'initstate");
     _caricaVinili();
   }
 
   Future<void> _caricaVinili() async{ //carica la lista di vinili tramite lo state(cosi rifà il render)
+    print("Provo a caricre i vinili in schermata collezione");
     final listaVinili=await DatabaseHelper.instance.getCollezione();
       setState(() {
       _listaVinili=listaVinili;

@@ -12,11 +12,10 @@ actions: [TextButton(onPressed: ()=> Navigator.of(context).pop(), child: const T
 }else */
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../database/dbvinili.dart';
+import '../database/databasehelper.dart';
 import '../vinile/condizione.dart';
 import '../vinile/genere.dart';
 import '../vinile/vinile.dart';
@@ -80,7 +79,8 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
     if (_formKey.currentState!.validate()) {
       final nuovoVinile = Vinile(titolo: _titoloController.text.trim(), artista: _artistaController.text.trim(),
         anno: int.parse(_annoController.text.trim()), genere:Genere.values[_genere], etichettaDiscografica:_etichettaController.text.trim(),
-        quantita: _quantita, condizione: Condizione.values[_condizione], immagine: _immagineFile?.path ?? 'vinile.jpeg',preferito: _preferito,);
+        quantita: _quantita, condizione: Condizione.values[_condizione], immagine: _immagineFile?.path ?? 'assets/immagini/vinilee.png',preferito: _preferito,);
+      print("Vinile creato: $nuovoVinile");
       if(await DatabaseHelper.instance.vinileEsiste(nuovoVinile)){
         showDialog(context: context,
             builder: (BuildContext context){
@@ -132,7 +132,7 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
                     ),
                     child: _immagineFile != null
                         ? Image.file(_immagineFile!, fit: BoxFit.cover)
-                        : Image.asset('vinile.jpeg', fit: BoxFit.cover),
+                        : Image.asset('assets/immagini/vinilee.png', fit: BoxFit.cover),
                   ),
                 ),
 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vinyl_collection_app/database/dbvinili.dart';
+import 'package:vinyl_collection_app/database/databasehelper.dart';
 import 'package:vinyl_collection_app/vinile/vinile.dart';
 
 class SchermataCollezione extends StatefulWidget {
@@ -20,14 +20,6 @@ class _SchermataCollezioneState extends State<SchermataCollezione> {
     _caricaVinili();
   }
 
-  void _aggiungiVinile() async {
-    final aggiunto = await Navigator.pushNamed(context, '/aggiunta');
-    print("Aggiungi: $aggiunto" );
-    if (aggiunto == true) {
-      await _caricaVinili();
-    }
-  }
-
   Future<void> _caricaVinili() async{ //carica la lista di vinili tramite lo state(cosi rifà il render)
     final listaVinili=await DatabaseHelper.instance.getCollezione();
       setState(() {
@@ -35,8 +27,9 @@ class _SchermataCollezioneState extends State<SchermataCollezione> {
     });
   }
 
-  Future<bool> _rimuoviVinile(Vinile vinile) async{
-      return await DatabaseHelper.instance.eliminaVinile(vinile);
+  Future<void> _rimuoviVinile(Vinile vinile) async{
+    await DatabaseHelper.instance.eliminaVinile(vinile);
+    _caricaVinili();
   }
 
   void _modificaVinile(Vinile vinile) async {
@@ -51,16 +44,6 @@ class _SchermataCollezioneState extends State<SchermataCollezione> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("La tua collezione"),
-        actions: [
-          IconButton(
-              onPressed: _aggiungiVinile,
-              icon: Image.asset(
-              'assets/icone/nuovoVinile.png',
-              width: 24,
-              height: 24,
-            ),
-          )
-        ],
       ),
       body: _listaVinili.isEmpty ? const Center(child: Text("Aggiungi un vinile"))
           : ListView.builder(
@@ -73,7 +56,7 @@ class _SchermataCollezioneState extends State<SchermataCollezione> {
                   leading: SizedBox(
                     width: 50,
                     height: 50,
-                    child: vinile.coverWidget,  // <-- qui!
+                    child: vinile.coverWidget,
                   ),
 
                   title: Text(vinile.titolo),

@@ -1,47 +1,87 @@
+import 'dart:io';
+
+import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../vinile/vinile.dart';
 
 class DatabaseHelper {
-  DatabaseHelper._();
+  static final _databaseName = "vinili.db";
+  static final _databaseVersion = 1;
 
-  static final DatabaseHelper instance = DatabaseHelper._();
+  DatabaseHelper._privateConstructor();
+
+  static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
 
   static Database? _database;
 
-  Future<Database> get database async =>
-      _database ??= await _initDatabase();
+  Future<Database> get database async {
+    if(_database != null) return _database!;
+    _database= await _initDatabase();
+    return _database!;
+  }
+
 
   Future<Database> _initDatabase() async {
-    final path = join(await getDatabasesPath(), 'vinili.db');
-    return openDatabase(
+    // Ottieni il percorso dove il database verrà salvato sul dispositivo
+    var databasesPath = await getDatabasesPath();
+    String path = join(databasesPath, _databaseName);
+
+    // Controlla se il database esiste già nella directory dell'app
+    bool exists = await databaseExists(path);
+
+    if (!exists) {
+      // Se il database non esiste, copia quello dall'asset
+      print("Creazione di una nuova copia del database da 'assets/database/vinili.db'");
+
+      // Assicurati che la directory esista
+      try {
+        await Directory(dirname(path)).create(recursive: true);
+      } catch (e) {
+        print("Errore durante la creazione della directory: $e");
+      }
+
+      // Carica il database come ByteData dal bundle degli asset
+      ByteData data = await rootBundle.load(join("assets", "database", _databaseName));
+      List<int> bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+
+      // Scrivi i byte nel percorso finale sul dispositivo
+      await File(path).writeAsBytes(bytes, flush: true);
+      print("Database copiato con successo in: $path");
+    } else {
+      print("Apertura del database esistente in: $path");
+    }
+
+    // Apri il database. Se è stato copiato, verrà aperto quello copiato.
+    // Se _onCreate è specificato, verrà chiamato solo se il database non esisteva
+    // e non è stato copiato, oppure se la versione è cambiata (necessitando un onUpgrade).
+    // Nel tuo caso, se il database è pre-popolato, _onCreate non dovrebbe ricreare le tabelle.
+    return await openDatabase(
       path,
-      version: 1,
-      onCreate: (db, version) async {
-        await db.execute('''
-          CREATE TABLE collezioneVinili(
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            titolo TEXT NOT NULL,
-            artista TEXT NOT NULL,
-            anno INTEGER NOT NULL,
-            genere INTEGER,
-            etichetta_discografica TEXT,
-            quantita INTEGER,
-            condizione INTEGER,
-            immagine TEXT,
-            preferito INTEGER DEFAULT 0,
-            created_at TEXT NOT NULL
-          )
-        ''');
+      version: _databaseVersion,
+      // Se il tuo database è già creato e popolato, l'onCreate dovrebbe essere vuoto
+      // o gestire solo l'aggiunta di nuove tabelle in futuri aggiornamenti.
+      // Non deve ricreare le tabelle che sono già presenti nel tuo .db pre-popolato.
+      onCreate: (db, version) {
+        // Qui potresti mettere codice per creare nuove tabelle
+        // solo se _databaseVersion aumenta e il database non contiene già quella tabella
+        // oppure gestire migrazioni future.
+        // Per il tuo caso attuale con un db pre-popolato, puoi anche lasciare vuoto se le tabelle esistono già.
+        return Future.value(); // Ritorna un Future completato
       },
+      // Potresti voler aggiungere onUpgrade per gestire migrazioni future
+      // onUpgrade: (db, oldVersion, newVersion) {
+      //   // Logica per aggiornare lo schema del database
+      // }
     );
   }
 
-  Future<int> insertVinile(Vinile v) async {
-    final db = await database;
 
-    // blocca duplicati (titolo+artista+anno)
+
+
+  Future<void> aggiungiVinile(Vinile v) async {
+    final db = await database;
     final exists = await db.query(
       'collezioneVinili',
       where: 'titolo = ? AND artista = ? AND anno = ?',
@@ -49,13 +89,12 @@ class DatabaseHelper {
     );
     if (exists.isNotEmpty) throw Exception('Vinile già presente');
 
-    return db.insert('collezioneVinili', {
+    db.insert('collezioneVinili', {
       ...v.toMap(),
-      'created_at': DateTime.now().toIso8601String(),
     });
   }
 
-  Future<List<Vinile>> getAllVinili() async {
+  Future<List<Vinile>> getCollezione() async {
     final db = await database;
     final maps = await db.query('collezioneVinili');
     return maps.map(Vinile.fromMap).toList();
@@ -66,14 +105,14 @@ class DatabaseHelper {
     final db = await database;
     final maps = await db.query(
       'collezioneVinili',
-      orderBy: 'datetime(created_at) DESC',
+      orderBy: 'datetime(createdAt) DESC',
       limit: limit,
     );
     return maps.map(Vinile.fromMap).toList();
   }
 
   /// un vinile casuale (o più di uno)
-  Future<List<Vinile>> getRandomVinili({int limit = 3}) async {
+  Future<List<Vinile>> getRandomVinili({int limit = 6}) async {
     final db = await database;
     final maps = await db.rawQuery(
       'SELECT * FROM collezioneVinili ORDER BY RANDOM() LIMIT ?',
@@ -82,16 +121,20 @@ class DatabaseHelper {
     return maps.map(Vinile.fromMap).toList();
   }
 
-  Future<int> deleteVinile(int id) async {
+
+
+  Future<int> eliminaVinile(Vinile vinile) async {
     final db = await database;
-    return db.delete('collezioneVinili', where: 'id = ?', whereArgs: [id]);
+    return db.delete('collezioneVinili', where: 'id = ?', whereArgs: [vinile.id]);
   }
 
-  Future<int> updateVinile(Vinile v) async {
+  Future<int> modificaVinile(Vinile v) async {
     final db = await database;
     return db.update('collezioneVinili', v.toMap(),
-        where: 'id = ?', whereArgs: [v.id]);
+        where: 'id = ?',
+        whereArgs: [v.id]);
   }
+
 
   Future<List<Vinile>> getViniliPreferiti() async {
     final db = DatabaseHelper.instance;

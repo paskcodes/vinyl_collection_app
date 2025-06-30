@@ -20,7 +20,7 @@ class Vinile {
   final String? createdAt;          // ISO‑8601 (“2025‑06‑30T14:05:00”)
 
   /* ---------- costruttore ---------- */
-  const Vinile({
+  Vinile({
     this.id,
     required this.titolo,
     required this.artista,
@@ -31,8 +31,8 @@ class Vinile {
     this.condizione,
     this.immagine,
     this.preferito = false,
-    this.createdAt,
-  });
+    String? createdAt,
+  }):createdAt = createdAt ?? DateTime.now().toIso8601String() ;
 
   /* ---------- helper per la UI ---------- */
   /// Restituisce un widget immagine da usare ovunque (Network o File).
@@ -54,7 +54,7 @@ class Vinile {
     'condizione': condizione?.index,
     'immagine': immagine,
     'preferito': preferito ? 1 : 0,
-    'created_at': createdAt,
+    'createdAt': createdAt,
   };
 
   factory Vinile.fromMap(Map<String, dynamic> m) => Vinile(
@@ -70,6 +70,6 @@ class Vinile {
         : null,
     immagine: m['immagine'] as String?,
     preferito: (m['preferito'] as int? ?? 0) == 1,
-    createdAt: m['created_at'] as String?,
+    createdAt: m['createdAt'] as String?,
   );
 }

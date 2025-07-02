@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
       title: 'Vinyl Collector',
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
-        scaffoldBackgroundColor: Colors.black,
+        scaffoldBackgroundColor: Colors.white,
       ),
       home: const MainScaffold(),  // <-- usa questa
       routes: {

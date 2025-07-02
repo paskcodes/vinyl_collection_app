@@ -215,17 +215,6 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
                       onChanged: (val) => setState(() => _condizione = val!),
                       decoration: const InputDecoration(labelText: "Condizione"),
                     ),
-                    DropdownButtonFormField<int>(
-                      value: _condizione,
-                      items: Condizione.values
-                          .asMap()
-                          .entries
-                          .map((e) => DropdownMenuItem(
-                          value: e.key, child: Text(e.value.name)))
-                          .toList(),
-                      onChanged: (val) => setState(() => _condizione = val!),
-                      decoration: const InputDecoration(labelText: "Condizione"),
-                    ),
                     IconButton(
                       icon: Icon(
                         _preferito ? Icons.star : Icons.star_border,

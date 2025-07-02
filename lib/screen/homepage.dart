@@ -84,10 +84,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pushNamed(context, '/aggiunta'),
-        child: const Icon(Icons.add),
-      ),
     );
   }
 }

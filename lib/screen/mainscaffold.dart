@@ -41,6 +41,7 @@ void _vaiSchermataAggiunta() async{
         children: _pages,
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'SchermataAggiunta',
         onPressed: _vaiSchermataAggiunta,
         tooltip: 'Aggiungi nuovo vinile',
         child: const Icon(Icons.add),

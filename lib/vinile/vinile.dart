@@ -3,7 +3,6 @@ library vinile_model;
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:vinyl_collection_app/vinile/condizione.dart';
-import 'package:vinyl_collection_app/vinile/genere.dart';
 
 class Vinile {
   /* ---------- campi ---------- */
@@ -11,13 +10,13 @@ class Vinile {
   final String titolo;
   final String artista;             // ex “nomeArtista”
   final int anno;
-  final Genere? genere;             // FK verso tabella generi (può essere null)
+  final int? genere;             // FK verso tabella generi (può essere null)
   final String? etichettaDiscografica;
   final int? quantita;
   final Condizione? condizione;
   final String? immagine;           // path locale o URL
   final bool preferito;
-  final String? createdAt;          // ISO‑8601 (“2025‑06‑30T14:05:00”)
+  final String? creato_il;// ISO‑8601 (“2025‑06‑30T14:05:00”)
 
   /* ---------- costruttore ---------- */
   Vinile({
@@ -29,10 +28,11 @@ class Vinile {
     this.etichettaDiscografica,
     this.quantita,
     this.condizione,
-    this.immagine,
+    String? immagine,
     this.preferito = false,
     String? createdAt,
-  }):createdAt = createdAt ?? DateTime.now().toIso8601String() ;
+  })  :immagine = immagine ?? "assets/immagini/vinilee.png",
+      creato_il = createdAt ?? DateTime.now().toIso8601String();
 
   /* ---------- helper per la UI ---------- */
   /// Restituisce un widget immagine da usare ovunque (Network o File).
@@ -48,13 +48,13 @@ class Vinile {
     'titolo': titolo,
     'artista': artista,
     'anno': anno,
-    'genere': genere?.index,
+    'genere': genere,
     'etichetta_discografica': etichettaDiscografica,
     'quantita': quantita,
     'condizione': condizione?.index,
     'immagine': immagine,
     'preferito': preferito ? 1 : 0,
-    "createdAt" : createdAt,
+    "creato_il" : creato_il,
   };
 
   factory Vinile.fromMap(Map<String, dynamic> m) => Vinile(
@@ -62,7 +62,7 @@ class Vinile {
     titolo: m['titolo'] as String,
     artista: m['artista'] as String,
     anno: m['anno'] as int,
-    genere: m['genere'] != null ? Genere.values[m['genere'] as int] : null,
+    genere: m['genere'] as int?,
     etichettaDiscografica: m['etichetta_discografica'] as String?,
     quantita: m['quantita'] as int?,
     condizione: m['condizione'] != null
@@ -70,6 +70,6 @@ class Vinile {
         : null,
     immagine: m['immagine'] as String?,
     preferito: (m['preferito'] as int? ?? 0) == 1,
-    createdAt: m["createdAt"] as String?,
+    createdAt: m['creato_il'] as String?,
   );
 }

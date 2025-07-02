@@ -1,23 +1,11 @@
-/*
-if(awayt vinileEsiste(vinile)){
-showDialog(context: context,
-builder: (BuildContext context){
-return AlertDialog(
-title: Text("Attenzione!"),
-content: const Text("Hai già questo vinile nella tua collezione."),
-actions: [TextButton(onPressed: ()=> Navigator.of(context).pop(), child: const Text("Ok"))],
-);
-}
-);
-}else */
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../categoria/genere.dart';
 import '../database/databasehelper.dart';
 import '../vinile/condizione.dart';
-import '../vinile/genere.dart';
 import '../vinile/vinile.dart';
 
 class SchermataAggiungi extends StatefulWidget {
@@ -40,10 +28,12 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
   final _etichettaController = TextEditingController();
 
   int _quantita = 1;
-  int _genere = 0;
+  int? _genereSelezionato;
   int _condizione = 0;
   bool _preferito = false;
   File? _immagineFile;
+  List<Genere> _categorie=[];
+
 
   final picker = ImagePicker();
 
@@ -54,7 +44,16 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
     _artistaController.addListener(_aggiornaStato);
     _annoController.addListener(_aggiornaStato);
     _etichettaController.addListener(_aggiornaStato);
+    caricaCategorie();
   }
+
+  Future<void> caricaCategorie() async{
+    List<Genere>categorie=await DatabaseHelper.instance.getCategorie();
+    setState(() {
+      _categorie=categorie;
+    });
+  }
+
 
   void _aggiornaStato() => setState(() {});
 
@@ -62,7 +61,8 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
     return _titoloController.text.trim().isNotEmpty &&
         _artistaController.text.trim().isNotEmpty &&
         _annoController.text.trim().isNotEmpty &&
-        _etichettaController.text.trim().isNotEmpty;
+        _etichettaController.text.trim().isNotEmpty &&
+        _genereSelezionato==null;
   }
 
 
@@ -78,8 +78,8 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
   Future<void> _aggiungi() async {
     if (_formKey.currentState!.validate()) {
       final nuovoVinile = Vinile(titolo: _titoloController.text.trim(), artista: _artistaController.text.trim(),
-        anno: int.parse(_annoController.text.trim()), genere:Genere.values[_genere], etichettaDiscografica:_etichettaController.text.trim(),
-        quantita: _quantita, condizione: Condizione.values[_condizione], immagine: _immagineFile?.path ?? 'assets/immagini/vinilee.png',preferito: _preferito,);
+        anno: int.parse(_annoController.text.trim()), genere:_genereSelezionato, etichettaDiscografica:_etichettaController.text.trim(),
+        quantita: _quantita, condizione: Condizione.values[_condizione], immagine: _immagineFile?.path ,preferito: _preferito,);
       print("Vinile creato: $nuovoVinile");
       if(await DatabaseHelper.instance.vinileEsiste(nuovoVinile)){
         showDialog(context: context,
@@ -190,15 +190,30 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
 
                     ),
                     DropdownButtonFormField<int>(
-                      value: _genere,
-                      items: Genere.values
+                      value: _genereSelezionato,
+                      items: _categorie.map((categoria) {
+                        return DropdownMenuItem<int>(
+                          value: categoria.id,
+                          child: Text(categoria.nome),
+                        );
+                      }).toList(),
+                      onChanged: (val) {
+                        setState(() {
+                          _genereSelezionato = val;
+                        });
+                      },
+                      decoration: const InputDecoration(labelText: "Categoria"),
+                    ),
+                    DropdownButtonFormField<int>(
+                      value: _condizione,
+                      items: Condizione.values
                           .asMap()
                           .entries
                           .map((e) => DropdownMenuItem(
                           value: e.key, child: Text(e.value.name)))
                           .toList(),
-                      onChanged: (val) => setState(() => _genere = val!),
-                      decoration: const InputDecoration(labelText: "Genere"),
+                      onChanged: (val) => setState(() => _condizione = val!),
+                      decoration: const InputDecoration(labelText: "Condizione"),
                     ),
                     DropdownButtonFormField<int>(
                       value: _condizione,

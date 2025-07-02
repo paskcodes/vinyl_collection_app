@@ -3,7 +3,13 @@ import '../vinile/vinile.dart';
 
 class VinylCard extends StatelessWidget {
   final Vinile vinile;
-  const VinylCard({super.key, required this.vinile});
+  final VoidCallback? onTap;          // ← callback opzionale
+
+  const VinylCard({
+    super.key,
+    required this.vinile,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -12,19 +18,22 @@ class VinylCard extends StatelessWidget {
       child: ListTile(
         leading: ClipRRect(
           borderRadius: BorderRadius.circular(4),
-          child: vinile.immagine != null
-              ? Image.network(
-            vinile.immagine!,
+          child: SizedBox(
             width: 50,
-            fit: BoxFit.cover,
-          )
-              : const Icon(Icons.album, size: 40),
+            height: 50,
+            child: vinile.coverWidget, // ← unico punto che gestisce URL/file/asset
+          ),
         ),
         title: Text(vinile.titolo),
         subtitle: Text(vinile.artista),
-        trailing: Text(vinile.anno.toString()),
-        onTap: () =>
-            Navigator.pushNamed(context, '/detail', arguments: vinile),
+        trailing: Text(vinile.anno?.toString() ?? ''), // niente “null”
+        // Se onTap è passato, usa quello; altrimenti naviga alla rotta /detail
+        onTap: onTap ??
+                () => Navigator.pushNamed(
+              context,
+              '/detail',
+              arguments: vinile,
+            ),
       ),
     );
   }

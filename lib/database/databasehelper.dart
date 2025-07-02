@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:vinyl_collection_app/categoria/genere.dart';
 
+import '../categoria/genere.dart';
 import '../vinile/vinile.dart';
 
 class DatabaseHelper {
@@ -143,7 +145,7 @@ VALUES
       etichetta_discografica TEXT NOT NULL,
       quantita INTEGER NOT NULL DEFAULT 1,
       condizione INTEGER NOT NULL,
-      immagine TEXT NOT NULL,
+      immagine TEXT,
       preferito INTEGER DEFAULT 0,
       creato_il TEXT NOT NULL,
       FOREIGN KEY(genere) REFERENCES generi(id)
@@ -269,5 +271,26 @@ VALUES
     return lista;
   }
 
+  Future<int> inserisciGenere(String nome) async =>
+      (await database).insert('generi', {'nome': nome.trim()});
 
+  Future<List<Map<String, dynamic>>> getCategorieConConteggio() async =>
+      (await database).rawQuery('''
+      SELECT g.id, g.nome,
+             COUNT(v.id) AS conteggio
+      FROM generi g
+      LEFT JOIN collezioneVinili v ON v.genere = g.id
+      GROUP BY g.id
+      ORDER BY g.nome;
+    ''');
+
+  //Visto che ogni genere quando viene inserito nel DB riceve un proprio ID, possiamo gestirci gli ID come se fossero parte di un ENUM
+  Future<List<Vinile>> getViniliByGenere(int idGenere) async {
+    final maps = await (await database).query(
+      'collezioneVinili',
+      where: 'genere = ?', whereArgs: [idGenere],
+      orderBy: 'creato_il DESC',
+    );
+    return maps.map(Vinile.fromMap).toList();
+  }
 }

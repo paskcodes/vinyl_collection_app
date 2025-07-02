@@ -1,82 +1,141 @@
+// lib/screens/home_screen.dart
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../components/vinyl_card.dart';
-import '../database/databasehelper.dart';
-import '../vinile/vinile.dart';
 import '../components/suggestion_tile.dart';
+import '../database/databasehelper.dart';
+import '../service/discogs_service.dart';
+import '../vinile/vinile.dart';
+import 'dettagliovinile.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final _db = DatabaseHelper.instance;
+  final _discogs = DiscogsService();
+
+  late Future<List<Vinile>> _recent;
+  late Future<List<Vinile>> _random;
+  late Future<List<Vinile>> _suggested;
+
+  @override
+  void initState() {
+    super.initState();
+    _caricaDati();
+  }
+
+  void _caricaDati() {
+    _recent    = _db.getLastVinili(limit: 5);
+    _random    = _db.getRandomVinili(limit: 5);
+    _suggested = _discogs.fetchTrendingVinyls(limit: 10);
+  }
+
+  void _apriDettaglio(BuildContext ctx, Vinile v) {
+    Navigator.push(
+      ctx,
+      MaterialPageRoute(builder: (_) => DettaglioVinile(vinile: v)),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final headline = GoogleFonts.roboto(
+      fontSize: 22,
+      fontWeight: FontWeight.bold,
+      color: Colors.black,
+    );
+
     return Scaffold(
-      appBar: AppBar(title: const Text('La mia Collezione')),
-      body: FutureBuilder<_HomeData>(
-        future: _caricaDatiHome(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        title: const Text('Vinyl App'),
+      ),
+      body: RefreshIndicator(
+        onRefresh: () async => setState(_caricaDati),
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            // ---- Ultimi aggiunti ----
+            Text('Ultimi vinili aggiunti', style: headline),
+            const SizedBox(height: 12),
+            _HorizontalFuture(
+              future: _recent,
+              itemBuilder: (v) => VinylCard(
+                vinile: v,
+                onTap: () => _apriDettaglio(context, v),
+              ),
+            ),
+
+            const SizedBox(height: 28),
+
+            // ---- Trend Discogs ----
+            Text('Consigliati per te', style: headline),
+            const SizedBox(height: 12),
+            _HorizontalFuture(
+              future: _suggested,
+              itemBuilder: (v) => SuggestionTile(
+                vinile: v,
+                onTap: () => _apriDettaglio(context, v),
+              ),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.pushNamed(context, '/aggiunta'),
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+}
+
+/// Lista orizzontale popolata da un `Future<List<Vinile>>`
+class _HorizontalFuture extends StatelessWidget {
+  final Future<List<Vinile>> future;
+  final Widget Function(Vinile) itemBuilder;
+
+  const _HorizontalFuture({required this.future, required this.itemBuilder});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 220,
+      child: FutureBuilder<List<Vinile>>(
+        future: future,
+        builder: (context, snap) {
+          // ⏳ loading
+          if (snap.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          final data = snapshot.data!;
-          return Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _SectionTitle('Ultimi vinili aggiunti'),
-                Expanded(
-                  flex: 2,
-                  child: ListView.builder(
-                    itemCount: data.recent.length,
-                    itemBuilder: (context, i) =>
-                        VinylCard(vinile: data.recent[i]),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                _SectionTitle('Suggerimenti casuali'),
-                SizedBox(
-                  height: 150,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: data.random.length,
-                    itemBuilder: (context, i) =>
-                        SuggestionTile(vinile: data.random[i]),
-                  ),
-                ),
-              ],
-            ),
+          if (snap.hasError) {
+            return Center(
+              child: Text(
+                'Errore: ${snap.error}',
+                style: const TextStyle(color: Colors.red),
+                textAlign: TextAlign.center,
+              ),
+            );
+          }
+          // ✅ dati (anche se vuoti)
+          final list = snap.data ?? [];
+          if (list.isEmpty) {
+            return const Center(child: Text('Nessun vinile'));
+          }
+          return ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: list.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 12),
+            itemBuilder: (_, i) => itemBuilder(list[i]),
           );
         },
       ),
     );
   }
-
-  Future<_HomeData> _caricaDatiHome() async {
-    final db = DatabaseHelper.instance;
-    final recent = await db.getLastVinili(limit: 5);
-    final random = await db.getRandomVinili(limit: 3);
-    return _HomeData(recent: recent, random: random);
-  }
-}
-
-
-
-class _HomeData {
-  final List<Vinile> recent;
-  final List<Vinile> random;
-  _HomeData({required this.recent, required this.random});
-}
-
-class _SectionTitle extends StatelessWidget {
-  final String text;
-  const _SectionTitle(this.text, {super.key});
-  @override
-  Widget build(BuildContext context) => Text(
-    text,
-    style: Theme.of(context)
-        .textTheme
-        .titleMedium!
-        .copyWith(fontWeight: FontWeight.bold),
-  );
 }

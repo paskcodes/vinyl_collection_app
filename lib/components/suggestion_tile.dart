@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import '../vinile/vinile.dart';
+import '../screen/dettagliovinile.dart';  // importa la pagina dettaglio
 
 class SuggestionTile extends StatelessWidget {
   final Vinile vinile;
-  const SuggestionTile({super.key, required this.vinile});
+  final VoidCallback onTap;  // mantieni questo se ti serve, altrimenti puoi rimuoverlo
+
+  const SuggestionTile({super.key, required this.vinile, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -11,8 +14,16 @@ class SuggestionTile extends StatelessWidget {
       width: 120,
       margin: const EdgeInsets.only(right: 12),
       child: InkWell(
-        onTap: () =>
-            Navigator.pushNamed(context, '/detail', arguments: vinile),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => DettaglioVinile(vinile: vinile),
+            ),
+          );
+          // Se vuoi eseguire anche onTap passato da fuori (se usi questo callback)
+          // onTap();
+        },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

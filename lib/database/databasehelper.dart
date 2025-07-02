@@ -1,13 +1,52 @@
-import 'dart:io';
-
-import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:vinyl_collection_app/categoria/genere.dart';
 
 import '../vinile/vinile.dart';
 
 class DatabaseHelper {
- /* static final _databaseName = "vinili.db";
+ /*
+ return db.execute(
+      '''CREATE TABLE "collezioneVinili" (
+          "id"	INTEGER NOT NULL UNIQUE,
+            "titolo"	TEXT NOT NULL,
+            "artista"	TEXT NOT NULL,
+            "anno"	INTEGER NOT NULL,
+            "genere"	INTEGER NOT NULL,
+            "etichetta_discografica"	TEXT NOT NULL,
+            "quantita"	INTEGER NOT NULL DEFAULT 1,
+            "condizione"	INTEGER NOT NULL,
+            "immagine"	TEXT NOT NULL,
+            "preferito"	INTEGER DEFAULT 0,
+            "creato_il"	TEXT NOT NULL,
+            PRIMARY KEY("id" AUTOINCREMENT)
+            FOREIGN KEY(genere) REFERENCES generi(id)
+          );
+          CREATE TABLE generi (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT NOT NULL UNIQUE,
+          );
+          INSERT INTO generi
+  ( nome, descrizione, colore )
+VALUES
+  ('rock'),
+  ('electronic'),
+  ('pop'),
+  ('country'),
+  ('jazz'),
+  ('funk'),
+  ('soul'),
+  ('classical'),
+  ('hiphop'),
+  ('latin'),
+  ('reggae'),
+  ('blues'),
+  ;
+
+        ''',
+    );
+
+ static final _databaseName = "vinili.db";
   static final _databaseVersion = 1;
 
   DatabaseHelper._privateConstructor();
@@ -86,25 +125,52 @@ class DatabaseHelper {
   Future<Database> _initDatabase() async {
     return openDatabase(
       join(await getDatabasesPath(), 'vinili.db'),
-      onCreate: (db, version) {
-        return db.execute(
-          '''CREATE TABLE "collezioneVinili" (
-          "id"	INTEGER NOT NULL UNIQUE,
-            "titolo"	TEXT NOT NULL,
-            "artista"	TEXT NOT NULL,
-            "anno"	INTEGER NOT NULL,
-            "genere"	INTEGER NOT NULL,
-            "etichetta_discografica"	TEXT NOT NULL,
-            "quantita"	INTEGER NOT NULL DEFAULT 1,
-            "condizione"	INTEGER NOT NULL,
-            "immagine"	TEXT NOT NULL,
-            "preferito"	INTEGER DEFAULT 0,
-            "creato_il"	TEXT NOT NULL,
-            PRIMARY KEY("id" AUTOINCREMENT)
-        );
-        ''',
-        );
-      },
+      onCreate: (db, version) async {
+        await db.execute('''
+    CREATE TABLE generi (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nome TEXT NOT NULL UNIQUE
+    );
+  ''');
+
+        await db.execute('''
+    CREATE TABLE collezioneVinili (
+      id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+      titolo TEXT NOT NULL,
+      artista TEXT NOT NULL,
+      anno INTEGER NOT NULL,
+      genere INTEGER NOT NULL,
+      etichetta_discografica TEXT NOT NULL,
+      quantita INTEGER NOT NULL DEFAULT 1,
+      condizione INTEGER NOT NULL,
+      immagine TEXT NOT NULL,
+      preferito INTEGER DEFAULT 0,
+      creato_il TEXT NOT NULL,
+      FOREIGN KEY(genere) REFERENCES generi(id)
+    );
+  ''');
+
+        // Inserisci generi iniziali
+        final batch = db.batch();
+        final generi = [
+          'rock',
+          'electronic',
+          'pop',
+          'country',
+          'jazz',
+          'funk',
+          'soul',
+          'classical',
+          'hiphop',
+          'latin',
+          'reggae',
+          'blues',
+        ];
+        for (final g in generi) {
+          batch.insert('generi', {'nome': g});
+        }
+        await batch.commit(noResult: true);
+  },
       version: 1,
     );
   }
@@ -195,4 +261,13 @@ class DatabaseHelper {
 
     return result.isNotEmpty;
   }
+
+  Future<List<Genere>> getCategorie() async{
+    final db = await database;
+    final maps = await db.query("generi");
+    List<Genere> lista= maps.map(Genere.fromMap).toList();
+    return lista;
+  }
+
+
 }

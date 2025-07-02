@@ -7,7 +7,7 @@ import 'package:sqflite/sqflite.dart';
 import '../vinile/vinile.dart';
 
 class DatabaseHelper {
-  static final _databaseName = "vinili.db";
+ /* static final _databaseName = "vinili.db";
   static final _databaseVersion = 1;
 
   DatabaseHelper._privateConstructor();
@@ -75,9 +75,39 @@ class DatabaseHelper {
       //   // Logica per aggiornare lo schema del database
       // }
     );
+  }*/
+
+  DatabaseHelper._privateConstructor();
+  static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
+
+  static Database? _database;
+  Future<Database> get database async => _database ??= await _initDatabase();
+
+  Future<Database> _initDatabase() async {
+    return openDatabase(
+      join(await getDatabasesPath(), 'vinili.db'),
+      onCreate: (db, version) {
+        return db.execute(
+          '''CREATE TABLE "collezioneVinili" (
+          "id"	INTEGER NOT NULL UNIQUE,
+            "titolo"	TEXT NOT NULL,
+            "artista"	TEXT NOT NULL,
+            "anno"	INTEGER NOT NULL,
+            "genere"	INTEGER NOT NULL,
+            "etichetta_discografica"	TEXT NOT NULL,
+            "quantita"	INTEGER NOT NULL DEFAULT 1,
+            "condizione"	INTEGER NOT NULL,
+            "immagine"	TEXT NOT NULL,
+            "preferito"	INTEGER DEFAULT 0,
+            "creato_il"	TEXT NOT NULL,
+            PRIMARY KEY("id" AUTOINCREMENT)
+        );
+        ''',
+        );
+      },
+      version: 1,
+    );
   }
-
-
 
 
   Future<void> aggiungiVinile(Vinile v) async {
@@ -113,7 +143,7 @@ class DatabaseHelper {
     final db = await database;
     final maps = await db.query(
       'collezioneVinili',
-      orderBy: 'datetime("createdAt") DESC',
+      orderBy: 'datetime("creato_il") DESC',
       limit: limit,
     );
     return maps.map(Vinile.fromMap).toList();

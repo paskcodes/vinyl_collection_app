@@ -17,7 +17,7 @@ class Vinile {
   final Condizione? condizione;
   final String? immagine;           // path locale o URL
   final bool preferito;
-  final String? createdAt;          // ISO‑8601 (“2025‑06‑30T14:05:00”)
+  final String? createdAt;// ISO‑8601 (“2025‑06‑30T14:05:00”)
 
   /* ---------- costruttore ---------- */
   Vinile({
@@ -29,10 +29,11 @@ class Vinile {
     this.etichettaDiscografica,
     this.quantita,
     this.condizione,
-    this.immagine,
+    String? immagine,
     this.preferito = false,
     String? createdAt,
-  }):createdAt = createdAt ?? DateTime.now().toIso8601String() ;
+  })  :immagine = immagine ?? "assets/immagini/vinilee.png",
+      createdAt = createdAt ?? DateTime.now().toIso8601String();
 
   /* ---------- helper per la UI ---------- */
   /// Restituisce un widget immagine da usare ovunque (Network o File).
@@ -54,7 +55,7 @@ class Vinile {
     'condizione': condizione?.index,
     'immagine': immagine,
     'preferito': preferito ? 1 : 0,
-    "createdAt" : createdAt,
+    "creato_il" : createdAt,
   };
 
   factory Vinile.fromMap(Map<String, dynamic> m) => Vinile(
@@ -70,6 +71,6 @@ class Vinile {
         : null,
     immagine: m['immagine'] as String?,
     preferito: (m['preferito'] as int? ?? 0) == 1,
-    createdAt: m["createdAt"] as String?,
+    createdAt: m['creato_il'] as String?,
   );
 }

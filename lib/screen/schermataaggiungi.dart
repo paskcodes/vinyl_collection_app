@@ -42,8 +42,10 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
   int _quantita = 1;
   int _genere = 0;
   int _condizione = 0;
+  late int _categoria;
   bool _preferito = false;
   File? _immagineFile;
+
 
   final picker = ImagePicker();
 
@@ -79,7 +81,7 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
     if (_formKey.currentState!.validate()) {
       final nuovoVinile = Vinile(titolo: _titoloController.text.trim(), artista: _artistaController.text.trim(),
         anno: int.parse(_annoController.text.trim()), genere:Genere.values[_genere], etichettaDiscografica:_etichettaController.text.trim(),
-        quantita: _quantita, condizione: Condizione.values[_condizione], immagine: _immagineFile?.path ?? 'assets/immagini/vinilee.png',preferito: _preferito,);
+        quantita: _quantita, condizione: Condizione.values[_condizione], immagine: _immagineFile?.path ,preferito: _preferito,);
       print("Vinile creato: $nuovoVinile");
       if(await DatabaseHelper.instance.vinileEsiste(nuovoVinile)){
         showDialog(context: context,
@@ -199,6 +201,17 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
                           .toList(),
                       onChanged: (val) => setState(() => _genere = val!),
                       decoration: const InputDecoration(labelText: "Genere"),
+                    ),
+                    DropdownButtonFormField<int>(
+                      value: _condizione,
+                      items: Condizione.values
+                          .asMap()
+                          .entries
+                          .map((e) => DropdownMenuItem(
+                          value: e.key, child: Text(e.value.name)))
+                          .toList(),
+                      onChanged: (val) => setState(() => _condizione = val!),
+                      decoration: const InputDecoration(labelText: "Condizione"),
                     ),
                     DropdownButtonFormField<int>(
                       value: _condizione,

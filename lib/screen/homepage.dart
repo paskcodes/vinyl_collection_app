@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../components/vinyl_card.dart';
-import '../database/dbvinili.dart';
+import '../database/databasehelper.dart';
 import '../vinile/vinile.dart';
 import '../components/suggestion_tile.dart';
 

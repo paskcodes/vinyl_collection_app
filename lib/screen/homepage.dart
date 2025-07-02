@@ -53,10 +53,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Text('Vinyl App'),
-      ),
       body: RefreshIndicator(
         onRefresh: () async => setState(_caricaDati),
         child: ListView(

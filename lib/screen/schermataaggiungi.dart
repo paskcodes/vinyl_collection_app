@@ -62,7 +62,7 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
         _artistaController.text.trim().isNotEmpty &&
         _annoController.text.trim().isNotEmpty &&
         _etichettaController.text.trim().isNotEmpty &&
-        _genereSelezionato==null;
+        _genereSelezionato!=null;
   }
 
 

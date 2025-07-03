@@ -1,30 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:vinyl_collection_app/screen/schermatamodifica.dart';
 import '../vinile/vinile.dart';
-import '../database/databasehelper.dart';
 
-class DettaglioVinile extends StatelessWidget {
+class DettaglioVinileSuggested extends StatelessWidget {
   final Vinile vinile;
-  const DettaglioVinile({super.key, required this.vinile});
-
-  Future<void> _aggiungiAllaCollezione(BuildContext context) async {
-    if(await DatabaseHelper.instance.vinileEsiste(vinile)){
-      showDialog(context: context,
-          builder: (BuildContext context){
-            return AlertDialog(
-              title: Text("Attenzione!"),
-              content: const Text("Hai già questo vinile nella tua collezione."),
-              actions: [TextButton(onPressed: ()=> Navigator.of(context).pop(), child: const Text("Ok"))],
-            );
-          }
-      );
-    }else{
-      await DatabaseHelper.instance.aggiungiVinile(vinile);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vinile aggiunto alla collezione')),
-      );
-    }
-
-  }
+  const DettaglioVinileSuggested({super.key, required this.vinile});
 
   @override
   Widget build(BuildContext context) {
@@ -46,15 +26,14 @@ class DettaglioVinile extends StatelessWidget {
           _InfoRow('Artista', vinile.artista),
           _InfoRow('Anno', vinile.anno?.toString() ?? '–'),
           _InfoRow('Etichetta', vinile.etichettaDiscografica ?? '–'),
-          _InfoRow('Genere (id)', vinile.genere?.toString() ?? '–'),
-          _InfoRow('Quantità', vinile.quantita?.toString() ?? '–'),
-          _InfoRow('Condizione', vinile.condizione.name),
-          _InfoRow('Preferito', vinile.preferito ? 'Sì' : 'No'),
-          _InfoRow('Creato il', vinile.creatoIl),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _aggiungiAllaCollezione(context),
+        onPressed: (){
+          Navigator.push(context,MaterialPageRoute(
+              builder: (context) => SchermataModifica(vinile: vinile,suggested: true,))
+          );
+        },
         icon: const Icon(Icons.playlist_add),
         label: const Text('Aggiungi'),
       ),

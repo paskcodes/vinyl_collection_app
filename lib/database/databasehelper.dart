@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../categoria/genere.dart';
@@ -234,11 +233,12 @@ VALUES
     return db.delete('collezioneVinili', where: 'id = ?', whereArgs: [vinile.id]);
   }
 
-  Future<int> modificaVinile(Vinile v) async {
+  Future<bool> modificaVinile(Vinile v) async {
     final db = await database;
-    return db.update('collezioneVinili', v.toMap(),
+    final result= await db.update('collezioneVinili', v.toMap(),
         where: 'id = ?',
         whereArgs: [v.id]);
+   return result == 1;
   }
 
 

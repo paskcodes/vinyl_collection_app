@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vinyl_collection_app/database/databasehelper.dart';
+import 'package:vinyl_collection_app/screen/schermatamodifica.dart';
 import 'package:vinyl_collection_app/vinile/vinile.dart';
 
 class SchermataCollezione extends StatefulWidget {
@@ -41,7 +42,8 @@ class SchermataCollezioneState extends State<SchermataCollezione> {
   }
 
   void _modificaVinile(Vinile vinile) async {
-    final modificato = await Navigator.pushNamed(context, '/schermatamodifica', arguments: vinile);
+    final modificato = await Navigator.push(context,MaterialPageRoute(
+        builder: (context) => SchermataModifica(vinile: vinile,suggested: false,)));
     if (modificato == true) {
       await _caricaVinili();
     }

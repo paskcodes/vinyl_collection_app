@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../vinile/vinile.dart';
-import '../screen/dettagliovinile.dart';  // importa la pagina dettaglio
+import '../screen/dettagliovinilesuggested.dart';  // importa la pagina dettaglio
 
 class SuggestionTile extends StatelessWidget {
   final Vinile vinile;
@@ -18,7 +18,7 @@ class SuggestionTile extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => DettaglioVinile(vinile: vinile),
+              builder: (_) => DettaglioVinileSuggested(vinile: vinile),
             ),
           );
           // Se vuoi eseguire anche onTap passato da fuori (se usi questo callback)

@@ -7,7 +7,7 @@ import '../components/suggestion_tile.dart';
 import '../database/databasehelper.dart';
 import '../service/discogs_service.dart';
 import '../vinile/vinile.dart';
-import 'dettagliovinile.dart';
+import 'dettagliovinilesuggested.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -39,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _apriDettaglio(BuildContext ctx, Vinile v) {
     Navigator.push(
       ctx,
-      MaterialPageRoute(builder: (_) => DettaglioVinile(vinile: v)),
+      MaterialPageRoute(builder: (_) => DettaglioVinileSuggested(vinile: v)),
     );
   }
 

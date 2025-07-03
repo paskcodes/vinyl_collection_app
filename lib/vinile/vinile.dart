@@ -6,7 +6,7 @@ import 'package:vinyl_collection_app/vinile/condizione.dart';
 
 class Vinile {
   /* ---------- campi ---------- */
-  final int? id;                    // PK autoincrement
+  int? id;                    // PK autoincrement
   final String titolo;
   final String artista;
   final int? anno;

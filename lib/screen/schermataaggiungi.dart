@@ -20,10 +20,10 @@ class SchermataAggiungi extends StatefulWidget {
 
 
 class _SchermataAggiungiState extends State<SchermataAggiungi> {
-  final _formKey = GlobalKey<FormState>();
-
   final _titoloController = TextEditingController();
+
   final _artistaController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
   final _annoController = TextEditingController();
   final _etichettaController = TextEditingController();
 

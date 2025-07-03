@@ -48,7 +48,7 @@ class _SchermataModificaState extends State<SchermataModifica> {
 
     _quantita = widget.vinile.quantita ?? 1;
     _genereSelezionato = widget.vinile.genere;
-    _condizione = widget.vinile.condizione.index;
+    _condizione =widget.vinile.condizione?.index ?? 0;
     _preferito = widget.vinile.preferito;
 
 

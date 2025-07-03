@@ -193,7 +193,11 @@ VALUES
 
   Future<List<Vinile>> getCollezione() async {
     final db = await database;
-    final maps = await db.query('collezioneVinili');
+    final maps = await db.query('collezioneVinili',
+        orderBy: 'LOWER(titolo) ASC',
+    );
+
+
     List<Vinile> lista= maps.map(Vinile.fromMap).toList();
     if(lista.isEmpty){
       print("è vuota!\n\n\n");
@@ -213,7 +217,16 @@ VALUES
       orderBy: 'datetime("creato_il") DESC',
       limit: limit,
     );
-    return maps.map(Vinile.fromMap).toList();
+    List<Vinile> lista=maps.map(Vinile.fromMap).toList();
+    if(lista.isEmpty){
+      print("è vuota!\n\n\n");
+    }
+    else
+    {
+      print("La lista è : ${lista.length} + ${lista.toString()} ");
+    }
+
+    return lista;
   }
 
   /// un vinile casuale (o più di uno)
@@ -283,6 +296,15 @@ VALUES
       GROUP BY g.id
       ORDER BY g.nome;
     ''');
+
+  Future<String> getGenere(int id) async{
+    final db= await DatabaseHelper.instance.database;
+    final maps= await db.query('generi',
+      where:"id = ?",
+      whereArgs:[id] ,
+    );
+    return maps.map(Genere.fromMap).first.nome;
+  }
 
   //Visto che ogni genere quando viene inserito nel DB riceve un proprio ID, possiamo gestirci gli ID come se fossero parte di un ENUM
   Future<List<Vinile>> getViniliByGenere(int idGenere) async {

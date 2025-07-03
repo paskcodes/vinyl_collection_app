@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:vinyl_collection_app/screen/dettagliovinilesuggested.dart';
+import 'package:vinyl_collection_app/vinile/vinile.dart';
 import '../service/discogs_service.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -12,7 +14,7 @@ class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _controller = TextEditingController();
   final DiscogsService _discogsService = DiscogsService();
 
-  List<Map<String, dynamic>> _results = [];
+  List<Vinile> _results = [];
   bool _isLoading = false;
   String? _error;
 
@@ -26,7 +28,7 @@ class _SearchScreenState extends State<SearchScreen> {
     });
 
     try {
-      final results = await _discogsService.searchVinyls(query);
+      List<Vinile> results = await _discogsService.ricerca(query);
       setState(() {
         _results = results;
       });
@@ -47,13 +49,19 @@ class _SearchScreenState extends State<SearchScreen> {
     super.dispose();
   }
 
-  Widget _buildResultItem(Map<String, dynamic> item) {
+  Widget _buildResultItem(Vinile vinile) {
     return ListTile(
-      leading: item['cover_image'] != null
-          ? Image.network(item['cover_image'], width: 50, fit: BoxFit.cover)
+      onTap: () async {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => DettaglioVinileSuggested(vinile: vinile)),
+        );
+      },
+      leading: vinile.immagine != null
+          ? Image.network(vinile.immagine!, width: 50, fit: BoxFit.cover)
           : const Icon(Icons.album),
-      title: Text(item['title'] ?? 'Senza titolo'),
-      subtitle: Text('${item['type']} - ${item['year'] ?? 'Anno sconosciuto'}'),
+      title: Text(vinile.titolo),
+      subtitle: Text('${vinile.artista} - ${vinile.anno?.toString() ?? 'Anno sconosciuto'}'),
     );
   }
 
@@ -91,9 +99,7 @@ class _SearchScreenState extends State<SearchScreen> {
               Expanded(
                 child: ListView.builder(
                   itemCount: _results.length,
-                  itemBuilder: (context, index) {
-                    return _buildResultItem(_results[index]);
-                  },
+                  itemBuilder: (context, index) => _buildResultItem(_results[index]),
                 ),
               ),
           ],

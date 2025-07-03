@@ -1,5 +1,5 @@
 enum Condizione{
-  Nuovo, Usato, DaRestaurare, Suggerito;
+  Nuovo, Usato, DaRestaurare;
 
   static Condizione fromDb(String? s) =>
       Condizione.values.firstWhere(

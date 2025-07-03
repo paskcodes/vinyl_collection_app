@@ -1,30 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:vinyl_collection_app/screen/schermatamodifica.dart';
 import '../vinile/vinile.dart';
 import '../database/databasehelper.dart';
 
 class DettaglioVinileCollezione extends StatelessWidget {
   final Vinile vinile;
   const DettaglioVinileCollezione({super.key, required this.vinile});
-
-  Future<void> _aggiungiAllaCollezione(BuildContext context) async {
-    if(await DatabaseHelper.instance.vinileEsiste(vinile)){
-      showDialog(context: context,
-          builder: (BuildContext context){
-            return AlertDialog(
-              title: Text("Attenzione!"),
-              content: const Text("Hai già questo vinile nella tua collezione."),
-              actions: [TextButton(onPressed: ()=> Navigator.of(context).pop(), child: const Text("Ok"))],
-            );
-          }
-      );
-    }else{
-      await DatabaseHelper.instance.aggiungiVinile(vinile);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vinile aggiunto alla collezione')),
-      );
-    }
-
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,18 +27,58 @@ class DettaglioVinileCollezione extends StatelessWidget {
           _InfoRow('Artista', vinile.artista),
           _InfoRow('Anno', vinile.anno?.toString() ?? '–'),
           _InfoRow('Etichetta', vinile.etichettaDiscografica ?? '–'),
-          _InfoRow('Genere (id)', vinile.genere?.toString() ?? '–'),
+          _InfoRow('Genere', vinile.genere?.toString() ?? '–'),
           _InfoRow('Quantità', vinile.quantita?.toString() ?? '–'),
-          _InfoRow('Condizione', vinile.condizione.name),
+          _InfoRow('Condizione', vinile.condizione!.name),
           _InfoRow('Preferito', vinile.preferito ? 'Sì' : 'No'),
-          _InfoRow('Creato il', vinile.creatoIl),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _aggiungiAllaCollezione(context),
-        icon: const Icon(Icons.playlist_add),
-        label: const Text('Aggiungi'),
-      ),
+      floatingActionButton: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        FloatingActionButton(
+          heroTag: 'edit',  // serve per distinguere i bottoni
+          onPressed: () async {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => SchermataModifica(vinile: vinile, suggested: false)),
+            );
+          },
+          child: const Icon(Icons.edit),
+        ),
+        const SizedBox(height: 12),
+        FloatingActionButton(
+          heroTag: 'delete',
+          onPressed: () async {
+            final conferma = await showDialog<bool>(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('Conferma eliminazione'),
+                content: const Text('Sei sicuro di voler eliminare questo vinile?'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: const Text('Annulla'),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(true),
+                    child: const Text('Elimina'),
+                  ),
+                ],
+              ),
+            );
+
+            if (conferma == true) {
+              // qui metti la logica per eliminare il vinile, ad es.:
+              await DatabaseHelper.instance.eliminaVinile(vinile);
+              Navigator.of(context).pop(true); // torni indietro dopo eliminazione
+            }
+          },
+          child: const Icon(Icons.delete),
+        ),
+      ],
+    ),
+
     );
   }
 }

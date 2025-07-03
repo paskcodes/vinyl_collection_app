@@ -13,7 +13,7 @@ class Vinile {
   final int? genere;                // FK verso tabella generi
   final String? etichettaDiscografica;
   final int? quantita;
-  final Condizione condizione;
+  final Condizione? condizione;
   final String? immagine;           // asset, file locale o URL
   final bool preferito;
   final String creatoIl;            // ISO‑8601
@@ -57,7 +57,7 @@ class Vinile {
     'genere': genere,
     'etichetta_discografica': etichettaDiscografica,
     'quantita': quantita,
-    'condizione': condizione.name,    // salva la stringa
+    'condizione': condizione?.name,    // salva la stringa
     'immagine': immagine,
     'preferito': preferito ? 1 : 0,
     'creato_il': creatoIl,

@@ -92,13 +92,14 @@ class _SchermataModificaState extends State<SchermataModifica> {
   }
 
 
-  Future<void> _aggiungi() async {
+  Future<void> _modifica() async {
     if (_formKey.currentState!.validate()) {
       final nuovoVinile = Vinile(id:widget.suggested? null:widget.vinile.id,titolo: _titoloController.text.trim(), artista: _artistaController.text.trim(),
         anno: int.parse(_annoController.text.trim()), genere:_genereSelezionato, etichettaDiscografica:_etichettaController.text.trim(),
         quantita: _quantita, condizione: Condizione.values[_condizione], immagine: _immagineFile?.path ,preferito: _preferito,);
       print("Vinile creato: $nuovoVinile");
       if(widget.suggested){
+
         if(await DatabaseHelper.instance.vinileEsiste(nuovoVinile)){
           showDialog(context: context,
               builder: (BuildContext context){
@@ -112,9 +113,20 @@ class _SchermataModificaState extends State<SchermataModifica> {
         }else {
           print("Sto per tornare indietro con true");
           await DatabaseHelper.instance.aggiungiVinile(nuovoVinile);
-          Navigator.pop(context, true); // torna indietro
-      }
+          if(mounted) {
+            Navigator.pop(context, true);
+          }// torna indietro
+        }
+
       }else{
+        if (nuovoVinile == widget.vinile) { // Qui usiamo il tuo nuovo operatore ==
+          // Se nessun valore è cambiato, torna indietro senza mostrare la snackbar
+          print("Nessuna modifica rilevata, torno indietro.");
+          if (mounted) {
+            Navigator.pop(context, false); // Torna indietro segnalando che NON ci sono state modifiche
+          }
+          return; // Termina la funzione qui
+        }
         if(await DatabaseHelper.instance.modificaVinile(nuovoVinile)){
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -240,7 +252,9 @@ class _SchermataModificaState extends State<SchermataModifica> {
                           .asMap()
                           .entries
                           .map((e) => DropdownMenuItem(
-                          value: e.key, child: Text(e.value.name)))
+                          value: e.key,
+                        child: Text(e.value.descrizione),
+                      ),)
                           .toList(),
                       onChanged: (val) => setState(() => _condizione = val!),
                       decoration: const InputDecoration(labelText: "Condizione"),
@@ -260,7 +274,7 @@ class _SchermataModificaState extends State<SchermataModifica> {
                     const Text("Preferito"),
                     const SizedBox(height: 12),
                     ElevatedButton(
-                      onPressed: _formValido() ? _aggiungi : null,
+                      onPressed: _formValido() ? _modifica : null,
                       child:widget.suggested
                           ? const Text("Aggiungi alla collezione")
                           : const Text("Conferma modifiche"),

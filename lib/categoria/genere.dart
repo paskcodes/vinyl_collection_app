@@ -11,5 +11,7 @@ class Genere{
     'id': id,
     'nome': nome,
   };
+
+
 }
 

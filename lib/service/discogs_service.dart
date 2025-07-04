@@ -44,7 +44,7 @@ class DiscogsService {
           artista: artista,
           anno: int.tryParse(r['year']?.toString() ?? ''),
           etichettaDiscografica: (r['label'] as List?)?.first,
-          condizione: Condizione.Nuovo,
+          condizione: Condizione.nuovo,
           immagine: r['cover_image'] as String?,
           preferito: false,
         );
@@ -91,7 +91,7 @@ class DiscogsService {
           artista: artista,
           anno: int.tryParse(r['year']?.toString() ?? ''),
           etichettaDiscografica: (r['label'] as List?)?.first,
-          condizione: Condizione.Nuovo,
+          condizione: Condizione.nuovo,
           immagine: r['cover_image'] as String?,
           preferito: false,
         );

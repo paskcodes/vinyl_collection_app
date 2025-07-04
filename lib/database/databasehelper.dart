@@ -191,6 +191,20 @@ VALUES
     });
   }
 
+  Future<Vinile?> getVinile(int id)async{
+    final db  = await database;
+    final maps= await db.query('collezioneVinili',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    if(maps.isNotEmpty){
+      return Vinile.fromMap(maps.first);
+    }
+    else{
+      return null;
+    }
+  }
+
   Future<List<Vinile>> getCollezione() async {
     final db = await database;
     final maps = await db.query('collezioneVinili',

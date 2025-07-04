@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import '../vinile/vinile.dart';
-import '../screen/dettagliovinilesuggested.dart';
-
 class SuggestionTile extends StatelessWidget {
   final Vinile vinile;
   final VoidCallback onTap;
@@ -14,16 +12,7 @@ class SuggestionTile extends StatelessWidget {
       width: 120, // Larghezza fissa del Container, come specificato
       margin: const EdgeInsets.only(right: 12),
       child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => DettaglioVinileSuggested(vinile: vinile),
-            ),
-          );
-          // Se la callback esterna serve, decommenta:
-          // onTap();
-        },
+        onTap: onTap,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           // La Column deve occupare tutta l'altezza disponibile nel suo genitore,

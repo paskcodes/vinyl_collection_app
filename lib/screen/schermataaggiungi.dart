@@ -210,7 +210,10 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
                           .asMap()
                           .entries
                           .map((e) => DropdownMenuItem(
-                          value: e.key, child: Text(e.value.name)))
+                          value: e.key,
+                          child: Text(e.value.descrizione),
+                          ),
+                      )
                           .toList(),
                       onChanged: (val) => setState(() => _condizione = val!),
                       decoration: const InputDecoration(labelText: "Condizione"),

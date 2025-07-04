@@ -27,7 +27,7 @@ class Vinile {
     this.genere,
     this.etichettaDiscografica,
     this.quantita,
-    this.condizione = Condizione.Nuovo,
+    this.condizione = Condizione.nuovo,
     this.immagine,
     this.preferito = false,
     String? creatoIl,
@@ -76,4 +76,43 @@ class Vinile {
     preferito: (m['preferito'] as int? ?? 0) == 1,
     creatoIl: m['creato_il'] as String?,
   );
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true; // Stessa istanza
+    if (other.runtimeType != runtimeType) return false; // Tipi diversi
+
+    // Cast sicuro dell'altro oggetto a Vinile
+    final Vinile otherVinile = other as Vinile;
+
+    // Confronta tutti i campi rilevanti per l'uguaglianza logica
+    // L'ID non viene confrontato qui, perché due vinili possono essere logicamente uguali
+    // anche se uno ha un ID (già salvato) e l'altro no (appena creato/modificato)
+    return titolo == otherVinile.titolo &&
+        artista == otherVinile.artista &&
+        anno == otherVinile.anno &&
+        genere == otherVinile.genere &&
+        etichettaDiscografica == otherVinile.etichettaDiscografica &&
+        quantita == otherVinile.quantita &&
+        condizione == otherVinile.condizione &&
+        immagine == otherVinile.immagine && // Confronta anche l'immagine
+        preferito == otherVinile.preferito;
+    // creatoIl non viene confrontato perché è un timestamp di creazione
+  }
+
+  @override
+  int get hashCode {
+    // Genera un hash code basato sugli stessi campi usati per equals
+    return Object.hash(
+      titolo,
+      artista,
+      anno,
+      genere,
+      etichettaDiscografica,
+      quantita,
+      condizione,
+      immagine,
+      preferito,
+    );
+  }
 }

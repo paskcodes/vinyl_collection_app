@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:vinyl_collection_app/vinile/condizione.dart';
 
+import '../database/databasehelper.dart';
+
 class Vinile {
   /* ---------- campi ---------- */
   int? id;                    // PK autoincrement
@@ -77,6 +79,14 @@ class Vinile {
     creatoIl: m['creato_il'] as String?,
   );
 
+  Future<String?> get genereNome async {
+    if (genere == null) {
+      return null; // O una stringa come 'Nessun Genere'
+    }
+    // Chiama il metodo di DatabaseHelper per ottenere il nome del genere
+    return await DatabaseHelper.instance.getGenereNomeById(genere!);
+  }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true; // Stessa istanza
@@ -115,4 +125,6 @@ class Vinile {
       preferito,
     );
   }
+
+
 }

@@ -60,7 +60,18 @@ class _DettaglioVinileCollezioneState extends State<DettaglioVinileCollezione> {
           // Per il genere e la condizione, è meglio recuperare il nome completo se hai un ID
           // o se la tua classe Vinile ha già un modo per farlo.
           // Per ora, useremo il nome dell'enum per la condizione e il genere come stringa.
-          _InfoRow('Genere', _vinileCorrente.genere?.toString() ?? '–'), // Potrebbe essere necessario un lookup per il nome del genere
+          FutureBuilder<String?>(
+            future: _vinileCorrente.genereNome, // Chiamiamo il getter asincrono
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return _InfoRow('Genere', 'Errore: ${snapshot.error}'); // Gestisci errori
+              } else {
+                // Se il dato è disponibile, usalo, altrimenti un fallback
+                final String genere = snapshot.data ?? 'Non Specificato';
+                return _InfoRow('Genere', genere); // Mostra il nome del genere
+              }
+            },
+          ),
           _InfoRow('Quantità', _vinileCorrente.quantita?.toString() ?? '–'), // Usa _vinileCorrente
           _InfoRow('Condizione', _vinileCorrente.condizione!.descrizione), // Usa _vinileCorrente.descrizione
           _InfoRow('Preferito', _vinileCorrente.preferito ? 'Sì' : 'No'), // Usa _vinileCorrente

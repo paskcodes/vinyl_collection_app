@@ -176,6 +176,26 @@ VALUES
     );
   }
 
+  Future<String?> getGenereNomeById(int idGenere) async {
+    final db = await database; // Ottieni l'istanza del database
+
+    // Esegui una query sulla tabella 'generi' filtrando per 'id'
+    final List<Map<String, dynamic>> maps = await db.query(
+      'generi',
+      columns: ['nome'], // Seleziona solo la colonna 'nome'
+      where: 'id = ?',
+      whereArgs: [idGenere],
+      limit: 1, // Ci aspettiamo solo un risultato per un dato ID
+    );
+
+    // Se troviamo un risultato, estrai il nome e restituiscilo
+    if (maps.isNotEmpty) {
+      return maps.first['nome'] as String;
+    } else {
+      // Se nessun genere con quell'ID è stato trovato, ritorna null
+      return null;
+    }
+  }
 
   Future<void> aggiungiVinile(Vinile v) async {
     final db = await database;

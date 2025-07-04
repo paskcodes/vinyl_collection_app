@@ -14,7 +14,7 @@ class Vinile {
   final int? anno;
   final int? genere;                // FK verso tabella generi
   final String? etichettaDiscografica;
-  final int? quantita;
+  final int? copie;
   final Condizione? condizione;
   final String? immagine;           // asset, file locale o URL
   final bool preferito;
@@ -28,7 +28,7 @@ class Vinile {
     this.anno,
     this.genere,
     this.etichettaDiscografica,
-    this.quantita,
+    this.copie,
     this.condizione = Condizione.nuovo,
     this.immagine,
     this.preferito = false,
@@ -58,7 +58,7 @@ class Vinile {
     'anno': anno,
     'genere': genere,
     'etichetta_discografica': etichettaDiscografica,
-    'quantita': quantita,
+    'quantita': copie,
     'condizione': condizione?.name,    // salva la stringa
     'immagine': immagine,
     'preferito': preferito ? 1 : 0,
@@ -72,7 +72,7 @@ class Vinile {
     anno: m['anno'] as int?,
     genere: m['genere'] as int?,
     etichettaDiscografica: m['etichetta_discografica'] as String?,
-    quantita: m['quantita'] as int?,
+    copie: m['quantita'] as int?,
     condizione: Condizione.fromDb(m['condizione'] as String?),
     immagine: m['immagine'] as String?,
     preferito: (m['preferito'] as int? ?? 0) == 1,
@@ -103,7 +103,7 @@ class Vinile {
         anno == otherVinile.anno &&
         genere == otherVinile.genere &&
         etichettaDiscografica == otherVinile.etichettaDiscografica &&
-        quantita == otherVinile.quantita &&
+        copie == otherVinile.copie &&
         condizione == otherVinile.condizione &&
         immagine == otherVinile.immagine && // Confronta anche l'immagine
         preferito == otherVinile.preferito;
@@ -119,7 +119,7 @@ class Vinile {
       anno,
       genere,
       etichettaDiscografica,
-      quantita,
+      copie,
       condizione,
       immagine,
       preferito,

@@ -1,63 +1,77 @@
 import 'package:flutter/material.dart';
 import '../vinile/vinile.dart';
+import '../utils/dimensioniSchermo.dart';
+
 class SuggestionTile extends StatelessWidget {
   final Vinile vinile;
   final VoidCallback onTap;
 
-  const SuggestionTile({super.key, required this.vinile, required this.onTap});
+  const SuggestionTile({
+    super.key,
+    required this.vinile,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
+    // Usa la larghezza passata o un valore calcolato
+    // Puoi anche calcolarla qui in base a una percentuale dello schermo
+    // Esempio: larghezza della card come 30% della larghezza dello schermo
+    // final double responsiveCardWidth = context.screenWidth * 0.3; // Usa questa se vuoi che la larghezza sia calcolata qui
+    // oppure semplicemente usa 'cardWidth' se lo calcoli dal genitore (come fai in HomeScreen)
+    final double cardWidth=context.screenWidth * 0.3;
+    // L'altezza dell'immagine dovrebbe essere proporzionale alla larghezza della card
+    final double imageHeight = cardWidth; // Per avere un'immagine quadrata
+
+    // Dimensione del font può essere proporzionale al lato più corto dello schermo
+    final double titleFontSize = context.shortestSide * 0.04; // Esempio: 4% del lato più corto
+    final double artistFontSize = context.shortestSide * 0.03; // Esempio: 3% del lato più corto
+
+
     return Container(
-      width: 120, // Larghezza fissa del Container, come specificato
+      // La larghezza del Container ora si adatta al cardWidth fornito o calcolato
+      width: cardWidth,
       margin: const EdgeInsets.only(right: 12),
       child: InkWell(
         onTap: onTap,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          // La Column deve occupare tutta l'altezza disponibile nel suo genitore,
-          // che nel _HorizontalFuture è 220px.
-          // mainAxisSize: MainAxisSize.max, // Già il default, ma per chiarezza
-
           children: [
-            // Immagine: Altezza Fissa per la copertina
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: SizedBox( // Avvolgi l'AspectRatio in un SizedBox se vuoi un controllo più diretto sull'altezza
-                width: 120, // Prende tutta la larghezza del Container genitore
-                height: 120, // <--- Regola questa altezza dell'immagine se necessario
-                child: vinile.immagine != null
+              child: SizedBox(
+                width: imageHeight, // Usa l'altezza calcolata in base alla larghezza della card
+                height: imageHeight,
+                child: vinile.immagine != null && vinile.immagine!.isNotEmpty
                     ? Image.network(
                   vinile.immagine!,
                   fit: BoxFit.cover,
                 )
-                    : const Icon(Icons.album, size: 60, color: Colors.grey),
+                    : Icon(Icons.album, size: imageHeight * 0.5, color: Colors.grey), // Dimensione icona proporzionale
               ),
             ),
-            const SizedBox(height: 6), // Spazio tra immagine e testo
+            const SizedBox(height: 6),
 
-            // I testi devono occupare lo spazio rimanente
-            // Wrap the Text widgets in an Expanded widget
             Expanded(
-              child: Column( // Column interna per i testi
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start, // Allinea i testi in alto all'interno dell'Expanded
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(
                     vinile.titolo,
-                    maxLines: 2, // Aumentato a 2 righe per dare più spazio al titolo
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14), // Potresti voler ridurre la dimensione del font
+                    // Usa la dimensione del font calcolata
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: titleFontSize),
                   ),
-                  const SizedBox(height: 2), // Piccolo spazio tra titolo e artista
+                  const SizedBox(height: 2),
                   Text(
                     vinile.artista,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Colors.grey, fontSize: 12), // Potresti voler ridurre la dimensione del font
+                    // Usa la dimensione del font calcolata
+                    style: TextStyle(color: Colors.grey, fontSize: artistFontSize),
                   ),
-                  // Se hai altri testi (es. anno), aggiungili qui.
-                  // Non dare Expanded ai singoli Text qui, la Column genitore Expanded si occupa dello spazio.
                 ],
               ),
             ),

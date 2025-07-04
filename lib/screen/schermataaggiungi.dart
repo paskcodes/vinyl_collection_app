@@ -27,7 +27,7 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
   final _annoController = TextEditingController();
   final _etichettaController = TextEditingController();
 
-  int _quantita = 1;
+  int _numeroCopie = 1;
   int? _genereSelezionato;
   int _condizione = 0;
   bool _preferito = false;
@@ -48,7 +48,7 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
   }
 
   Future<void> caricaCategorie() async{
-    List<Genere>categorie=await DatabaseHelper.instance.getCategorie();
+    List<Genere>categorie=await DatabaseHelper.instance.getGeneri();
     setState(() {
       _categorie=categorie;
     });
@@ -79,7 +79,7 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
     if (_formKey.currentState!.validate()) {
       final nuovoVinile = Vinile(titolo: _titoloController.text.trim(), artista: _artistaController.text.trim(),
         anno: int.parse(_annoController.text.trim()), genere:_genereSelezionato, etichettaDiscografica:_etichettaController.text.trim(),
-        quantita: _quantita, condizione: Condizione.values[_condizione], immagine: _immagineFile?.path ,preferito: _preferito,);
+        copie: _numeroCopie, condizione: Condizione.values[_condizione], immagine: _immagineFile?.path ,preferito: _preferito,);
       print("Vinile creato: $nuovoVinile");
       if(await DatabaseHelper.instance.vinileEsiste(nuovoVinile)){
         showDialog(context: context,
@@ -165,23 +165,23 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text("Quantità"),
+                        const Text("Copie possedute"),
                         IconButton(
                           icon: const Icon(Icons.remove),
                           onPressed: () {
                             setState(() {
-                              if (_quantita > 1) _quantita--;
+                              if (_numeroCopie > 1) _numeroCopie--;
                             });
                           },
                         ),
 
-                        Text("$_quantita"),
+                        Text("$_numeroCopie"),
 
                         IconButton(
                           icon: const Icon(Icons.add),
                           onPressed: () {
                             setState(() {
-                              _quantita++;
+                              _numeroCopie++;
                             });
                           },
                         ),

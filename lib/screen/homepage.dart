@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:vinyl_collection_app/screen/dettagliovinilecollezione.dart';
+import 'package:vinyl_collection_app/utils/dimensioniSchermo.dart';
 import '../components/suggestion_tile.dart';
 import '../database/databasehelper.dart';
 import '../service/discogs_service.dart';
@@ -65,17 +66,11 @@ class HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
+    final double cardWidth = (context.screenWidth - (16 * 2) - 12) / 2.5;
 
-    // Calcolo della larghezza delle card (come prima)
-    final double cardWidth = (screenWidth - (16 * 2) - 12) / 2.5;
-
-    // --- NUOVO CALCOLO DELL'ALTEZZA DELLA LISTA ---
-    // L'altezza della lista è basata sull'altezza che una singola SuggestionTile occupa.
-    // Supponiamo: larghezza card + altezza testo (es. 40-60 pixel) + padding extra.
-    // Questa è un'altezza 'stimata' che dovrai affinare in base al contenuto esatto della tua SuggestionTile.
-    final double estimatedTextHeight = 50.0; // Altezza stimata per titolo e artista sotto l'immagine
-    final double listHeight = cardWidth + estimatedTextHeight + 20.0; // 20.0 per padding o margini aggiuntivi
+    // Calcolo dell'altezza della lista (stima)
+    final double estimatedTextHeight = 50.0;
+    final double listHeight = cardWidth + estimatedTextHeight + 20.0;
 
     final headline = GoogleFonts.roboto(
       fontSize: 22,

@@ -176,26 +176,7 @@ VALUES
     );
   }
 
-  Future<String?> getGenereNomeById(int idGenere) async {
-    final db = await database; // Ottieni l'istanza del database
 
-    // Esegui una query sulla tabella 'generi' filtrando per 'id'
-    final List<Map<String, dynamic>> maps = await db.query(
-      'generi',
-      columns: ['nome'], // Seleziona solo la colonna 'nome'
-      where: 'id = ?',
-      whereArgs: [idGenere],
-      limit: 1, // Ci aspettiamo solo un risultato per un dato ID
-    );
-
-    // Se troviamo un risultato, estrai il nome e restituiscilo
-    if (maps.isNotEmpty) {
-      return maps.first['nome'] as String;
-    } else {
-      // Se nessun genere con quell'ID è stato trovato, ritorna null
-      return null;
-    }
-  }
 
   Future<void> aggiungiVinile(Vinile v) async {
     final db = await database;
@@ -311,25 +292,46 @@ VALUES
     return result.isNotEmpty;
   }
 
-  Future<List<Genere>> getCategorie() async{
+  Future<List<Genere>> getGeneri() async{
     final db = await database;
     final maps = await db.query("generi");
     List<Genere> lista= maps.map(Genere.fromMap).toList();
     return lista;
   }
 
+  Future<String?> getGenereNomeById(int idGenere) async {
+    final db = await database; // Ottieni l'istanza del database
+
+    // Esegui una query sulla tabella 'generi' filtrando per 'id'
+    final List<Map<String, dynamic>> maps = await db.query(
+      'generi',
+      columns: ['nome'], // Seleziona solo la colonna 'nome'
+      where: 'id = ?',
+      whereArgs: [idGenere],
+      limit: 1, // Ci aspettiamo solo un risultato per un dato ID
+    );
+
+    // Se troviamo un risultato, estrai il nome e restituiscilo
+    if (maps.isNotEmpty) {
+      return maps.first['nome'] as String;
+    } else {
+      // Se nessun genere con quell'ID è stato trovato, ritorna null
+      return null;
+    }
+  }
   Future<int> inserisciGenere(String nome) async =>
       (await database).insert('generi', {'nome': nome.trim()});
 
   Future<List<Map<String, dynamic>>> getCategorieConConteggio() async =>
       (await database).rawQuery('''
       SELECT g.id, g.nome,
-             COUNT(v.id) AS conteggio
+             SUM(COALESCE(v.quantita, 0)) AS conteggio
       FROM generi g
       LEFT JOIN collezioneVinili v ON v.genere = g.id
-      GROUP BY g.id
+      GROUP BY g.id, g.nome
       ORDER BY g.nome;
     ''');
+
 
   Future<String> getGenere(int id) async{
     final db= await DatabaseHelper.instance.database;

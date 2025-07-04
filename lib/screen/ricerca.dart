@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:vinyl_collection_app/screen/dettagliovinilesuggested.dart';
 import 'package:vinyl_collection_app/vinile/vinile.dart';
 import '../service/discogs_service.dart';
+// Importa la tua estensione per le dimensioni dello schermo
+import '../utils/dimensioniSchermo.dart'; // Assicurati che il percorso sia corretto
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -20,7 +22,14 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Future<void> _search() async {
     final query = _controller.text.trim();
-    if (query.isEmpty) return;
+    if (query.isEmpty) {
+      // Se la query è vuota, potresti voler pulire i risultati o mostrare un messaggio
+      setState(() {
+        _results = [];
+        _error = null;
+      });
+      return;
+    }
 
     setState(() {
       _isLoading = true;
@@ -50,6 +59,12 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildResultItem(Vinile vinile) {
+    // Calcola una dimensione per l'immagine leading basata sulla larghezza dello schermo
+    // Ad esempio, il 12% della larghezza dello schermo, o un valore minimo/massimo
+    final double leadingImageSize = context.screenWidth * 0.12; // Esempio
+    // Puoi anche usare context.shortestSide per una dimensione che si adatti meglio
+    // final double leadingImageSize = context.shortestSide * 0.1;
+
     return ListTile(
       onTap: () async {
         await Navigator.push(
@@ -57,9 +72,16 @@ class _SearchScreenState extends State<SearchScreen> {
           MaterialPageRoute(builder: (_) => DettaglioVinileSuggested(vinile: vinile)),
         );
       },
-      leading: vinile.immagine != null
-          ? Image.network(vinile.immagine!, width: 50, fit: BoxFit.cover)
-          : const Icon(Icons.album),
+      leading: SizedBox( // Avvolgi l'immagine in un SizedBox per controllare le dimensioni
+        width: leadingImageSize,
+        height: leadingImageSize,
+        child: vinile.immagine != null && vinile.immagine!.isNotEmpty
+            ? Image.network(
+          vinile.immagine!,
+          fit: BoxFit.cover,
+        )
+            : const Icon(Icons.album), // Considera di dare una dimensione all'icona
+      ),
       title: Text(vinile.titolo),
       subtitle: Text('${vinile.artista} - ${vinile.anno?.toString() ?? 'Anno sconosciuto'}'),
     );

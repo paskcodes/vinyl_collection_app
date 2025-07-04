@@ -72,7 +72,7 @@ class _DettaglioVinileCollezioneState extends State<DettaglioVinileCollezione> {
               }
             },
           ),
-          _InfoRow('Quantità', _vinileCorrente.quantita?.toString() ?? '–'), // Usa _vinileCorrente
+          _InfoRow('Copie possedute', _vinileCorrente.copie?.toString() ?? '–'), // Usa _vinileCorrente
           _InfoRow('Condizione', _vinileCorrente.condizione!.descrizione), // Usa _vinileCorrente.descrizione
           _InfoRow('Preferito', _vinileCorrente.preferito ? 'Sì' : 'No'), // Usa _vinileCorrente
         ],

@@ -28,7 +28,7 @@ class _SchermataModificaState extends State<SchermataModifica> {
   final _annoController = TextEditingController();
   final _etichettaController = TextEditingController();
 
-  late int _quantita;
+  late int _numeroCopie;
   int? _genereSelezionato;
   late int _condizione;
   late bool _preferito;
@@ -46,7 +46,7 @@ class _SchermataModificaState extends State<SchermataModifica> {
     _annoController.text = widget.vinile.anno?.toString() ?? '';
     _etichettaController.text = widget.vinile.etichettaDiscografica ?? '';
 
-    _quantita = widget.vinile.quantita ?? 1;
+    _numeroCopie = widget.vinile.copie ?? 1;
     _genereSelezionato = widget.vinile.genere;
     _condizione =widget.vinile.condizione?.index ?? 0;
     _preferito = widget.vinile.preferito;
@@ -61,7 +61,7 @@ class _SchermataModificaState extends State<SchermataModifica> {
   }
 
   Future<void> caricaCategorie() async{
-    List<Genere>categorie=await DatabaseHelper.instance.getCategorie();
+    List<Genere>categorie=await DatabaseHelper.instance.getGeneri();
     setState(() {
       _categorie=categorie;
       if (_genereSelezionato == null && _categorie.isNotEmpty) {
@@ -96,7 +96,7 @@ class _SchermataModificaState extends State<SchermataModifica> {
     if (_formKey.currentState!.validate()) {
       final nuovoVinile = Vinile(id:widget.suggested? null:widget.vinile.id,titolo: _titoloController.text.trim(), artista: _artistaController.text.trim(),
         anno: int.parse(_annoController.text.trim()), genere:_genereSelezionato, etichettaDiscografica:_etichettaController.text.trim(),
-        quantita: _quantita, condizione: Condizione.values[_condizione], immagine: _immagineFile?.path ,preferito: _preferito,);
+        copie: _numeroCopie, condizione: Condizione.values[_condizione], immagine: _immagineFile?.path ,preferito: _preferito,);
       print("Vinile creato: $nuovoVinile");
       if(widget.suggested){
 
@@ -207,23 +207,23 @@ class _SchermataModificaState extends State<SchermataModifica> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text("Quantità"),
+                        const Text("Copie possedute"),
                         IconButton(
                           icon: const Icon(Icons.remove),
                           onPressed: () {
                             setState(() {
-                              if (_quantita > 1) _quantita--;
+                              if (_numeroCopie > 1) _numeroCopie--;
                             });
                           },
                         ),
 
-                        Text("$_quantita"),
+                        Text("$_numeroCopie"),
 
                         IconButton(
                           icon: const Icon(Icons.add),
                           onPressed: () {
                             setState(() {
-                              _quantita++;
+                              _numeroCopie++;
                             });
                           },
                         ),

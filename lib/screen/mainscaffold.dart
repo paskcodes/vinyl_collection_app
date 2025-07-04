@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vinyl_collection_app/screen/schermatacategorie.dart';
 import 'homepage.dart';
 import 'ricerca.dart';
 import 'schermatacollezione.dart';
@@ -15,6 +16,7 @@ class _MainScaffoldState extends State<MainScaffold> {
 
   final GlobalKey<SchermataCollezioneState> _collezioneKey = GlobalKey<SchermataCollezioneState>();
   final GlobalKey<HomeScreenState> _homeKey = GlobalKey<HomeScreenState>();
+  final GlobalKey<SchermataCategorieState> _categorieKey = GlobalKey<SchermataCategorieState>();
   late final List<Widget> _pages;
 
   @override
@@ -24,14 +26,15 @@ class _MainScaffoldState extends State<MainScaffold> {
       HomeScreen(key: _homeKey),
       const SearchScreen(),
       SchermataCollezione(key: _collezioneKey),
-
+      SchermataCategorie(key: _categorieKey),
     ];
   }
 void _vaiSchermataAggiunta() async{
     bool? aggiunto= await Navigator.pushNamed(context, '/aggiunta') as bool?;
     if(aggiunto==true){
       _homeKey.currentState?.caricaDati();
-      _collezioneKey.currentState?.aggiornaCollezione();
+      _collezioneKey.currentState?.caricaVinili();
+      _categorieKey.currentState?.aggiornaGeneri();
     }
 
 }
@@ -62,7 +65,10 @@ void _vaiSchermataAggiunta() async{
             _homeKey.currentState?.caricaDati();
           }
           if (index == 2) {  // 2 è l'indice della schermata Collezione
-            _collezioneKey.currentState?.aggiornaCollezione();
+            _collezioneKey.currentState?.caricaVinili();
+          }
+          if (index == 3) {  // 2 è l'indice della schermata Collezione
+            _categorieKey.currentState?.aggiornaGeneri();
           }
         },
         items: const [
@@ -80,6 +86,11 @@ void _vaiSchermataAggiunta() async{
             activeIcon: Icon(Icons.library_music),
             label: 'Collezione',
           ),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.category_outlined),
+              activeIcon: Icon(Icons.category),
+              label:'Categorie',
+          )
         ],
       ),
     );

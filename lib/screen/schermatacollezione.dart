@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:vinyl_collection_app/database/databasehelper.dart';
 import 'package:vinyl_collection_app/screen/schermatamodifica.dart';
 import 'package:vinyl_collection_app/screen/dettagliovinilecollezione.dart'; // Importa la schermata dettaglio
+import 'package:vinyl_collection_app/utils/dimensioniSchermo.dart';
 import 'package:vinyl_collection_app/vinile/vinile.dart';
 
 class SchermataCollezione extends StatefulWidget {
@@ -14,19 +15,14 @@ class SchermataCollezione extends StatefulWidget {
 class SchermataCollezioneState extends State<SchermataCollezione> {
   late List<Vinile> _listaVinili = [];
 
-  Future<void> aggiornaCollezione() async {
-    print(' SchermataCollezione: aggiorna');
-    await _caricaVinili();
-  }
-
   @override
   void initState() {
     super.initState();
     print("carico l'initstate");
-    _caricaVinili();
+    caricaVinili();
   }
 
-  Future<void> _caricaVinili() async {
+  Future<void> caricaVinili() async {
     print("Provo a caricre i vinili in schermata collezione");
     final listaVinili = await DatabaseHelper.instance.getCollezione();
     setState(() {
@@ -36,7 +32,7 @@ class SchermataCollezioneState extends State<SchermataCollezione> {
 
   Future<void> _rimuoviVinile(Vinile vinile) async {
     await DatabaseHelper.instance.eliminaVinile(vinile);
-    await _caricaVinili();
+    await caricaVinili();
   }
 
   void _modificaVinile(Vinile vinile) async {
@@ -47,7 +43,7 @@ class SchermataCollezioneState extends State<SchermataCollezione> {
       ),
     );
     if (modificato == true) {
-      await _caricaVinili();
+      await caricaVinili();
     }
   }
 
@@ -84,12 +80,15 @@ class SchermataCollezioneState extends State<SchermataCollezione> {
 
     if (eliminato == true) {
       // Se è stato eliminato, ricarica la lista
-      await _caricaVinili();
+      await caricaVinili();
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Puoi definire le dimensioni qui una volta, se le usi più volte.
+    // Esempio: larghezza dell'immagine leading proporzionale allo schermo
+    final double leadingImageSize = context.screenWidth * 0.12; // Esempio: 12% della larghezza dello schermo
     return Scaffold(
       appBar: AppBar(
         title: const Text("La tua collezione"),
@@ -105,8 +104,8 @@ class SchermataCollezioneState extends State<SchermataCollezione> {
             child: ListTile(
               onTap: () => _apriDettaglioVinile(vinile),
               leading: SizedBox(
-                width: 50,
-                height: 50,
+                width: leadingImageSize, // Usa la dimensione calcolata
+                height: leadingImageSize, // Usa la stessa dimensione per un'immagine quadrata
                 child: vinile.coverWidget,
               ),
               title: Text(vinile.titolo),

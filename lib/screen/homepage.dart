@@ -1,4 +1,3 @@
-// lib/screens/home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:vinyl_collection_app/screen/dettagliovinilecollezione.dart';
@@ -75,7 +74,6 @@ class HomeScreenState extends State<HomeScreen> {
     final headline = GoogleFonts.roboto(
       fontSize: 22,
       fontWeight: FontWeight.bold,
-      color: Colors.black,
     );
 
     if (_isLoading) {
@@ -83,7 +81,7 @@ class HomeScreenState extends State<HomeScreen> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: RefreshIndicator(
         onRefresh: caricaDati,
         child: ListView(
@@ -94,19 +92,19 @@ class HomeScreenState extends State<HomeScreen> {
             _HorizontalList(
               vinili: _recent,
               itemWidth: cardWidth,
-              listHeight: listHeight, // Passa l'altezza calcolata
+              listHeight: listHeight,
               itemBuilder: (vinile) => SuggestionTile(
                 vinile: vinile,
                 onTap: () => _apriDettaglioCollezione(vinile),
               ),
             ),
-            const SizedBox(height: 28), // Mantenuto lo spazio tra le sezioni
+            const SizedBox(height: 28),
             Text('Consigliati per te', style: headline),
             const SizedBox(height: 12),
             _HorizontalList(
               vinili: _suggested,
               itemWidth: cardWidth,
-              listHeight: listHeight, // Passa l'altezza calcolata
+              listHeight: listHeight,
               itemBuilder: (v) => SuggestionTile(
                 vinile: v,
                 onTap: () => _apriDettaglioSuggested(context, v),

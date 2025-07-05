@@ -96,7 +96,7 @@ class _SchermataModificaState extends State<SchermataModifica> {
     if (_formKey.currentState!.validate()) {
       final nuovoVinile = Vinile(id:widget.suggested? null:widget.vinile.id,titolo: _titoloController.text.trim(), artista: _artistaController.text.trim(),
         anno: int.parse(_annoController.text.trim()), genere:_genereSelezionato, etichettaDiscografica:_etichettaController.text.trim(),
-        copie: _numeroCopie, condizione: Condizione.values[_condizione], immagine: _immagineFile?.path ,preferito: _preferito,);
+        copie: _numeroCopie, condizione: Condizione.values[_condizione], immagine: _immagineFile != null ? 'file://${_immagineFile!.path}' : widget.vinile.immagine, preferito: _preferito,);
       print("Vinile creato: $nuovoVinile");
       if(widget.suggested){
 

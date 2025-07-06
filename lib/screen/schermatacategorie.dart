@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:vinyl_collection_app/database/databasehelper.dart';
 import 'package:vinyl_collection_app/components/genere_tile.dart';
 import 'package:vinyl_collection_app/screen/schermatapercategoria.dart';
 import 'package:vinyl_collection_app/utils/dimensioniSchermo.dart';
+
+import '../categoria/genere.dart';
 
 class SchermataCategorie extends StatefulWidget {
   const SchermataCategorie({super.key});
@@ -21,18 +22,9 @@ class SchermataCategorieState extends State<SchermataCategorie> {
   }
 
   Future<void> aggiornaGeneri() async {
-    List<Map<String, dynamic>> listaCompleta =
-    await DatabaseHelper.instance.getCategorieConConteggio();
-
-    List<Map<String, dynamic>> filteredList = [];
-    for (final Map<String, dynamic> genere in listaCompleta) {
-      if ((genere['conteggio'] as int? ?? 0) > 0) {
-        filteredList.add(genere);
-      }
-    }
-
+    List<Map<String, dynamic>> lista = await Genere.generiFiltrati();
     setState(() {
-      _listaFiltrata = filteredList;
+      _listaFiltrata = lista;
     });
   }
 
@@ -42,6 +34,51 @@ class SchermataCategorieState extends State<SchermataCategorie> {
         MaterialPageRoute(builder: (context) => SchermataViniliPerCategoria(genereId: genereId, genereNome: genereNome)));
     aggiornaGeneri();
 }
+  // All'interno della classe SchermataCategorieState
+  Widget _buildAddCategoryTile(BuildContext context) {
+    final double cardWidth   = context.screenWidth * 0.4;
+    final double iconSize    = cardWidth * 0.6;
+    final double titleSize   = context.shortestSide * 0.045; // Stessa dimensione del titolo delle categorie
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
+    return InkWell(
+      onTap: null,//aggiungere vai a aggiungi categorie
+      child: Card(
+        elevation: 4,
+        margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        color: scheme.surfaceContainerHighest,
+        child: Container(
+          width: cardWidth,
+          padding: const EdgeInsets.all(12),
+          child: Column( // Usa Column per icona e testo
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.add_circle_outline, // Un'icona 'add' con cerchio potrebbe essere più esplicita
+                size: iconSize,
+                color: scheme.onSurfaceVariant,
+              ),
+              const SizedBox(height: 8), // Spazio tra icona e testo
+              Text(
+                'Nuova categoria',
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: titleSize,
+                  color: scheme.onSurfaceVariant, // Colore del testo adattivo
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,8 +102,11 @@ class SchermataCategorieState extends State<SchermataCategorie> {
           // L'altezza è stimata in base al contenuto della GenereTile.
           childAspectRatio: (context.screenWidth / 2 - 16) / (context.screenWidth * 0.4 + (context.shortestSide * 0.045 * 2) + (context.shortestSide * 0.03) + 8 + 4 + 12 + 12),
         ),
-        itemCount: _listaFiltrata!.length,
+        itemCount: _listaFiltrata!.length+1,
         itemBuilder: (context, index) {
+          if(index==_listaFiltrata!.length){
+            return _buildAddCategoryTile(context);
+          }else{
           final genereMap = _listaFiltrata![index];
           final int genereId = genereMap['id'] as int;
           final String nomeGenere = genereMap['nome'] as String;
@@ -78,6 +118,7 @@ class SchermataCategorieState extends State<SchermataCategorie> {
             numeroVinili: conteggio,
             onTap: () => apriSchermata(genereId,nomeGenere),
           );
+          }
         },
       ),
     );

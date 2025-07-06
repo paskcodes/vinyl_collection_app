@@ -36,6 +36,13 @@ class SchermataCategorieState extends State<SchermataCategorie> {
     });
   }
 
+  Future<void> apriSchermata(int genereId,String genereNome) async {
+    await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => SchermataViniliPerCategoria(genereId: genereId, genereNome: genereNome)));
+    aggiornaGeneri();
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,17 +76,7 @@ class SchermataCategorieState extends State<SchermataCategorie> {
             genereId: genereId,
             nomeGenere: nomeGenere,
             numeroVinili: conteggio,
-            onTap: () {
-             Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SchermataViniliPerCategoria(
-                    genereId: genereId,
-                    genereNome: nomeGenere,
-                  ),
-                ),
-              );
-            },
+            onTap: () => apriSchermata(genereId,nomeGenere),
           );
         },
       ),

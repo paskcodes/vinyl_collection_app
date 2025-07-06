@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vinyl_collection_app/database/databasehelper.dart';
 import 'package:vinyl_collection_app/components/genere_tile.dart';
+import 'package:vinyl_collection_app/screen/schermatapercategoria.dart';
 import 'package:vinyl_collection_app/utils/dimensioniSchermo.dart';
 
 class SchermataCategorie extends StatefulWidget {
@@ -68,16 +69,16 @@ class SchermataCategorieState extends State<SchermataCategorie> {
             genereId: genereId,
             nomeGenere: nomeGenere,
             numeroVinili: conteggio,
-            onTap: () { null;
-             /* Navigator.push(
+            onTap: () {
+             Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => SchermataListaViniliPerGenere(
+                  builder: (context) => SchermataViniliPerCategoria(
                     genereId: genereId,
                     genereNome: nomeGenere,
                   ),
                 ),
-              );*/
+              );
             },
           );
         },

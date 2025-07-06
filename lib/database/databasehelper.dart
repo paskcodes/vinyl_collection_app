@@ -342,6 +342,25 @@ VALUES
     return maps.map(Genere.fromMap).first.nome;
   }
 
+  Future<int?> controlloGenere(String? nome) async {
+    if (nome == null || nome.trim().isEmpty) return null;
+
+    final db = await database;
+    final res = await db.query(
+      'genere',
+      where: 'name = ?',
+      whereArgs: [nome.trim()],
+      limit: 1,
+    );
+
+    if (res.isNotEmpty) {
+      return res.first['id'] as int; // già esiste
+    }
+
+    // se non esiste lo inseriamo e restituiamo il nuovo id
+    return await db.insert('genere', {'name': nome.trim()});
+  }
+
   //Visto che ogni genere quando viene inserito nel DB riceve un proprio ID, possiamo gestirci gli ID come se fossero parte di un ENUM
   Future<List<Vinile>> getViniliByGenere(int idGenere) async {
     final maps = await (await database).query(

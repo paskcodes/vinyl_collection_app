@@ -1,4 +1,3 @@
-// lib/service/discogs_service.dart
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -6,99 +5,79 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import '../vinile/vinile.dart';
 import '../vinile/condizione.dart';
+import '../database/databasehelper.dart';
+
 
 class DiscogsService {
-  static final _token  = dotenv.env['DISCOGS_TOKEN'];
-  static final String baseUrl = 'https://api.discogs.com/database/search';
+  static final String? _token = dotenv.env['DISCOGS_TOKEN'];
+  static const String _baseUrl = 'https://api.discogs.com/database/search';
 
-
+  /// Ricerche libere (titolo / artista / label *full‑text*)
   Future<List<Vinile>> ricerca(String query) async {
-    try {
-      late Uri uri;
-      if (_token != null && _token!.isNotEmpty) {
-         uri = Uri.parse('$baseUrl?q=$query&type=release&token=$_token');
-      } else {
-        throw Exception('Chiavi Discogs mancanti (.env)');
-      }
+    final uri = _buildUri({'q': query, 'type': 'release'});
+    final res = await http.get(uri);
+    _checkResponse(res);
+    final List results = (jsonDecode(res.body)['results'] as List?) ?? [];
 
-      final res = await http.get(uri);
-      if (res.statusCode != 200) {
-        throw Exception(
-            'Discogs ${res.statusCode}: ${res.reasonPhrase ?? ''}');
-      }
+    return _mapResults(results);
+  }
 
-      final results = (jsonDecode(res.body)['results'] as List?) ?? [];
-      return results.map<Vinile>((r) {
-        final fullTitle = r['title'] ?? '';
-        var artista = r['artist'] ?? '';
-        var titolo  = fullTitle;
+  /// Release «hot» su Discogs
+  Future<List<Vinile>> fetchTrendingVinyls({int limit = 10}) async {
+    final uri = _buildUri({'type': 'release', 'sort': 'hot', 'per_page': '$limit'});
+    final res = await http.get(uri);
+    _checkResponse(res);
+    final List results = (jsonDecode(res.body)['results'] as List?) ?? [];
 
-        if (artista.isEmpty && fullTitle.contains(' - ')) {
-          final parts = fullTitle.split(' - ');
-          artista = parts.first.trim();
-          titolo  = parts.sublist(1).join(' - ').trim();
-        }
+    return _mapResults(results);
+  }
 
-        return Vinile(
-          titolo: titolo,
-          artista: artista,
-          anno: int.tryParse(r['year']?.toString() ?? ''),
-          etichettaDiscografica: (r['label'] as List?)?.first,
-          condizione: Condizione.nuovo,
-          immagine: r['cover_image'] as String?,
-          preferito: false,
-        );
-      }).toList();
-    } catch (e, s) {
-      debugPrint('DiscogsService error: $e\n$s');
-      return [];
+  // ============== private helpers ==============
+
+  Uri _buildUri(Map<String, String> params) {
+    if (_token == null || _token!.isEmpty) {
+      throw Exception('DISCOGS_TOKEN mancante nel file .env');
+    }
+    final all = <String, String>{...params, 'token': _token!};
+    return Uri.parse(_baseUrl).replace(queryParameters: all);
+  }
+
+  void _checkResponse(http.Response res) {
+    if (res.statusCode != 200) {
+      throw Exception('Discogs ${res.statusCode}: ${res.reasonPhrase ?? ''}');
     }
   }
 
-  // Restituisce i trending da Discogs.
-  Future<List<Vinile>> fetchTrendingVinyls({int limit = 10}) async {
-    try {
-      late Uri uri;
-      if (_token != null && _token!.isNotEmpty) {
-        uri = Uri.parse(
-          'https://api.discogs.com/database/search'
-              '?type=release&sort=hot&per_page=$limit&token=$_token',
-        );
-      } else {
-        throw Exception('Chiavi Discogs mancanti (.env)');
+  Future<List<Vinile>> _mapResults(List<dynamic> results) async {
+    // Future.wait per permettere query async al DB per ogni risultato
+    return Future.wait(results.map<Future<Vinile>>((raw) async {
+      final Map<String, dynamic> r = raw as Map<String, dynamic>;
+
+      final fullTitle = r['title'] as String? ?? '';
+      String artista = r['artist'] as String? ?? '';
+      String titolo = fullTitle;
+
+      if (artista.isEmpty && fullTitle.contains(' - ')) {
+        final parts = fullTitle.split(' - ');
+        artista = parts.first.trim();
+        titolo = parts.sublist(1).join(' - ').trim();
       }
 
-      final res = await http.get(uri);
-      if (res.statusCode != 200) {
-        throw Exception(
-            'Discogs ${res.statusCode}: ${res.reasonPhrase ?? ''}');
-      }
+      //   --- GENERE -------------------------------------------
+      final List<dynamic>? generiJson = r['genere'] as List<dynamic>?;
+      final String? primoGenere = generiJson?.isNotEmpty == true ? generiJson!.first as String : null;
+      final int? genereId = await DatabaseHelper.instance.controlloGenere(primoGenere);
 
-      final results = (jsonDecode(res.body)['results'] as List?) ?? [];
-      return results.map<Vinile>((r) {
-        final fullTitle = r['title'] ?? '';
-        var artista = r['artist'] ?? '';
-        var titolo  = fullTitle;
-
-        if (artista.isEmpty && fullTitle.contains(' - ')) {
-          final parts = fullTitle.split(' - ');
-          artista = parts.first.trim();
-          titolo  = parts.sublist(1).join(' - ').trim();
-        }
-
-        return Vinile(
-          titolo: titolo,
-          artista: artista,
-          anno: int.tryParse(r['year']?.toString() ?? ''),
-          etichettaDiscografica: (r['label'] as List?)?.first,
-          condizione: Condizione.nuovo,
-          immagine: r['cover_image'] as String?,
-          preferito: false,
-        );
-      }).toList();
-    } catch (e, s) {
-      debugPrint('DiscogsService error: $e\n$s');
-      return [];
-    }
+      return Vinile(
+        titolo: titolo,
+        artista: artista,
+        anno: int.tryParse(r['year']?.toString() ?? ''),
+        genere: genereId,
+        etichettaDiscografica: (r['label'] as List?)?.first,
+        condizione: Condizione.nuovo,
+        immagine: r['cover_image'] as String?,
+        preferito: false,
+      );
+    }).toList());
   }
 }

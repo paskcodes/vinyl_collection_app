@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vinyl_collection_app/components/genere_tile.dart';
 import 'package:vinyl_collection_app/screen/schermatapercategoria.dart';
-import 'package:vinyl_collection_app/utils/dimensioniSchermo.dart';
+import 'package:vinyl_collection_app/utils/dimensionischermo.dart';
 
 import '../categoria/genere.dart';
 

@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:vinyl_collection_app/vinile/vinile.dart';
@@ -97,7 +96,7 @@ class _SchermataModificaState extends State<SchermataModifica> {
       final nuovoVinile = Vinile(id:widget.suggested? null:widget.vinile.id,titolo: _titoloController.text.trim(), artista: _artistaController.text.trim(),
         anno: int.parse(_annoController.text.trim()), genere:_genereSelezionato, etichettaDiscografica:_etichettaController.text.trim(),
         copie: _numeroCopie, condizione: Condizione.values[_condizione], immagine: _immagineFile != null ? 'file://${_immagineFile!.path}' : widget.vinile.immagine, preferito: _preferito,);
-      print("Vinile creato: $nuovoVinile");
+      logger.i("Vinile creato: $nuovoVinile");
       if(widget.suggested){
 
         if(await DatabaseHelper.instance.vinileEsiste(nuovoVinile)){
@@ -111,7 +110,7 @@ class _SchermataModificaState extends State<SchermataModifica> {
               }
           );
         }else {
-          print("Sto per tornare indietro con true");
+          logger.i("Controllo effettuato. Aggiungo il vinile al database.");
           await DatabaseHelper.instance.aggiungiVinile(nuovoVinile);
           if(mounted) {
             Navigator.pop(context, true);
@@ -121,7 +120,7 @@ class _SchermataModificaState extends State<SchermataModifica> {
       }else{
         if (nuovoVinile == widget.vinile) { // Qui usiamo il tuo nuovo operatore ==
           // Se nessun valore è cambiato, torna indietro senza mostrare la snackbar
-          print("Nessuna modifica rilevata, torno indietro.");
+          logger.i("Nessuna modifica rilevata, torno indietro.");
           if (mounted) {
             Navigator.pop(context, false); // Torna indietro segnalando che NON ci sono state modifiche
           }

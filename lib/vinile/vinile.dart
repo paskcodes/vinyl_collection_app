@@ -1,4 +1,4 @@
-library vinile_model;
+library;
 
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -73,7 +73,7 @@ class Vinile {
     genere: m['genere'] as int?,
     etichettaDiscografica: m['etichetta_discografica'] as String?,
     copie: m['quantita'] as int?,
-    condizione: Condizione.fromDb(m['condizione'] as String?),
+    condizione: Condizione.fromDb(m['condizione']?.toString()),
     immagine: m['immagine'] as String?,
     preferito: (m['preferito'] as int? ?? 0) == 1,
     creatoIl: m['creato_il'] as String?,

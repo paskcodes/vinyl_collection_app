@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:logger/logger.dart';
 
 import '../categoria/genere.dart';
 import '../vinile/vinile.dart';
+
+final logger = Logger();
 
 class DatabaseHelper {
  /*
@@ -215,11 +218,11 @@ VALUES
 
     List<Vinile> lista= maps.map(Vinile.fromMap).toList();
     if(lista.isEmpty){
-      print("è vuota!\n\n\n");
+      logger.e("è vuota!\n\n\n");
     }
     else
       {
-        print("La lista è : ${lista.length} + ${lista.toString()} ");
+        logger.i("La lista è : ${lista.length} + ${lista.toString()} ");
       }
     return lista;
   }
@@ -234,11 +237,11 @@ VALUES
     );
     List<Vinile> lista=maps.map(Vinile.fromMap).toList();
     if(lista.isEmpty){
-      print("è vuota!\n\n\n");
+      logger.e("è vuota!\n\n\n");
     }
     else
     {
-      print("La lista è : ${lista.length} + ${lista.toString()} ");
+      logger.i("La lista è : ${lista.length} + ${lista.toString()} ");
     }
 
     return lista;
@@ -347,8 +350,8 @@ VALUES
 
     final db = await database;
     final res = await db.query(
-      'genere',
-      where: 'name = ?',
+      'generi',
+      where: 'nome = ?',
       whereArgs: [nome.trim()],
       limit: 1,
     );

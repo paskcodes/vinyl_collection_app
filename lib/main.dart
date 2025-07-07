@@ -8,7 +8,6 @@ import 'screen/schermataaggiungi.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
-
   runApp(const MyApp());
 }
 
@@ -19,7 +18,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: themeNotifier,
-      builder: (_, currentMode, __) {
+      builder: (_, currentMode, _) {
         return MaterialApp(
           title: 'Vinyl Collector',
           debugShowCheckedModeBanner: false,

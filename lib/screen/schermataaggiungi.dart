@@ -80,7 +80,7 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
       final nuovoVinile = Vinile(titolo: _titoloController.text.trim(), artista: _artistaController.text.trim(),
         anno: int.parse(_annoController.text.trim()), genere:_genereSelezionato, etichettaDiscografica:_etichettaController.text.trim(),
         copie: _numeroCopie, condizione: Condizione.values[_condizione], immagine: _immagineFile?.path ,preferito: _preferito,);
-      print("Vinile creato: $nuovoVinile");
+      logger.i("Vinile creato: $nuovoVinile");
       if(await DatabaseHelper.instance.vinileEsiste(nuovoVinile)){
         showDialog(context: context,
             builder: (BuildContext context){
@@ -92,7 +92,7 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
             }
         );
       }else{
-        print("Sto per tornare indietro con true");
+        logger.i("Controllo effettuato. Aggiungo il vinile al database.");
         await DatabaseHelper.instance.aggiungiVinile(nuovoVinile);
         Navigator.pop(context,true); // torna indietro
 

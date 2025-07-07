@@ -39,7 +39,7 @@ class VinylCard extends StatelessWidget {
                   height: 80, // Altezza desiderata per la copertina (regola!)
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(4),
-                    child: vinile.coverWidget ?? const Icon(Icons.album, size: 60, color: Colors.grey),
+                    child: vinile.coverWidget,
                   ),
                 ),
               ),

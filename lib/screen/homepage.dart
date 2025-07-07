@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:vinyl_collection_app/screen/dettagliovinilecollezione.dart';
-import 'package:vinyl_collection_app/utils/dimensioniSchermo.dart';
+import 'package:vinyl_collection_app/utils/dimensionischermo.dart';
 import '../components/suggestion_tile.dart';
 import '../database/databasehelper.dart';
 import '../service/discogs_service.dart';
@@ -56,10 +56,10 @@ class HomeScreenState extends State<HomeScreen> {
       MaterialPageRoute(builder: (_) => DettaglioVinileCollezione(vinile: v)),
     );
     if (aggiorna == true||aggiorna==null) {
-      print("\n\n\n\nAggiorno!\n\n\n");
+      logger.i("\n\n\n\nAggiorno!\n\n\n");
       await caricaDati();
     }else{
-      print("\n\n\n Non Aggiorno\n\n\n");
+      logger.i("\n\n\n Non Aggiorno\n\n\n");
     }
   }
 
@@ -130,8 +130,7 @@ class _HorizontalList extends StatelessWidget {
     required this.vinili,
     required this.itemBuilder,
     this.itemWidth = 150,
-    required this.listHeight, // Ora è obbligatorio
-    super.key,
+    required this.listHeight,
   });
 
   @override
@@ -144,7 +143,7 @@ class _HorizontalList extends StatelessWidget {
       content = ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: vinili.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        separatorBuilder: (_, _) => const SizedBox(width: 12),
         itemBuilder: (_, i) {
           return SizedBox(
             width: itemWidth,

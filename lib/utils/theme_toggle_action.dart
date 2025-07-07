@@ -8,7 +8,7 @@ class ThemeToggleAction extends StatelessWidget {
   Widget build(BuildContext context) {
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: themeNotifier,
-      builder: (_, mode, __) {
+      builder: (_, mode, _) {
         final isDark = mode == ThemeMode.dark;
         return IconButton(
           tooltip: isDark ? 'Tema chiaro' : 'Tema scuro',

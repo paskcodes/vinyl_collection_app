@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../vinile/vinile.dart';
-import '../utils/dimensioniSchermo.dart';
+import '../utils/dimensionischermo.dart';
 
 class SuggestionTile extends StatelessWidget {
   final Vinile vinile;

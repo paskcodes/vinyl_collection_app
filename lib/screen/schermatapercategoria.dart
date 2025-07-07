@@ -4,7 +4,7 @@ import '../database/databasehelper.dart';
 import '../vinile/vinile.dart';
 import '../screen/schermatamodifica.dart';
 import '../screen/dettagliovinilecollezione.dart';
-import '../utils/dimensioniSchermo.dart';
+import '../utils/dimensionischermo.dart';
 
 class SchermataViniliPerCategoria extends StatefulWidget {
   final int genereId;
@@ -60,7 +60,7 @@ class _SchermataViniliPerCategoriaState extends State<SchermataViniliPerCategori
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Conferma eliminazione'),
-        content: Text('Eliminare \"${v.titolo}\"?'),
+        content: Text('Eliminare "${v.titolo}"?'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Annulla')),
           TextButton(onPressed: () => Navigator.pop(context, true),  child: const Text('Elimina', style: TextStyle(color: Colors.red))),

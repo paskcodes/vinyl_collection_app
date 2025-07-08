@@ -58,19 +58,22 @@ class _MainScaffoldState extends State<MainScaffold> {
         actions: const [ThemeToggleAction()],
       ),
 
-      // 🔄 PageView = transizione slide
       body: PageView(
         controller: _pageController,
-        physics: const NeverScrollableScrollPhysics(), // se non vuoi swipe
+        physics: const NeverScrollableScrollPhysics(),
         onPageChanged: (index) => setState(() => _currentIndex = index),
         children: _pages,
       ),
 
-      floatingActionButton: FloatingActionButton(
-        heroTag: 'SchermataAggiunta',
-        tooltip: 'Aggiungi nuovo vinile',
-        onPressed: _vaiSchermataAggiunta,
-        child: const Icon(Icons.add),
+      floatingActionButton: Tooltip(
+        message: 'Aggiungi un nuovo vinile',
+        waitDuration: const Duration(milliseconds: 300),
+        child: FloatingActionButton(
+          heroTag: 'SchermataAggiunta',
+          tooltip: 'Aggiungi nuovo vinile',
+          onPressed: _vaiSchermataAggiunta,
+          child: const Icon(Icons.add),
+        ),
       ),
 
       bottomNavigationBar: BottomNavigationBar(
@@ -79,7 +82,6 @@ class _MainScaffoldState extends State<MainScaffold> {
         selectedItemColor: const Color(0xFF1DB954),
         unselectedItemColor: Colors.grey,
         onTap: (index) {
-          // animazione: 300ms, lenta
           _pageController.animateToPage(
             index,
             duration: const Duration(milliseconds: 300),

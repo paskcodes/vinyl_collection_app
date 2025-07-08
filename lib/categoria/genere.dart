@@ -27,6 +27,16 @@ class Genere{
     return listaFiltrata;
   }
 
+  static Future<List<Map<String, dynamic>>> tuttiGeneri() async {
+    return await DatabaseHelper.instance.getCategorieConConteggio();
+  }
+
+  Genere copyWith({int? id, String? nome}) {
+    return Genere(
+      id: id ?? this.id,
+      nome: nome ?? this.nome,
+    );
+  }
 
 }
 

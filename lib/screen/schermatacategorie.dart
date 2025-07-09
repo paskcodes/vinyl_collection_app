@@ -238,7 +238,6 @@ class SchermataCategorieState extends State<SchermataCategorie> {
           ),
         ]
       : [],
-
       ),
       body: _listaFiltrata == null
           ? const Center(child: CircularProgressIndicator())

@@ -47,18 +47,18 @@ class DatabaseHelper {
         // Inserisci generi iniziali
         final batch = db.batch();
         final generi = [
-          'rock',
-          'electronic',
-          'pop',
-          'country',
-          'jazz',
-          'funk',
-          'soul',
-          'classical',
-          'hiphop',
-          'latin',
-          'reggae',
-          'blues',
+          'Rock',
+          'Electronic',
+          'Pop',
+          'Country',
+          'Jazz',
+          'Funk',
+          'Soul',
+          'Classical',
+          'Hiphop',
+          'Latin',
+          'Reggae',
+          'Blues',
         ];
         for (final g in generi) {
           batch.insert('generi', {'nome': g});
@@ -68,8 +68,6 @@ class DatabaseHelper {
       version: 1,
     );
   }
-
-
 
   Future<void> aggiungiVinile(Vinile v) async {
     final db = await database;
@@ -213,12 +211,8 @@ class DatabaseHelper {
     }
   }
 
-
-
   Future<int> inserisciGenere(String nome) async =>
       (await database).insert('generi', {'nome': nome.trim()});
-
-
 
   Future<List<Map<String, dynamic>>> getCategorieConConteggio() async =>
       (await database).rawQuery('''
@@ -229,7 +223,6 @@ class DatabaseHelper {
       GROUP BY g.id, g.nome
       ORDER BY g.nome;
     ''');
-
 
   Future<String> getGenere(int id) async{
     final db= await DatabaseHelper.instance.database;
@@ -254,9 +247,7 @@ class DatabaseHelper {
     if (res.isNotEmpty) {
       return res.first['id'] as int; // già esiste
     }
-
-    // se non esiste lo inseriamo e restituiamo il nuovo id
-    return await db.insert('genere', {'name': nome.trim()});
+    return null;
   }
 
   //Visto che ogni genere quando viene inserito nel DB riceve un proprio ID, possiamo gestirci gli ID come se fossero parte di un ENUM
@@ -301,5 +292,17 @@ class DatabaseHelper {
     return result.map((row) => row['immagine'] as String).toList();
   }
 
+  Future<String?> getGenerePiuComune() async {
+    final db = await database;
+    final result = await db.rawQuery('''
+      SELECT g.nome, COUNT(v.id) AS cnt
+      FROM collezioneVinili v
+      JOIN generi g ON v.genere = g.id
+      GROUP BY v.genere
+      ORDER BY cnt DESC
+      LIMIT 1
+    ''');
+    return result.isNotEmpty ? result.first['nome'] as String? : null;
+  }
 
 }

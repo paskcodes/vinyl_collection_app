@@ -1,8 +1,6 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-
 import '../categoria/genere.dart';
 import '../database/databasehelper.dart';
 import '../vinile/condizione.dart';
@@ -15,236 +13,188 @@ class SchermataAggiungi extends StatefulWidget {
   State<SchermataAggiungi> createState() => _SchermataAggiungiState();
 }
 
-
-
 class _SchermataAggiungiState extends State<SchermataAggiungi> {
-  final _titoloController = TextEditingController();
-
-  final _artistaController = TextEditingController();
+  // controller & keys
   final _formKey = GlobalKey<FormState>();
-  final _annoController = TextEditingController();
-  final _etichettaController = TextEditingController();
+  final _titolo   = TextEditingController();
+  final _artista  = TextEditingController();
+  final _anno     = TextEditingController();
+  final _etichetta= TextEditingController();
+  final _picker   = ImagePicker();
 
-  int _numeroCopie = 1;
-  int? _genereSelezionato;
-  int _condizione = 0;
+  // state
+  int _copie = 1;
+  int? _genereId;
+  int _condizioneIdx = 0;
   bool _preferito = false;
-  File? _immagineFile;
-  List<Genere> _categorie=[];
-
-
-  final picker = ImagePicker();
+  File? _coverFile;
+  List<Genere> _generi = [];
 
   @override
   void initState() {
     super.initState();
-    _titoloController.addListener(_aggiornaStato);
-    _artistaController.addListener(_aggiornaStato);
-    _annoController.addListener(_aggiornaStato);
-    _etichettaController.addListener(_aggiornaStato);
-    caricaCategorie();
+    _loadGeneri();
   }
 
-  Future<void> caricaCategorie() async{
-    List<Genere>categorie=await DatabaseHelper.instance.getGeneri();
+  Future<void> _loadGeneri() async {
+    final list = await DatabaseHelper.instance.getGeneri();
     setState(() {
-      _categorie=categorie;
+      _generi = list;
+      if (_genereId == null && list.isNotEmpty) _genereId = list.first.id;
     });
   }
 
-
-  void _aggiornaStato() => setState(() {});
-
-  bool _formValido() {
-    return _titoloController.text.trim().isNotEmpty &&
-        _artistaController.text.trim().isNotEmpty &&
-        _annoController.text.trim().isNotEmpty &&
-        _etichettaController.text.trim().isNotEmpty &&
-        _genereSelezionato!=null;
-  }
-
-
   Future<void> _pickImage() async {
-    final picked = await picker.pickImage(source: ImageSource.gallery);
-    if (picked != null) {
-      setState(() {
-        _immagineFile = File(picked.path);
-      });
-    }
+    final picked = await _picker.pickImage(source: ImageSource.gallery);
+    if (picked != null) setState(() => _coverFile = File(picked.path));
   }
+
+  bool get _formValid =>
+      _formKey.currentState?.validate() == true && _genereId != null;
 
   Future<void> _aggiungi() async {
-    if (_formKey.currentState!.validate()) {
-      final nuovoVinile = Vinile(titolo: _titoloController.text.trim(), artista: _artistaController.text.trim(),
-        anno: int.parse(_annoController.text.trim()), genere:_genereSelezionato, etichettaDiscografica:_etichettaController.text.trim(),
-        copie: _numeroCopie, condizione: Condizione.values[_condizione], immagine: _immagineFile?.path ,preferito: _preferito,);
-      logger.i("Vinile creato: $nuovoVinile");
-      if(await DatabaseHelper.instance.vinileEsiste(nuovoVinile)){
-        showDialog(context: context,
-            builder: (BuildContext context){
-              return AlertDialog(
-                title: Text("Attenzione!"),
-                content: const Text("Hai già questo vinile nella tua collezione."),
-                actions: [TextButton(onPressed: ()=> Navigator.of(context).pop(), child: const Text("Ok"))],
-              );
-            }
-        );
-      }else{
-        logger.i("Controllo effettuato. Aggiungo il vinile al database.");
-        await DatabaseHelper.instance.aggiungiVinile(nuovoVinile);
-        Navigator.pop(context,true); // torna indietro
+    if (!_formValid) return;
 
-      }
+    final nuovo = Vinile(
+      titolo: _titolo.text.trim(),
+      artista: _artista.text.trim(),
+      anno: int.tryParse(_anno.text),
+      genere: _genereId,
+      etichettaDiscografica: _etichetta.text.trim(),
+      copie: _copie,
+      condizione: Condizione.values[_condizioneIdx],
+      immagine: _coverFile != null ? 'file://${_coverFile!.path}' : null,
+      preferito: _preferito,
+    );
+
+    if (await DatabaseHelper.instance.vinileEsiste(nuovo)) {
+      if (mounted) _showAlert('Attenzione', 'Hai già questo vinile nella tua collezione.');
+      return;
     }
+
+    await DatabaseHelper.instance.aggiungiVinile(nuovo);
+    if (mounted) Navigator.pop(context, true);
   }
 
-  @override
-  void dispose() {
-    _titoloController.dispose();
-    _artistaController.dispose();
-    _annoController.dispose();
-    _etichettaController.dispose();
-    super.dispose();
-  }
+  void _showAlert(String title, String msg) => showDialog(
+    context: context,
+    builder: (_) => AlertDialog(title: Text(title), content: Text(msg), actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))]),
+  );
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Aggiungi il tuo vinile:"),
-      ),
-      body: SingleChildScrollView(        //se esce fuori dallo schermo dà errore,con singlechildscrollview no.
-        padding: const EdgeInsets.all(16),
-        child: Form(
-            key: _formKey,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,//allineati orizzontalmente a sinistra
-              children: [
-                //gestione immagine
-                GestureDetector(
+      appBar: AppBar(title: const Text('Aggiungi vinile')),
+      body: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Copertina
+              Center(
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(16),
                   onTap: _pickImage,
-                  child: Container(
-                    width: 120,
-                    height: 120,
-                    decoration: BoxDecoration(
-                        border:Border.all(color: Colors.grey)
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Container(
+                      width: 140,
+                      height: 140,
+                      color: theme.colorScheme.surfaceVariant,
+                      child: _coverFile != null
+                          ? Image.file(_coverFile!, fit: BoxFit.cover)
+                          : Image.asset('assets/immagini/vinilee.png', fit: BoxFit.cover),
                     ),
-                    child: _immagineFile != null
-                        ? Image.file(_immagineFile!, fit: BoxFit.cover)
-                        : Image.asset('assets/immagini/vinilee.png', fit: BoxFit.cover),
                   ),
                 ),
+              ),
+              const SizedBox(height: 24),
 
-                const SizedBox(width: 16,),
-                //gestione form
-                Expanded(child: Column(
-                  children: [
-                    TextFormField(
-                      controller: _titoloController,
-                      decoration: const InputDecoration(labelText: 'Titolo'),
-                      validator: (value) => value!.isEmpty? 'Inserisci un titolo' : null,
-                    ),
-                    TextFormField(
-                      controller: _artistaController,
-                      decoration: const InputDecoration(labelText: 'Artista'),
-                      validator: (value) => value!.isEmpty? 'Inserisci un artista' : null,
-                    ),
-                    TextFormField(
-                      controller: _annoController,
-                      decoration: const InputDecoration(labelText: 'Anno'),
-                      keyboardType: TextInputType.number,
-                      validator: (value) => ( value!.isEmpty || int.tryParse(value)==null|| int.tryParse(value)!<1948 || int.tryParse(value)!>DateTime.now().year)? 'Inserisci un anno valido' : null,
-                    ),
-                    TextFormField(
-                      controller: _etichettaController,
-                      decoration: const InputDecoration(labelText: 'Etichetta'),
-                      validator: (value) => value!.isEmpty? 'Inserisci un etichetta' : null,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              // TextFields
+              _M3TextField(controller: _titolo, label: 'Titolo'),
+              _M3TextField(controller: _artista, label: 'Artista'),
+              _M3TextField(
+                controller: _anno,
+                label: 'Anno',
+                keyboardType: TextInputType.number,
+                validator: (v) {
+                  final y = int.tryParse(v ?? '');
+                  if (y == null || y < 1948 || y > DateTime.now().year) return 'Anno non valido';
+                  return null;
+                },
+              ),
+              _M3TextField(controller: _etichetta, label: 'Etichetta'),
+
+              // Categoria
+              DropdownButtonFormField<int>(
+                value: _genereId,
+                items: _generi
+                    .map((g) => DropdownMenuItem<int>(value: g.id, child: Text(g.nome)))
+                    .toList(),
+                onChanged: (v) => setState(() => _genereId = v),
+                decoration: const InputDecoration(labelText: 'Categoria'),
+              ),
+              const SizedBox(height: 16),
+
+              // Condizione
+              SegmentedButton<int>(
+                segments: Condizione.values
+                    .map((c) => ButtonSegment(value: c.index, label: Text(c.descrizione)))
+                    .toList(),
+                selected: {_condizioneIdx},
+                onSelectionChanged: (s) => setState(() => _condizioneIdx = s.first),
+              ),
+              const SizedBox(height: 16),
+
+              // Copie e preferito
+              Row(
+                children: [
+                  Expanded(
+                    child: Row(
                       children: [
-                        const Text("Copie possedute"),
-                        IconButton(
-                          icon: const Icon(Icons.remove),
-                          onPressed: () {
-                            setState(() {
-                              if (_numeroCopie > 1) _numeroCopie--;
-                            });
-                          },
-                        ),
-
-                        Text("$_numeroCopie"),
-
-                        IconButton(
-                          icon: const Icon(Icons.add),
-                          onPressed: () {
-                            setState(() {
-                              _numeroCopie++;
-                            });
-                          },
-                        ),
-
+                        IconButton(icon: const Icon(Icons.remove_circle_outline), onPressed: _copie > 1 ? () => setState(() => _copie--) : null),
+                        Text('$_copie copie'),
+                        IconButton(icon: const Icon(Icons.add_circle_outline), onPressed: () => setState(() => _copie++)),
                       ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(_preferito ? Icons.star_rounded : Icons.star_border_rounded, color: Colors.amber, size: 32),
+                    onPressed: () => setState(() => _preferito = !_preferito),
+                  )
+                ],
+              ),
+              const SizedBox(height: 32),
 
-                    ),
-                    DropdownButtonFormField<int>(
-                      value: _genereSelezionato,
-                      items: _categorie.map((categoria) {
-                        return DropdownMenuItem<int>(
-                          value: categoria.id,
-                          child: Text(categoria.nome),
-                        );
-                      }).toList(),
-                      onChanged: (val) {
-                        setState(() {
-                          _genereSelezionato = val;
-                        });
-                      },
-                      decoration: const InputDecoration(labelText: "Categoria"),
-                    ),
-                    DropdownButtonFormField<int>(
-                      value: _condizione,
-                      items: Condizione.values
-                          .asMap()
-                          .entries
-                          .map((e) => DropdownMenuItem(
-                          value: e.key,
-                          child: Text(e.value.descrizione),
-                          ),
-                      )
-                          .toList(),
-                      onChanged: (val) => setState(() => _condizione = val!),
-                      decoration: const InputDecoration(labelText: "Condizione"),
-                    ),
-                    IconButton(
-                      icon: Icon(
-                        _preferito ? Icons.star : Icons.star_border,
-                        color: Colors.amber,
-                        size: 30,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _preferito = !_preferito;
-                        });
-                      },
-                    ),
-                    const Text("Preferito"),
-                    const SizedBox(height: 12),
-                    ElevatedButton(
-                      onPressed: _formValido() ? _aggiungi : null,
-                      child: const Text("Aggiungi Vinile"),
-                    ),
-                  ],
-                )
-                )
-
-
-              ],//fine childer
-            )
+              // Pulsante salva
+              FilledButton.icon(
+                onPressed: _formValid ? _aggiungi : null,
+                icon: const Icon(Icons.add),
+                label: const Text('Aggiungi alla collezione'),
+              ),
+            ],
+          ),
         ),
       ),
-
     );
-
   }
+}
+
+class _M3TextField extends StatelessWidget {
+  final TextEditingController controller;
+  final String label;
+  final TextInputType? keyboardType;
+  final String? Function(String?)? validator;
+  const _M3TextField({required this.controller, required this.label, this.keyboardType, this.validator});
+
+  @override
+  Widget build(BuildContext context) => TextFormField(
+    controller: controller,
+    keyboardType: keyboardType,
+    validator: validator ?? (v) => v == null || v.trim().isEmpty ? 'Campo obbligatorio' : null,
+    decoration: InputDecoration(labelText: label),
+  );
 }

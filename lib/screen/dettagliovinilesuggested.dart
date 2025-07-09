@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:vinyl_collection_app/database/databasehelper.dart';
 import 'package:vinyl_collection_app/screen/schermatamodifica.dart';
 import '../vinile/vinile.dart';
 
-class DettaglioVinileSuggested extends StatefulWidget { // <--- Da StatelessWidget a StatefulWidget
+class DettaglioVinileSuggested extends StatefulWidget {
   final Vinile vinile;
   const DettaglioVinileSuggested({super.key, required this.vinile});
 
@@ -10,48 +11,66 @@ class DettaglioVinileSuggested extends StatefulWidget { // <--- Da StatelessWidg
   State<DettaglioVinileSuggested> createState() => _DettaglioVinileSuggestedState();
 }
 
-class _DettaglioVinileSuggestedState extends State<DettaglioVinileSuggested> { // <--- Nuova classe State
+class _DettaglioVinileSuggestedState extends State<DettaglioVinileSuggested> {
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+
     return Scaffold(
-      appBar: AppBar(title: Text(widget.vinile.titolo)), // Usa widget.vinile
+      appBar: AppBar(title: Text(widget.vinile.titolo)),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         children: [
-          // Copertina
-          AspectRatio(
-            aspectRatio: 1,
+          // Copertina grande
+          Center(
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: widget.vinile.coverWidget, // Usa widget.vinile
+              borderRadius: BorderRadius.circular(16),
+              child: SizedBox(
+                width: 220,
+                height: 220,
+                child: widget.vinile.coverWidget,
+              ),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
 
-          _InfoRow('Artista', widget.vinile.artista), // Usa widget.vinile
-          _InfoRow('Anno', widget.vinile.anno?.toString() ?? '–'), // Usa widget.vinile
-          _InfoRow('Etichetta', widget.vinile.etichettaDiscografica ?? '–'), // Usa widget.vinile
+          _InfoRow('Artista', widget.vinile.artista, textTheme),
+          _InfoRow('Anno', widget.vinile.anno?.toString() ?? '—', textTheme),
+          _InfoRow('Etichetta', widget.vinile.etichettaDiscografica ?? '—', textTheme),
+
+          FutureBuilder<String?>(
+            future: DatabaseHelper.instance.getGenereNomeById(widget.vinile.genere ?? -1),
+            builder: (context, snapshot) {
+              String value;
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                value = 'Caricamento...';
+              } else if (snapshot.hasError) {
+                value = 'Errore';
+              } else if (!snapshot.hasData || snapshot.data == null || snapshot.data!.isEmpty) {
+                value = 'Sconosciuto';
+              } else {
+                value = snapshot.data!;
+              }
+              return _InfoRow('Genere', value, textTheme);
+            },
+          ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () async { // <--- Aggiungi 'async' qui
-          // Aspetta il risultato dalla SchermataModifica
-          final bool? added = await Navigator.push<bool>( // <--- Aspetta un booleano
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat
+      ,
+      floatingActionButton: FilledButton.icon(
+        icon: const Icon(Icons.playlist_add),
+        label: const Text('Aggiungi alla collezione'),
+        onPressed: () async {
+          final added = await Navigator.push<bool>(
             context,
             MaterialPageRoute(
-              builder: (context) => SchermataModifica(vinile: widget.vinile, suggested: true),
+              builder: (_) => SchermataModifica(vinile: widget.vinile, suggested: true),
             ),
           );
-
-          // Se l'elemento è stato aggiunto con successo, torna indietro segnalando true
-          if (added == true) {
-            if (mounted) { // Assicurati che il widget sia ancora montato
-              Navigator.pop(context, true); // <--- Passa true alla HomeScreen
-            }
-          }
+          if (added == true && mounted) Navigator.pop(context, true);
         },
-        icon: const Icon(Icons.playlist_add),
-        label: const Text('Aggiungi'),
       ),
     );
   }
@@ -60,17 +79,17 @@ class _DettaglioVinileSuggestedState extends State<DettaglioVinileSuggested> { /
 class _InfoRow extends StatelessWidget {
   final String label;
   final String value;
-  const _InfoRow(this.label, this.value);
+  final TextTheme textTheme;
+  const _InfoRow(this.label, this.value, this.textTheme);
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 6),
+    padding: const EdgeInsets.symmetric(vertical: 8),
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('$label: ',
-            style: const TextStyle(fontWeight: FontWeight.bold)),
-        Expanded(child: Text(value)),
+        Text('$label: ', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+        Expanded(child: Text(value, style: textTheme.bodyMedium)),
       ],
     ),
   );

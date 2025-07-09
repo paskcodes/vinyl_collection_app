@@ -11,7 +11,7 @@ class DiscogsService {
   static final String? _token = dotenv.env['DISCOGS_TOKEN'];
   static const String _baseUrl = 'https://api.discogs.com/database/search';
 
-  /// Ricerche libere (titolo / artista / label *full‑text*)
+  // Ricerche libere (titolo / artista / label *full‑text*)
   Future<List<Vinile>> ricerca(String query) async {
     final uri = _buildUri({'q': query, 'type': 'release'});
     final res = await http.get(uri);
@@ -21,7 +21,7 @@ class DiscogsService {
     return _mapResults(results);
   }
 
-  /// Release «hot» su Discogs
+  // Release «hot» su Discogs
   Future<List<Vinile>> fetchTrendingVinyls({int limit = 10}) async {
     final uri = _buildUri({'type': 'release', 'sort': 'hot', 'per_page': '$limit'});
     final res = await http.get(uri);
@@ -30,8 +30,6 @@ class DiscogsService {
 
     return _mapResults(results);
   }
-
-  // ============== private helpers ==============
 
   Uri _buildUri(Map<String, String> params) {
     if (_token == null || _token!.isEmpty) {
@@ -62,10 +60,49 @@ class DiscogsService {
         titolo = parts.sublist(1).join(' - ').trim();
       }
 
-      //   --- GENERE -------------------------------------------
-      final List<dynamic>? generiJson = r['genere'] as List<dynamic>?;
+      final List<dynamic>? generiJson = r['genre'] as List<dynamic>?;
       final String? primoGenere = generiJson?.isNotEmpty == true ? generiJson!.first as String : null;
       final int? genereId = await DatabaseHelper.instance.controlloGenere(primoGenere);
+
+      return Vinile(
+        titolo: titolo,
+        artista: artista,
+        anno: int.tryParse(r['year']?.toString() ?? ''),
+        genere: genereId,
+        etichettaDiscografica: (r['label'] as List?)?.first,
+        condizione: Condizione.nuovo,
+        immagine: r['cover_image'] as String?,
+        preferito: false,
+      );
+    }).toList());
+  }
+
+  Future<List<Vinile>> cercaPerGenere(String genere, {int limit = 10}) async {
+    final uri = Uri.parse(
+      'https://api.discogs.com/database/search?genre=$genere&type=release&per_page=$limit&token=$_token',
+    );
+    final res = await http.get(uri);
+    if (res.statusCode != 200) throw Exception('Errore: ${res.statusCode}');
+
+    final results = (jsonDecode(res.body)['results'] as List?) ?? [];
+
+    return Future.wait(results.map<Future<Vinile>>((r) async {
+      final fullTitle = r['title'] ?? '';
+      var artista = r['artist'] ?? '';
+      var titolo = fullTitle;
+
+      if (artista.isEmpty && fullTitle.contains(' - ')) {
+        final parts = fullTitle.split(' - ');
+        artista = parts.first.trim();
+        titolo = parts.sublist(1).join(' - ').trim();
+      }
+
+      final List<dynamic>? generiJson = r['genre'] as List<dynamic>?;
+      final String? primoGenere = generiJson?.isNotEmpty == true ? generiJson!.first as String : null;
+
+      final int? genereId = primoGenere != null
+          ? await DatabaseHelper.instance.controlloGenere(primoGenere)
+          : null;
 
       return Vinile(
         titolo: titolo,

@@ -21,6 +21,8 @@ class HomeScreenState extends State<HomeScreen> {
 
   List<Vinile> _recent = [];
   List<Vinile> _suggested = [];
+  List<Vinile> _potrebberoPiacerti = [];
+
 
   bool _isLoading = true;
 
@@ -33,12 +35,19 @@ class HomeScreenState extends State<HomeScreen> {
   Future<void> caricaDati() async {
     final recent = await _db.getLastVinili(limit: 5);
     final suggested = await _discogs.fetchTrendingVinyls(limit: 10);
+    final generePreferito = await _db.getGenerePiuComune();
+    final consigliati = generePreferito != null
+        ? await _discogs.cercaPerGenere(generePreferito, limit: 10)
+        : <Vinile>[];
+
     setState(() {
       _recent = recent;
       _suggested = suggested;
+      _potrebberoPiacerti = consigliati;
       _isLoading = false;
     });
   }
+
 
   Future<void> _apriDettaglioSuggested(BuildContext ctx, Vinile v) async {
     final aggiorna = await Navigator.push<bool>(
@@ -87,8 +96,9 @@ class HomeScreenState extends State<HomeScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            Text('Ultimi vinili aggiunti', style: headline),
-            const SizedBox(height: 12),
+            SizedBox(height: MediaQuery.of(context).padding.top + 12), // padding top dinamico
+            Text('Ultimi Vinili Aggiunti', style: headline),
+            const SizedBox(height: 6),
             _HorizontalList(
               vinili: _recent,
               itemWidth: cardWidth,
@@ -98,11 +108,23 @@ class HomeScreenState extends State<HomeScreen> {
                 onTap: () => _apriDettaglioCollezione(vinile),
               ),
             ),
-            const SizedBox(height: 28),
-            Text('Consigliati per te', style: headline),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
+            Text('Ultimi Trend', style: headline),
+            const SizedBox(height: 6),
             _HorizontalList(
               vinili: _suggested,
+              itemWidth: cardWidth,
+              listHeight: listHeight,
+              itemBuilder: (v) => SuggestionTile(
+                vinile: v,
+                onTap: () => _apriDettaglioSuggested(context, v),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text('Potrebbero Piacerti', style: headline),
+            const SizedBox(height: 6),
+            _HorizontalList(
+              vinili: _potrebberoPiacerti,
               itemWidth: cardWidth,
               listHeight: listHeight,
               itemBuilder: (v) => SuggestionTile(

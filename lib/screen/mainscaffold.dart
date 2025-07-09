@@ -53,10 +53,31 @@ class _MainScaffoldState extends State<MainScaffold> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(['Home', 'Cerca', 'Collezione', 'Categorie'][_currentIndex]),
-        centerTitle: true,
-        actions: const [ThemeToggleAction()],
-      ),
+  centerTitle: true,
+  leading: _currentIndex == 3
+      ? IconButton(
+          icon: Icon(
+            _categorieKey.currentState?.mostraTutte ?? false
+                ? Icons.visibility_off
+                : Icons.visibility,
+          ),
+          tooltip: _categorieKey.currentState?.mostraTutte ?? false
+              ? 'Mostra solo categorie con vinili'
+              : 'Mostra tutte le categorie',
+          onPressed: () {
+            _categorieKey.currentState?.toggleMostraTutte();
+            setState(() {}); // forza rebuild per aggiornare icona
+          },
+        )
+      : null,
+  title: Text(
+    ['Home', 'Cerca', 'Collezione', 'Categorie'][_currentIndex],
+    style: const TextStyle(fontSize: 20),
+  ),
+  actions: const [ThemeToggleAction()],
+),
+
+
 
       body: PageView(
         controller: _pageController,
@@ -65,7 +86,13 @@ class _MainScaffoldState extends State<MainScaffold> {
         children: _pages,
       ),
 
-      floatingActionButton: Tooltip(
+      floatingActionButton: _currentIndex == 3
+    ? FloatingActionButton(
+        tooltip: 'Aggiungi nuova categoria',
+        onPressed: _categorieKey.currentState?.vaiAggiuntaCategoria,
+        child: const Icon(Icons.create_new_folder),
+      )
+    : Tooltip(
         message: 'Aggiungi un nuovo vinile',
         waitDuration: const Duration(milliseconds: 300),
         child: FloatingActionButton(
@@ -75,6 +102,7 @@ class _MainScaffoldState extends State<MainScaffold> {
           child: const Icon(Icons.add),
         ),
       ),
+
 
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,

@@ -1,15 +1,14 @@
-
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../categoria/genere.dart';
 import '../database/databasehelper.dart';
 
 class DialogSelezioneGenere extends StatefulWidget {
+  const DialogSelezioneGenere({super.key});
   @override
   State<DialogSelezioneGenere> createState() => _DialogSelezioneGenereState();
 }
+
 
 class _DialogSelezioneGenereState extends State<DialogSelezioneGenere> {
   int? _genereSelezionato;

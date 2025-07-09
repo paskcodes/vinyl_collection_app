@@ -9,8 +9,6 @@ import '../vinile/condizione.dart';
 import '../vinile/vinile.dart';
 
 class SchermataAggiungi extends StatefulWidget {
-
-
   const SchermataAggiungi({super.key});
 
   @override

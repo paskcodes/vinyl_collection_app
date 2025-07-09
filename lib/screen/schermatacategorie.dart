@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vinyl_collection_app/components/genere_tile.dart';
 import 'package:vinyl_collection_app/screen/schermatapercategoria.dart';
-import 'package:vinyl_collection_app/utils/dimensionischermo.dart';
 import '../categoria/genere.dart';
 import '../database/databasehelper.dart';
 
@@ -14,9 +13,12 @@ class SchermataCategorie extends StatefulWidget {
 
 class SchermataCategorieState extends State<SchermataCategorie> {
   List<Map<String, dynamic>>? _listaFiltrata;
-  Set<int> _categorieSelezionate = {};
+  final Set<int> _categorieSelezionate = {};
   bool _modalitaSelezione = false;
   bool _mostraTutte = false;
+
+  // Getter pubblico per _mostraTutte
+  bool get mostraTutte => _mostraTutte;
 
   @override
   void initState() {
@@ -25,11 +27,21 @@ class SchermataCategorieState extends State<SchermataCategorie> {
   }
 
   Future<void> aggiornaGeneri() async {
-    List<Map<String, dynamic>> lista = _mostraTutte
+    final db = DatabaseHelper.instance;
+    List<Map<String, dynamic>> listaBase = _mostraTutte
         ? await Genere.tuttiGeneri()
         : await Genere.generiFiltrati();
+
+    // Aggiungi le copertine per ogni genere
+    List<Map<String, dynamic>> listaCompleta = [];
+    for (var genere in listaBase) {
+      int id = genere['id'];
+      List<String> copertine = await db.getCopertineViniliByGenere(id);
+      listaCompleta.add({...genere, 'copertine': copertine});
+    }
+
     setState(() {
-      _listaFiltrata = lista;
+      _listaFiltrata = listaCompleta;
     });
   }
 
@@ -42,7 +54,9 @@ class SchermataCategorieState extends State<SchermataCategorie> {
 
   void vaiAggiuntaCategoria() {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Funzione da implementare: aggiunta categoria")),
+      const SnackBar(
+        content: Text("Funzione da implementare: aggiunta categoria"),
+      ),
     );
   }
 
@@ -72,8 +86,10 @@ class SchermataCategorieState extends State<SchermataCategorie> {
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) =>
-            SchermataViniliPerCategoria(genereId: genereId, genereNome: genereNome),
+        builder: (context) => SchermataViniliPerCategoria(
+          genereId: genereId,
+          genereNome: genereNome,
+        ),
       ),
     );
     aggiornaGeneri();
@@ -81,40 +97,55 @@ class SchermataCategorieState extends State<SchermataCategorie> {
 
   Future<void> eliminaCategorieSelezionate() async {
     List<Map<String, dynamic>> eliminabili = _listaFiltrata!
-        .where((genere) =>
-    _categorieSelezionate.contains(genere['id']) && genere['conteggio'] == 0)
+        .where(
+          (genere) =>
+              _categorieSelezionate.contains(genere['id']) &&
+              genere['conteggio'] == 0,
+        )
         .toList();
 
     final nonEliminabili = _listaFiltrata!
-        .where((genere) =>
-    _categorieSelezionate.contains(genere['id']) && genere['conteggio'] > 0)
+        .where(
+          (genere) =>
+              _categorieSelezionate.contains(genere['id']) &&
+              genere['conteggio'] > 0,
+        )
         .toList();
 
     if (eliminabili.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Non puoi eliminare categorie che contengono vinili.")),
+        const SnackBar(
+          content: Text("Non puoi eliminare categorie che contengono vinili."),
+        ),
       );
       return;
     }
 
     String messaggio = "Eliminare ${eliminabili.length} categoria/e?";
     if (nonEliminabili.isNotEmpty) {
-      messaggio += "\n(${nonEliminabili.length} non verranno eliminate perché contengono vinili)";
+      messaggio +=
+          "\n(${nonEliminabili.length} non verranno eliminate perché contengono vinili)";
     }
 
-
-    bool conferma = await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Conferma eliminazione"),
-        content: Text(messaggio),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Annulla")),
-          ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text("Elimina")),
-        ],
-      ),
-    ) ?? false;
-
+    bool conferma =
+        await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("Conferma eliminazione"),
+            content: Text(messaggio),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text("Annulla"),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text("Elimina"),
+              ),
+            ],
+          ),
+        ) ??
+        false;
 
     if (conferma) {
       for (var genere in eliminabili) {
@@ -142,20 +173,30 @@ class SchermataCategorieState extends State<SchermataCategorie> {
           decoration: const InputDecoration(labelText: "Nuovo nome"),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Annulla")),
-          ElevatedButton(onPressed: () => Navigator.pop(context, controller.text.trim()), child: const Text("Salva")),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Annulla"),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, controller.text.trim()),
+            child: const Text("Salva"),
+          ),
         ],
       ),
     );
 
     if (nuovoNome != null && nuovoNome.isNotEmpty) {
       bool nomeEsistente = _listaFiltrata!.any(
-            (genere) => genere['nome'].toLowerCase() == nuovoNome.toLowerCase() && genere['id'] != id,
+        (genere) =>
+            genere['nome'].toLowerCase() == nuovoNome.toLowerCase() &&
+            genere['id'] != id,
       );
 
       if (nomeEsistente) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Esiste già una categoria con questo nome.")),
+          const SnackBar(
+            content: Text("Esiste già una categoria con questo nome."),
+          ),
         );
         return;
       }
@@ -165,70 +206,25 @@ class SchermataCategorieState extends State<SchermataCategorie> {
       _modalitaSelezione = false;
       aggiornaGeneri();
     }
-
   }
-
-  /*Widget _buildAddCategoryTile(BuildContext context) {
-    final double cardWidth = context.screenWidth * 0.4;
-    final double iconSize = cardWidth * 0.6;
-    final double titleSize = context.shortestSide * 0.045;
-    final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
-    return InkWell(
-      onTap: vaiAggiuntaCategoria,
-      child: Card(
-        elevation: 4,
-        margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        color: scheme.surfaceContainerHighest,
-        child: Container(
-          width: cardWidth,
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.add_circle_outline, size: iconSize, color: scheme.onSurfaceVariant),
-              const SizedBox(height: 8),
-              Text(
-                'Nuova categoria',
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: titleSize,
-                  color: scheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }*/
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_modalitaSelezione
-            ? "${_categorieSelezionate.length} selezionate"
-            : 'Le tue categorie'),
-        centerTitle: true,
         leading: _modalitaSelezione
             ? IconButton(
-          icon: const Icon(Icons.close),
-          onPressed: () {
-            setState(() {
-              _categorieSelezionate.clear();
-              _modalitaSelezione = false;
-            });
-          },
-        )
+                icon: const Icon(Icons.close),
+                onPressed: () {
+                  setState(() {
+                    _categorieSelezionate.clear();
+                    _modalitaSelezione = false;
+                  });
+                },
+              )
             : null,
         actions: _modalitaSelezione
-            ? [
+      ? [
           if (_categorieSelezionate.length == 1)
             IconButton(
               icon: const Icon(Icons.edit),
@@ -241,78 +237,61 @@ class SchermataCategorieState extends State<SchermataCategorie> {
             onPressed: eliminaCategorieSelezionate,
           ),
         ]
-            : [
-          IconButton(
-            icon: const Icon(Icons.playlist_add),
-            tooltip: 'Aggiungi categoria',
-            onPressed: vaiAggiuntaCategoria,
-          ),
-          IconButton(
-            icon: Icon(_mostraTutte ? Icons.visibility_off : Icons.visibility),
-            tooltip: _mostraTutte
-                ? 'Mostra solo categorie con vinili'
-                : 'Mostra tutte le categorie',
-            onPressed: toggleMostraTutte,
-          ),
-        ],
+      : [],
+
       ),
       body: _listaFiltrata == null
           ? const Center(child: CircularProgressIndicator())
           : _listaFiltrata!.isEmpty
-          ? const Center(child: Text("Aggiungi vinili per visualizzare le categorie."))
-          : GridView.builder(
-        padding: const EdgeInsets.all(16),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          childAspectRatio: (context.screenWidth / 2 - 16) /
-              (context.screenWidth * 0.4 +
-                  (context.shortestSide * 0.045 * 2) +
-                  (context.shortestSide * 0.03) +
-                  8 +
-                  4 +
-                  12 +
-                  12),
-        ),
-        itemCount: _listaFiltrata!.length,//+1
-        itemBuilder: (context, index) {
-          /*if (index == _listaFiltrata!.length) {
-            return _buildAddCategoryTile(context);
-          } else {*/
-            final genereMap = _listaFiltrata![index];
-            final int id = genereMap['id'];
-            final String nome = genereMap['nome'];
-            final int conteggio = genereMap['conteggio'];
-
-            return GestureDetector(
-              onTap: () => onTileTap(id, nome, conteggio),
-              onLongPress: () => onTileLongPress(id),
-              child: Stack(
-                children: [
-                  GenereTile(
-                    genereId: id,
-                    nomeGenere: nome,
-                    numeroVinili: conteggio,
-                    onTap: () => onTileTap(id, nome, conteggio),
+              ? const Center(
+                  child: Text("Aggiungi vinili per visualizzare le categorie."),
+                )
+              : GridView.builder(
+                  padding: const EdgeInsets.all(16),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 0.7,
                   ),
-                  if (_modalitaSelezione)
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: Icon(
-                        _categorieSelezionate.contains(id)
-                            ? Icons.check_circle
-                            : Icons.radio_button_unchecked,
-                        color: Theme.of(context).colorScheme.primary,
+                  itemCount: _listaFiltrata!.length,
+                  itemBuilder: (context, index) {
+                    final genereMap = _listaFiltrata![index];
+                    final int id = genereMap['id'];
+                    final String nome = genereMap['nome'];
+                    final int conteggio = genereMap['conteggio'];
+                    final List<String> copertine = List<String>.from(
+                      genereMap['copertine'] ?? [],
+                    );
+
+                    return GestureDetector(
+                      onTap: () => onTileTap(id, nome, conteggio),
+                      onLongPress: () => onTileLongPress(id),
+                      child: Stack(
+                        children: [
+                          GenereTile(
+                            genereId: id,
+                            nomeGenere: nome,
+                            numeroVinili: conteggio,
+                            copertineVinili: copertine,
+                            onTap: () => onTileTap(id, nome, conteggio),
+                          ),
+                          if (_modalitaSelezione)
+                            Positioned(
+                              top: 8,
+                              right: 8,
+                              child: Icon(
+                                _categorieSelezionate.contains(id)
+                                    ? Icons.check_circle
+                                    : Icons.radio_button_unchecked,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                            ),
+                        ],
                       ),
-                    ),
-                ],
-              ),
-            );
-          //}
-        },
-      ),
+                    );
+                  },
+                ),
     );
   }
 }

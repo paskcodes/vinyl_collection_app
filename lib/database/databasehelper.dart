@@ -286,5 +286,20 @@ class DatabaseHelper {
         where: 'id = ?', whereArgs: [vinileId]);
   }
 
+  /// Restituisce fino a 4 URL di copertine per un determinato genere, ordinate per data di inserimento (più recenti prima).
+  Future<List<String>> getCopertineViniliByGenere(int idGenere, {int limit = 4}) async {
+    final db = await database;
+    final result = await db.query(
+      'collezioneVinili',
+      columns: ['immagine'],
+      where: 'genere = ? AND immagine IS NOT NULL AND immagine != ""',
+      whereArgs: [idGenere],
+      orderBy: 'datetime(creato_il) DESC',
+      limit: limit,
+    );
+
+    return result.map((row) => row['immagine'] as String).toList();
+  }
+
 
 }

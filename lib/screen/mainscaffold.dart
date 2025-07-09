@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../utils/theme_toggle_action.dart';
 import 'homepage.dart';
 import 'ricerca.dart';
 import 'schermatacategorie.dart';
@@ -52,47 +51,21 @@ class _MainScaffoldState extends State<MainScaffold> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-  centerTitle: true,
-  leading: _currentIndex == 3
-      ? IconButton(
-          icon: Icon(
-            _categorieKey.currentState?.mostraTutte ?? false
-                ? Icons.visibility_off
-                : Icons.visibility,
-          ),
-          tooltip: _categorieKey.currentState?.mostraTutte ?? false
-              ? 'Mostra solo categorie con vinili'
-              : 'Mostra tutte le categorie',
-          onPressed: () {
-            _categorieKey.currentState?.toggleMostraTutte();
-            setState(() {}); // forza rebuild per aggiornare icona
-          },
-        )
-      : null,
-  title: Text(
-    ['Home', 'Cerca', 'Collezione', 'Categorie'][_currentIndex],
-    style: const TextStyle(fontSize: 20),
-  ),
-  actions: const [ThemeToggleAction()],
-),
-
-
-
+      // 🔄 PageView = transizione slide
       body: PageView(
         controller: _pageController,
-        physics: const NeverScrollableScrollPhysics(),
+        physics: const NeverScrollableScrollPhysics(), // se non vuoi swipe
         onPageChanged: (index) => setState(() => _currentIndex = index),
         children: _pages,
       ),
 
       floatingActionButton: _currentIndex == 3
-    ? FloatingActionButton(
+          ? FloatingActionButton(
         tooltip: 'Aggiungi nuova categoria',
         onPressed: _categorieKey.currentState?.vaiAggiuntaCategoria,
         child: const Icon(Icons.create_new_folder),
       )
-    : Tooltip(
+          : Tooltip(
         message: 'Aggiungi un nuovo vinile',
         waitDuration: const Duration(milliseconds: 300),
         child: FloatingActionButton(
@@ -103,13 +76,13 @@ class _MainScaffoldState extends State<MainScaffold> {
         ),
       ),
 
-
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         backgroundColor: Colors.black,
         selectedItemColor: const Color(0xFF1DB954),
         unselectedItemColor: Colors.grey,
         onTap: (index) {
+          // animazione: 300ms, lenta
           _pageController.animateToPage(
             index,
             duration: const Duration(milliseconds: 300),

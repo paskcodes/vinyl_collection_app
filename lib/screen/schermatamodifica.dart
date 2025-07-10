@@ -49,6 +49,7 @@ class _SchermataModificaState extends State<SchermataModifica> {
 
   Future<void> _loadGeneri() async {
     final list = await DatabaseHelper.instance.getGeneri();
+    if (!mounted) return;
     setState(() {
       _generi = list;
       _genereId ??= list.isNotEmpty ? list.first.id : null;
@@ -57,7 +58,9 @@ class _SchermataModificaState extends State<SchermataModifica> {
 
   Future<void> _pickImage() async {
     final picked = await _picker.pickImage(source: ImageSource.gallery);
-    if (picked != null) setState(() => _coverFile = File(picked.path));
+    if (picked != null && mounted) {
+      setState(() => _coverFile = File(picked.path));
+    }
   }
 
   bool get _formValid => _formKey.currentState?.validate() == true && _genereId != null;

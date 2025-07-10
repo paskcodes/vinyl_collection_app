@@ -254,26 +254,41 @@ class SchermataCollezioneState extends State<SchermataCollezione> {
                     ),
                     title: Text(vinile.titolo),
                     subtitle: Text('${vinile.artista} (${vinile.anno})'),
-                    trailing: _modalitaSelezione
-                        ? Icon(
-                      selezionato
-                          ? Icons.check_circle
-                          : Icons.radio_button_unchecked,
-                      color: selezionato ? Colors.blue : Colors.grey,
-                    )
-                        : PopupMenuButton<String>(
-                      onSelected: (scelta) {
-                        if (scelta == 'modifica') {
-                          _modificaVinile(vinile);
-                        } else if (scelta == 'elimina') {
-                          _confermaEliminaVinile(vinile);
-                        }
-                      },
-                      itemBuilder: (context) => const [
-                        PopupMenuItem(value: 'modifica', child: Text('Modifica')),
-                        PopupMenuItem(value: 'elimina', child: Text('Elimina')),
-                      ],
-                    ),
+                      trailing: _modalitaSelezione
+                          ? Icon(
+                        selezionato
+                            ? Icons.check_circle
+                            : Icons.radio_button_unchecked,
+                        color: selezionato ? Colors.blue : Colors.grey,
+                      )
+                          : Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: Icon(
+                              vinile.preferito ? Icons.star_rounded : Icons.star_border_rounded,
+                              color: vinile.preferito ? Colors.amber : Colors.grey,
+                            ),
+                            onPressed: () async {
+                              setState(() => vinile.preferito = !vinile.preferito);
+                              await DatabaseHelper.instance.aggiornaPreferito(vinile.id!, vinile.preferito);
+                            },
+                          ),
+                          PopupMenuButton<String>(
+                            onSelected: (scelta) {
+                              if (scelta == 'modifica') {
+                                _modificaVinile(vinile);
+                              } else if (scelta == 'elimina') {
+                                _confermaEliminaVinile(vinile);
+                              }
+                            },
+                            itemBuilder: (context) => const [
+                              PopupMenuItem(value: 'modifica', child: Text('Modifica')),
+                              PopupMenuItem(value: 'elimina', child: Text('Elimina')),
+                            ],
+                          ),
+                        ],
+                      ),
                   ),
                 );
               },

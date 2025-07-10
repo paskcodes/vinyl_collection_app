@@ -20,6 +20,7 @@ class HomeScreenState extends State<HomeScreen> {
   final _discogs = DiscogsService();
 
   List<Vinile> _recent = [];
+  List<Vinile> _preferiti = [];
   List<Vinile> _suggested = [];
   List<Vinile> _potrebberoPiacerti = [];
   List<Vinile> _piuCollezionati = [];
@@ -38,6 +39,7 @@ class HomeScreenState extends State<HomeScreen> {
 
   Future<void> caricaDati() async {
     final recent = await _db.getLastVinili(limit: 5);
+    final preferiti = await _db.getPreferiti();
     final suggested = await _discogs.cercaViniliTendenza(limit: 10);
     final generePreferito = await _db.getGenerePiuComune();
     final consigliati = generePreferito != null
@@ -52,8 +54,12 @@ class HomeScreenState extends State<HomeScreen> {
     final prossimeUscite = await _discogs.prossimeUscite(limit: 10);
     final ultimeAggiunte = await _discogs.ultimeReleaseAggiunte(limit: 10);
 
+    // ✅ CONTROLLA SE IL WIDGET È ANCORA MONTATO
+    if (!mounted) return;
+
     setState(() {
       _recent = recent;
+      _preferiti = preferiti;
       _suggested = suggested;
       _potrebberoPiacerti = consigliati;
       _piuCollezionati = piuCollezionati;
@@ -63,8 +69,6 @@ class HomeScreenState extends State<HomeScreen> {
       _isLoading = false;
     });
   }
-
-
 
   Future<void> _apriDettaglioSuggested(BuildContext ctx, Vinile v) async {
     final aggiorna = await Navigator.push<bool>(
@@ -81,13 +85,14 @@ class HomeScreenState extends State<HomeScreen> {
       context,
       MaterialPageRoute(builder: (_) => DettaglioVinileCollezione(vinile: v)),
     );
-    if (aggiorna == true||aggiorna==null) {
+    if ((aggiorna == true || aggiorna == null) && mounted) {
       logger.i("\n\n\n\nAggiorno!\n\n\n");
       await caricaDati();
-    }else{
+    } else {
       logger.i("\n\n\n Non Aggiorno\n\n\n");
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -125,7 +130,6 @@ class HomeScreenState extends State<HomeScreen> {
                 onTap: () => _apriDettaglioCollezione(vinile),
               ),
             ),
-            const SizedBox(height: 8),
             Text('Ultimi Trend', style: headline),
             const SizedBox(height: 6),
             _HorizontalList(
@@ -137,7 +141,17 @@ class HomeScreenState extends State<HomeScreen> {
                 onTap: () => _apriDettaglioSuggested(context, v),
               ),
             ),
-            const SizedBox(height: 8),
+            Text('I tuoi Preferiti', style: headline),
+            const SizedBox(height: 6),
+            _HorizontalList(
+              vinili: _preferiti,
+              itemWidth: cardWidth,
+              listHeight: listHeight,
+              itemBuilder: (vinile) => SuggestionTile(
+                vinile: vinile,
+                onTap: () => _apriDettaglioCollezione(vinile),
+              ),
+            ),
             Text('Potrebbero Piacerti', style: headline),
             const SizedBox(height: 6),
             _HorizontalList(
@@ -149,7 +163,6 @@ class HomeScreenState extends State<HomeScreen> {
                 onTap: () => _apriDettaglioSuggested(context, v),
               ),
             ),
-            const SizedBox(height: 8),
             Text('Scelte Casuali dalla tua Collezione', style: headline),
             const SizedBox(height: 6),
             _HorizontalList(
@@ -161,7 +174,6 @@ class HomeScreenState extends State<HomeScreen> {
                 onTap: () => _apriDettaglioCollezione(v),
               ),
             ),
-            const SizedBox(height: 8),
             Text('I Più Collezionati', style: headline),
             const SizedBox(height: 6),
             _HorizontalList(
@@ -173,7 +185,6 @@ class HomeScreenState extends State<HomeScreen> {
                 onTap: () => _apriDettaglioSuggested(context, v),
               ),
             ),
-            const SizedBox(height: 8),
             Text('Le Prossime Uscite', style: headline),
             const SizedBox(height: 6),
             _HorizontalList(
@@ -185,7 +196,6 @@ class HomeScreenState extends State<HomeScreen> {
                 onTap: () => _apriDettaglioSuggested(context, v),
               ),
             ),
-            const SizedBox(height: 8),
             Text('Le Ultime Aggiunte su Discogs', style: headline),
             const SizedBox(height: 6),
             _HorizontalList(

@@ -14,31 +14,44 @@ class DettaglioVinileSuggested extends StatefulWidget {
 class _DettaglioVinileSuggestedState extends State<DettaglioVinileSuggested> {
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-
     return Scaffold(
-      appBar: AppBar(title: Text(widget.vinile.titolo)),
+      appBar: AppBar(
+        title: Text(widget.vinile.titolo),
+        centerTitle: true,
+      ),
       body: ListView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
         children: [
-          // Copertina grande
+          // Cover con effetto vetrina
           Center(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: SizedBox(
-                width: 220,
-                height: 220,
+            child: Material(
+              elevation: 8,
+              borderRadius: BorderRadius.circular(20),
+              clipBehavior: Clip.antiAlias,
+              child: AspectRatio(
+                aspectRatio: 1,
                 child: widget.vinile.coverWidget,
               ),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 32),
 
-          _InfoRow('Artista', widget.vinile.artista, textTheme),
-          _InfoRow('Anno', widget.vinile.anno?.toString() ?? '—', textTheme),
-          _InfoRow('Etichetta', widget.vinile.etichettaDiscografica ?? '—', textTheme),
-
+          // Box informativi in stile moderno
+          _ModernInfoBox(
+            icon: Icons.person,
+            label: 'Artista',
+            value: widget.vinile.artista,
+          ),
+          _ModernInfoBox(
+            icon: Icons.calendar_today,
+            label: 'Anno',
+            value: widget.vinile.anno?.toString() ?? '–',
+          ),
+          _ModernInfoBox(
+            icon: Icons.album,
+            label: 'Etichetta',
+            value: widget.vinile.etichettaDiscografica ?? '–',
+          ),
           FutureBuilder<String?>(
             future: DatabaseHelper.instance.getGenereNomeById(widget.vinile.genere ?? -1),
             builder: (context, snapshot) {
@@ -47,50 +60,95 @@ class _DettaglioVinileSuggestedState extends State<DettaglioVinileSuggested> {
                 value = 'Caricamento...';
               } else if (snapshot.hasError) {
                 value = 'Errore';
-              } else if (!snapshot.hasData || snapshot.data == null || snapshot.data!.isEmpty) {
+              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                 value = 'Sconosciuto';
               } else {
                 value = snapshot.data!;
               }
-              return _InfoRow('Genere', value, textTheme);
+
+              return _ModernInfoBox(
+                icon: Icons.category,
+                label: 'Genere',
+                value: value,
+              );
             },
           ),
         ],
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat
-      ,
-      floatingActionButton: FilledButton.icon(
-        icon: const Icon(Icons.playlist_add),
-        label: const Text('Aggiungi alla collezione'),
-        onPressed: () async {
-          final added = await Navigator.push<bool>(
-            context,
-            MaterialPageRoute(
-              builder: (_) => SchermataModifica(vinile: widget.vinile, suggested: true),
-            ),
-          );
-          if (added == true && mounted) Navigator.pop(context, true);
-        },
+
+      // Pulsante coerente graficamente con DettaglioVinileCollezione
+      bottomNavigationBar: BottomAppBar(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        child: FilledButton.icon(
+          icon: const Icon(Icons.playlist_add),
+          label: const Text('Aggiungi alla collezione'),
+          style: FilledButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+            textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          ),
+          onPressed: () async {
+            final added = await Navigator.push<bool>(
+              context,
+              MaterialPageRoute(
+                builder: (_) => SchermataModifica(vinile: widget.vinile, suggested: true),
+              ),
+            );
+            if (added == true && mounted) Navigator.pop(context, true);
+          },
+        ),
       ),
     );
   }
 }
 
-class _InfoRow extends StatelessWidget {
+// BOX COERENTE con DettaglioVinileCollezione
+class _ModernInfoBox extends StatelessWidget {
+  final IconData icon;
   final String label;
   final String value;
-  final TextTheme textTheme;
-  const _InfoRow(this.label, this.value, this.textTheme);
+  final Color? iconColor;
+
+  const _ModernInfoBox({
+    required this.icon,
+    required this.label,
+    required this.value,
+    this.iconColor,
+  });
 
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 8),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('$label: ', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-        Expanded(child: Text(value, style: textTheme.bodyMedium)),
-      ],
-    ),
-  );
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 24, color: iconColor ?? theme.colorScheme.primary),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    )),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

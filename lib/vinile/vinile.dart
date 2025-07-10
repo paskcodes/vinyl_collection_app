@@ -17,7 +17,7 @@ class Vinile {
   final int? copie;
   final Condizione? condizione;
   final String? immagine;           // asset, file locale o URL
-  final bool preferito;
+  bool preferito;
   final String creatoIl;            // ISO‑8601
 
   /* ---------- costruttore ---------- */

@@ -292,6 +292,27 @@ class DatabaseHelper {
     return result.map((row) => row['immagine'] as String).toList();
   }
 
+  Future<void> aggiornaPreferito(int id, bool preferito) async {
+    final db = await database;
+    await db.update(
+      'collezioneVinili',
+      {'preferito': preferito ? 1 : 0},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<List<Vinile>> getPreferiti() async {
+    final db = await database;
+    final maps = await db.query(
+      'collezioneVinili',
+      where: 'preferito = ?',
+      whereArgs: [1],
+      orderBy: 'id DESC',
+    );
+    return maps.map((m) => Vinile.fromMap(m)).toList();
+  }
+
   Future<String?> getGenerePiuComune() async {
     final db = await database;
     final result = await db.rawQuery('''

@@ -140,12 +140,14 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
               const SizedBox(height: 16),
 
               // Condizione
-              SegmentedButton<int>(
-                segments: Condizione.values
-                    .map((c) => ButtonSegment(value: c.index, label: Text(c.descrizione)))
-                    .toList(),
-                selected: {_condizioneIdx},
-                onSelectionChanged: (s) => setState(() => _condizioneIdx = s.first),
+              Center(
+                child: SegmentedButton<int>(
+                  segments: Condizione.values
+                      .map((c) => ButtonSegment(value: c.index, label: Text(c.descrizione)))
+                      .toList(),
+                  selected: {_condizioneIdx},
+                  onSelectionChanged: (s) => setState(() => _condizioneIdx = s.first),
+                ),
               ),
               const SizedBox(height: 16),
 
@@ -170,10 +172,12 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
               const SizedBox(height: 32),
 
               // Pulsante salva
-              FilledButton.icon(
-                onPressed: _formValid ? _aggiungi : null,
-                icon: const Icon(Icons.add),
-                label: const Text('Aggiungi alla collezione'),
+              Center(
+                child: FilledButton.icon(
+                  onPressed: _formValid ? _aggiungi : null,
+                  icon: const Icon(Icons.add),
+                  label: const Text('Aggiungi alla collezione'),
+                ),
               ),
             ],
           ),

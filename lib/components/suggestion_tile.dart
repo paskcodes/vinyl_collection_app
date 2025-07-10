@@ -42,12 +42,24 @@ class SuggestionTile extends StatelessWidget {
               child: SizedBox(
                 width: imageHeight, // Usa l'altezza calcolata in base alla larghezza della card
                 height: imageHeight,
-                child: vinile.immagine != null && vinile.immagine!.isNotEmpty
-                    ? Image.network(
+                child: vinile.immagine != null
+                    ? (vinile.immagine!.startsWith('assets/')
+                    ? Image.asset(
                   vinile.immagine!,
                   fit: BoxFit.cover,
                 )
-                    : Icon(Icons.album, size: imageHeight * 0.5, color: Colors.grey), // Dimensione icona proporzionale
+                    : Image.network(
+                  vinile.immagine!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Image.asset(
+                    'assets/immagini/vinilee.png',
+                    fit: BoxFit.cover,
+                  ),
+                ))
+                    : Image.asset(
+                  'assets/immagini/vinilee.png',
+                  fit: BoxFit.cover,
+                ), // Dimensione icona proporzionale
               ),
             ),
             const SizedBox(height: 6),

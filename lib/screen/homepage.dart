@@ -22,6 +22,10 @@ class HomeScreenState extends State<HomeScreen> {
   List<Vinile> _recent = [];
   List<Vinile> _suggested = [];
   List<Vinile> _potrebberoPiacerti = [];
+  List<Vinile> _piuCollezionati = [];
+  List<Vinile> _ultimiInseriti = [];
+  List<Vinile> _randomCollection = [];
+  List<Vinile> _ultimeAggiunte = [];
 
 
   bool _isLoading = true;
@@ -34,19 +38,32 @@ class HomeScreenState extends State<HomeScreen> {
 
   Future<void> caricaDati() async {
     final recent = await _db.getLastVinili(limit: 5);
-    final suggested = await _discogs.fetchTrendingVinyls(limit: 10);
+    final suggested = await _discogs.cercaViniliTendenza(limit: 10);
     final generePreferito = await _db.getGenerePiuComune();
     final consigliati = generePreferito != null
         ? await _discogs.cercaPerGenere(generePreferito, limit: 10)
         : <Vinile>[];
 
+    final collezione = await _db.getCollezione();
+    collezione.shuffle();
+    final random = collezione.take(10).toList();
+
+    final piuCollezionati = await _discogs.iPiuCollezionati(limit: 10);
+    final prossimeUscite = await _discogs.prossimeUscite(limit: 10);
+    final ultimeAggiunte = await _discogs.ultimeReleaseAggiunte(limit: 10);
+
     setState(() {
       _recent = recent;
       _suggested = suggested;
       _potrebberoPiacerti = consigliati;
+      _piuCollezionati = piuCollezionati;
+      _ultimiInseriti = prossimeUscite;
+      _randomCollection = random;
+      _ultimeAggiunte = ultimeAggiunte;
       _isLoading = false;
     });
   }
+
 
 
   Future<void> _apriDettaglioSuggested(BuildContext ctx, Vinile v) async {
@@ -125,6 +142,54 @@ class HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 6),
             _HorizontalList(
               vinili: _potrebberoPiacerti,
+              itemWidth: cardWidth,
+              listHeight: listHeight,
+              itemBuilder: (v) => SuggestionTile(
+                vinile: v,
+                onTap: () => _apriDettaglioSuggested(context, v),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text('Scelte Casuali dalla tua Collezione', style: headline),
+            const SizedBox(height: 6),
+            _HorizontalList(
+              vinili: _randomCollection,
+              itemWidth: cardWidth,
+              listHeight: listHeight,
+              itemBuilder: (v) => SuggestionTile(
+                vinile: v,
+                onTap: () => _apriDettaglioCollezione(v),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text('I Più Collezionati', style: headline),
+            const SizedBox(height: 6),
+            _HorizontalList(
+              vinili: _piuCollezionati,
+              itemWidth: cardWidth,
+              listHeight: listHeight,
+              itemBuilder: (v) => SuggestionTile(
+                vinile: v,
+                onTap: () => _apriDettaglioSuggested(context, v),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text('Le Prossime Uscite', style: headline),
+            const SizedBox(height: 6),
+            _HorizontalList(
+              vinili: _ultimiInseriti,
+              itemWidth: cardWidth,
+              listHeight: listHeight,
+              itemBuilder: (v) => SuggestionTile(
+                vinile: v,
+                onTap: () => _apriDettaglioSuggested(context, v),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text('Le Ultime Aggiunte su Discogs', style: headline),
+            const SizedBox(height: 6),
+            _HorizontalList(
+              vinili: _ultimeAggiunte,
               itemWidth: cardWidth,
               listHeight: listHeight,
               itemBuilder: (v) => SuggestionTile(

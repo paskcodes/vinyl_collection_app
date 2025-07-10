@@ -22,7 +22,7 @@ class DiscogsService {
   }
 
   // Release «hot» su Discogs
-  Future<List<Vinile>> fetchTrendingVinyls({int limit = 10}) async {
+  Future<List<Vinile>> cercaViniliTendenza({int limit = 10}) async {
     final uri = _buildUri({'type': 'release', 'sort': 'hot', 'per_page': '$limit'});
     final res = await http.get(uri);
     _checkResponse(res);
@@ -71,7 +71,9 @@ class DiscogsService {
         genere: genereId,
         etichettaDiscografica: (r['label'] as List?)?.first,
         condizione: Condizione.nuovo,
-        immagine: r['cover_image'] as String?,
+        immagine: (r['cover_image'] as String?)?.isNotEmpty == true
+            ? r['cover_image']
+            : 'assets/immagini/vinilee.png',
         preferito: false,
       );
     }).toList());
@@ -115,5 +117,53 @@ class DiscogsService {
         preferito: false,
       );
     }).toList());
+  }
+
+  Future<List<Vinile>> iPiuCollezionati({int limit = 10}) async {
+    final uri = _buildUri({
+      'type': 'release',
+      'sort': 'have', // ordinati per numero di persone che lo possiedono
+      'per_page': '$limit',
+    });
+
+    final res = await http.get(uri);
+    _checkResponse(res);
+    final results = (jsonDecode(res.body)['results'] as List?) ?? [];
+
+    return _mapResults(results);
+  }
+
+  Future<List<Vinile>> prossimeUscite({int limit = 10}) async {
+    final uri = _buildUri({
+      'type': 'release',
+      'sort': 'year',
+      'sort_order': 'desc',
+      'per_page': '$limit',
+    });
+
+    final res = await http.get(uri);
+    _checkResponse(res);
+    final results = (jsonDecode(res.body)['results'] as List?) ?? [];
+
+    return _mapResults(results);
+  }
+
+  Future<List<Vinile>> ultimeReleaseAggiunte({int limit = 10}) async {
+    final uri = _buildUri({
+      'type': 'release',
+      'year': DateTime
+          .now()
+          .year
+          .toString(), // solo release del 2025
+      'sort': 'year',
+      'sort_order': 'desc',
+      'per_page': '$limit',
+    });
+
+    final res = await http.get(uri);
+    _checkResponse(res);
+    final results = (jsonDecode(res.body)['results'] as List?) ?? [];
+
+    return _mapResults(results);
   }
 }

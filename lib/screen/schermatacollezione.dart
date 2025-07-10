@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vinyl_collection_app/database/databasehelper.dart';
+import 'package:vinyl_collection_app/screen/schermataanalisivinili.dart';
 import 'package:vinyl_collection_app/screen/schermatamodifica.dart';
 import 'package:vinyl_collection_app/screen/dettagliovinilecollezione.dart';
 import 'package:vinyl_collection_app/utils/dimensionischermo.dart';
@@ -214,6 +215,17 @@ class SchermataCollezioneState extends State<SchermataCollezione> {
       ),
       body: Column(
         children: [
+          if (_listaVinili.isNotEmpty || _tuttiIVinili.isNotEmpty)
+            FilledButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AnalisiViniliScreen()),
+                );
+              },
+              icon: const Icon(Icons.analytics),
+              label: const Text('Mostra Analisi Vinili'),
+            ),
           if (_mostraFiltri)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

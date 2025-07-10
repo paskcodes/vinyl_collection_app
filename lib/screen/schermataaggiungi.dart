@@ -14,15 +14,13 @@ class SchermataAggiungi extends StatefulWidget {
 }
 
 class _SchermataAggiungiState extends State<SchermataAggiungi> {
-  // controller & keys
   final _formKey = GlobalKey<FormState>();
-  final _titolo   = TextEditingController();
-  final _artista  = TextEditingController();
-  final _anno     = TextEditingController();
-  final _etichetta= TextEditingController();
-  final _picker   = ImagePicker();
+  final _titolo = TextEditingController();
+  final _artista = TextEditingController();
+  final _anno = TextEditingController();
+  final _etichetta = TextEditingController();
+  final _picker = ImagePicker();
 
-  // state
   int _copie = 1;
   int? _genereId;
   int _condizioneIdx = 0;
@@ -78,42 +76,49 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
 
   void _showAlert(String title, String msg) => showDialog(
     context: context,
-    builder: (_) => AlertDialog(title: Text(title), content: Text(msg), actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))]),
+    builder: (_) => AlertDialog(
+      title: Text(title),
+      content: Text(msg),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('OK'),
+        )
+      ],
+    ),
   );
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Aggiungi vinile')),
+      backgroundColor: theme.colorScheme.surface,
+      appBar: AppBar(title: const Text('Aggiungi Vinile')),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Copertina
               Center(
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(16),
+                child: GestureDetector(
                   onTap: _pickImage,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Container(
-                      width: 140,
-                      height: 140,
+                  child: Container(
+                    width: 160,
+                    height: 160,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
                       color: theme.colorScheme.surfaceContainerHighest,
-                      child: _coverFile != null
-                          ? Image.file(_coverFile!, fit: BoxFit.cover)
-                          : Image.asset('assets/immagini/vinilee.png', fit: BoxFit.cover),
+                      image: _coverFile != null
+                          ? DecorationImage(image: FileImage(_coverFile!), fit: BoxFit.cover)
+                          : const DecorationImage(image: AssetImage('assets/immagini/vinilee.png'), fit: BoxFit.cover),
                     ),
                   ),
                 ),
               ),
               const SizedBox(height: 24),
 
-              // TextFields
               _M3TextField(controller: _titolo, label: 'Titolo'),
               _M3TextField(controller: _artista, label: 'Artista'),
               _M3TextField(
@@ -127,19 +132,28 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
                 },
               ),
               _M3TextField(controller: _etichetta, label: 'Etichetta'),
-
-              // Categoria
+              const SizedBox(height: 16),
               DropdownButtonFormField<int>(
                 value: _genereId,
                 items: _generi
-                    .map((g) => DropdownMenuItem<int>(value: g.id, child: Text(g.nome)))
+                    .map((g) => DropdownMenuItem<int>(
+                  value: g.id,
+                  child: Text(g.nome, style: const TextStyle(fontSize: 16)),
+                ))
                     .toList(),
                 onChanged: (v) => setState(() => _genereId = v),
-                decoration: const InputDecoration(labelText: 'Categoria'),
+                decoration: const InputDecoration(
+                  labelText: 'Categoria',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
+                  filled: true,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                ),
+                dropdownColor: Theme.of(context).colorScheme.surface,
+                menuMaxHeight: 300,
               ),
               const SizedBox(height: 16),
-
-              // Condizione
               Center(
                 child: SegmentedButton<int>(
                   segments: Condizione.values
@@ -150,8 +164,6 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
                 ),
               ),
               const SizedBox(height: 16),
-
-              // Copie e preferito
               Row(
                 children: [
                   Expanded(
@@ -170,8 +182,6 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
                 ],
               ),
               const SizedBox(height: 32),
-
-              // Pulsante salva
               Center(
                 child: FilledButton.icon(
                   onPressed: _formValid ? _aggiungi : null,
@@ -192,13 +202,28 @@ class _M3TextField extends StatelessWidget {
   final String label;
   final TextInputType? keyboardType;
   final String? Function(String?)? validator;
-  const _M3TextField({required this.controller, required this.label, this.keyboardType, this.validator});
+
+  const _M3TextField({
+    required this.controller,
+    required this.label,
+    this.keyboardType,
+    this.validator,
+  });
 
   @override
-  Widget build(BuildContext context) => TextFormField(
-    controller: controller,
-    keyboardType: keyboardType,
-    validator: validator ?? (v) => v == null || v.trim().isEmpty ? 'Campo obbligatorio' : null,
-    decoration: InputDecoration(labelText: label),
-  );
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      validator: validator ?? (v) => v == null || v.trim().isEmpty ? 'Campo obbligatorio' : null,
+      decoration: InputDecoration(
+        labelText: label,
+        border: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(12)),
+        ),
+        filled: true,
+      ),
+    );
+  }
 }
+

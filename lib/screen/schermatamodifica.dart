@@ -15,8 +15,23 @@ class SchermataModifica extends StatefulWidget {
   State<SchermataModifica> createState() => _SchermataModificaState();
 }
 
+ImageProvider _buildImageProvider(String? path) {
+  if (path == null || path.isEmpty) {
+    return const AssetImage('assets/immagini/vinilee.png');
+  }
+
+  if (path.startsWith('file://')) {
+    return FileImage(File(Uri.parse(path).toFilePath()));
+  }
+
+  if (path.startsWith('http')) {
+    return NetworkImage(path);
+  }
+
+  return AssetImage(path);
+}
+
 class _SchermataModificaState extends State<SchermataModifica> {
-  // -------- controllers & keys --------
   final _formKey = GlobalKey<FormState>();
   final _titolo = TextEditingController();
   final _artista = TextEditingController();
@@ -24,7 +39,6 @@ class _SchermataModificaState extends State<SchermataModifica> {
   final _etichetta = TextEditingController();
   final _picker = ImagePicker();
 
-  // -------- state fields --------
   int _copie = 1;
   int? _genereId;
   int _condizioneIdx = 0;
@@ -63,7 +77,8 @@ class _SchermataModificaState extends State<SchermataModifica> {
     }
   }
 
-  bool get _formValid => _formKey.currentState?.validate() == true && _genereId != null;
+  bool get _formValid =>
+      _formKey.currentState?.validate() == true && _genereId != null;
 
   Future<void> _salva() async {
     if (!_formValid) return;
@@ -76,14 +91,16 @@ class _SchermataModificaState extends State<SchermataModifica> {
       etichettaDiscografica: _etichetta.text.trim(),
       copie: _copie,
       condizione: Condizione.values[_condizioneIdx],
-      immagine: _coverFile != null ? 'file://${_coverFile!.path}' : widget.vinile.immagine,
+      immagine: _coverFile != null ? 'file://${_coverFile!.path}' : widget
+          .vinile.immagine,
       preferito: _preferito,
     );
 
     if (widget.suggested) {
       final esiste = await DatabaseHelper.instance.vinileEsiste(nuovo);
       if (esiste) {
-        if (mounted) _showAlert('Attenzione', 'Hai già questo vinile nella tua collezione.');
+        if (mounted) _showAlert(
+            'Attenzione', 'Hai già questo vinile nella tua collezione.');
         return;
       }
       await DatabaseHelper.instance.aggiungiVinile(nuovo);
@@ -98,46 +115,60 @@ class _SchermataModificaState extends State<SchermataModifica> {
     }
   }
 
-  void _showAlert(String title, String msg) => showDialog(
-    context: context,
-    builder: (_) => AlertDialog(title: Text(title), content: Text(msg), actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))]),
-  );
+  void _showAlert(String title, String msg) =>
+      showDialog(
+        context: context,
+        builder: (_) =>
+            AlertDialog(
+              title: Text(title),
+              content: Text(msg),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(context),
+                    child: const Text('OK')),
+              ],
+            ),
+      );
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     return Scaffold(
-      appBar: AppBar(title: Text(widget.suggested ? 'Aggiungi vinile' : 'Modifica vinile')),
+      backgroundColor: theme.colorScheme.surface,
+      appBar: AppBar(
+        title: Text(widget.suggested ? 'Aggiungi vinile' : 'Modifica vinile'),
+      ),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ------ Copertina ------
               Center(
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(16),
+                child: GestureDetector(
                   onTap: _pickImage,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Container(
-                      width: 140,
-                      height: 140,
+                  child: Container(
+                    width: 160,
+                    height: 160,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
                       color: theme.colorScheme.surfaceContainerHighest,
-                      child: _coverFile != null
-                          ? Image.file(_coverFile!, fit: BoxFit.cover)
-                          : widget.vinile.coverWidget,
+                      image: DecorationImage(
+                        fit: BoxFit.cover,
+                        image: _coverFile != null
+                            ? FileImage(_coverFile!)
+                            : _buildImageProvider(widget.vinile.immagine),
+                      ),
                     ),
                   ),
                 ),
               ),
               const SizedBox(height: 24),
-
-              // ------ TextFields ------
               _M3TextField(controller: _titolo, label: 'Titolo'),
+              const SizedBox(height: 16),
               _M3TextField(controller: _artista, label: 'Artista'),
+              const SizedBox(height: 16),
               _M3TextField(
                 controller: _anno,
                 label: 'Anno',
@@ -148,30 +179,42 @@ class _SchermataModificaState extends State<SchermataModifica> {
                   return null;
                 },
               ),
+              const SizedBox(height: 16),
               _M3TextField(controller: _etichetta, label: 'Etichetta'),
-
-              // ------ Categoria ------
+              const SizedBox(height: 16),
               DropdownButtonFormField<int>(
                 value: _genereId,
                 items: _generi
-                    .map((g) => DropdownMenuItem<int>(value: g.id, child: Text(g.nome)))
+                    .map((g) => DropdownMenuItem<int>(
+                  value: g.id,
+                  child: Text(g.nome, style: const TextStyle(fontSize: 16)),
+                ))
                     .toList(),
                 onChanged: (v) => setState(() => _genereId = v),
-                decoration: const InputDecoration(labelText: 'Categoria'),
+                decoration: const InputDecoration(
+                  labelText: 'Categoria',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
+                  filled: true,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                ),
+                dropdownColor: Theme.of(context).colorScheme.surface,
+                menuMaxHeight: 300,
               ),
               const SizedBox(height: 16),
-
-              // ------ Condizione ------
-              SegmentedButton<int>(
-                segments: Condizione.values
-                    .map((c) => ButtonSegment(value: c.index, label: Text(c.descrizione)))
-                    .toList(),
-                selected: {_condizioneIdx},
-                onSelectionChanged: (s) => setState(() => _condizioneIdx = s.first),
+              Center(
+                child: SegmentedButton<int>(
+                  segments: Condizione.values
+                      .map((c) =>
+                      ButtonSegment(value: c.index, label: Text(c.descrizione)))
+                      .toList(),
+                  selected: {_condizioneIdx},
+                  onSelectionChanged: (s) =>
+                      setState(() => _condizioneIdx = s.first),
+                ),
               ),
               const SizedBox(height: 16),
-
-              // ------ Copie + Preferito ------
               Row(
                 children: [
                   Expanded(
@@ -179,7 +222,9 @@ class _SchermataModificaState extends State<SchermataModifica> {
                       children: [
                         IconButton(
                           icon: const Icon(Icons.remove_circle_outline),
-                          onPressed: _copie > 1 ? () => setState(() => _copie--) : null,
+                          onPressed: _copie > 1
+                              ? () => setState(() => _copie--)
+                              : null,
                         ),
                         Text('$_copie copie'),
                         IconButton(
@@ -190,18 +235,25 @@ class _SchermataModificaState extends State<SchermataModifica> {
                     ),
                   ),
                   IconButton(
-                    icon: Icon(_preferito ? Icons.star_rounded : Icons.star_border_rounded, color: Colors.amber, size: 32),
+                    icon: Icon(
+                      _preferito ? Icons.star_rounded : Icons
+                          .star_border_rounded,
+                      color: Colors.amber,
+                      size: 32,
+                    ),
                     onPressed: () => setState(() => _preferito = !_preferito),
-                  )
+                  ),
                 ],
               ),
               const SizedBox(height: 32),
-
-              // ------ Pulsante Salva ------
-              FilledButton.icon(
-                onPressed: _formValid ? _salva : null,
-                icon: Icon(widget.suggested ? Icons.add : Icons.check),
-                label: Text(widget.suggested ? 'Aggiungi alla collezione' : 'Salva modifiche'),
+              Center(
+                child: FilledButton.icon(
+                  onPressed: _formValid ? _salva : null,
+                  icon: Icon(widget.suggested ? Icons.add : Icons.check),
+                  label: Text(widget.suggested
+                      ? 'Aggiungi alla collezione'
+                      : 'Salva modifiche'),
+                ),
               ),
             ],
           ),
@@ -224,6 +276,10 @@ class _M3TextField extends StatelessWidget {
     controller: controller,
     keyboardType: keyboardType,
     validator: validator ?? (v) => v == null || v.trim().isEmpty ? 'Campo obbligatorio' : null,
-    decoration: InputDecoration(labelText: label),
+    decoration: InputDecoration(
+      labelText: label,
+      border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+      filled: true,
+    ),
   );
 }

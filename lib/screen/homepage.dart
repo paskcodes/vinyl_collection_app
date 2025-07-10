@@ -96,15 +96,14 @@ class HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final double cardWidth = (context.screenWidth - (16 * 2) - 12) / 2.5;
-
-    // Calcolo dell'altezza della lista (stima)
+    final theme = Theme.of(context);
+    final double cardWidth = (context.screenWidth - 48) / 2.5;
     final double estimatedTextHeight = 50.0;
     final double listHeight = cardWidth + estimatedTextHeight + 20.0;
 
-    final headline = GoogleFonts.roboto(
-      fontSize: 22,
+    final titleStyle = theme.textTheme.headlineSmall?.copyWith(
       fontWeight: FontWeight.bold,
+      color: theme.colorScheme.onSurface,
     );
 
     if (_isLoading) {
@@ -112,108 +111,122 @@ class HomeScreenState extends State<HomeScreen> {
     }
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: theme.colorScheme.surface,
       body: RefreshIndicator(
         onRefresh: caricaDati,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
           children: [
-            SizedBox(height: MediaQuery.of(context).padding.top + 12), // padding top dinamico
-            Text('Ultimi Vinili Aggiunti', style: headline),
-            const SizedBox(height: 6),
-            _HorizontalList(
+            SizedBox(height: MediaQuery.of(context).padding.top),
+
+            _buildSection(
+              title: 'Ultimi Vinili Aggiunti',
               vinili: _recent,
-              itemWidth: cardWidth,
+              cardWidth: cardWidth,
               listHeight: listHeight,
-              itemBuilder: (vinile) => SuggestionTile(
-                vinile: vinile,
-                onTap: () => _apriDettaglioCollezione(vinile),
-              ),
+              onTap: _apriDettaglioCollezione,
             ),
-            Text('Ultimi Trend', style: headline),
-            const SizedBox(height: 6),
-            _HorizontalList(
+
+            _buildSection(
+              title: 'Ultimi Trend',
               vinili: _suggested,
-              itemWidth: cardWidth,
+              cardWidth: cardWidth,
               listHeight: listHeight,
-              itemBuilder: (v) => SuggestionTile(
-                vinile: v,
-                onTap: () => _apriDettaglioSuggested(context, v),
-              ),
+              onTap: (v) => _apriDettaglioSuggested(context, v),
             ),
-            Text('I tuoi Preferiti', style: headline),
-            const SizedBox(height: 6),
-            _HorizontalList(
+
+            _buildSection(
+              title: 'I tuoi Preferiti',
               vinili: _preferiti,
-              itemWidth: cardWidth,
+              cardWidth: cardWidth,
               listHeight: listHeight,
-              itemBuilder: (vinile) => SuggestionTile(
-                vinile: vinile,
-                onTap: () => _apriDettaglioCollezione(vinile),
-              ),
+              onTap: _apriDettaglioCollezione,
             ),
-            Text('Potrebbero Piacerti', style: headline),
-            const SizedBox(height: 6),
-            _HorizontalList(
+
+            _buildSection(
+              title: 'Potrebbero Piacerti',
               vinili: _potrebberoPiacerti,
-              itemWidth: cardWidth,
+              cardWidth: cardWidth,
               listHeight: listHeight,
-              itemBuilder: (v) => SuggestionTile(
-                vinile: v,
-                onTap: () => _apriDettaglioSuggested(context, v),
-              ),
+              onTap: (v) => _apriDettaglioSuggested(context, v),
             ),
-            Text('Scelte Casuali dalla tua Collezione', style: headline),
-            const SizedBox(height: 6),
-            _HorizontalList(
+
+            _buildSection(
+              title: 'Scelte Casuali dalla tua Collezione',
               vinili: _randomCollection,
-              itemWidth: cardWidth,
+              cardWidth: cardWidth,
               listHeight: listHeight,
-              itemBuilder: (v) => SuggestionTile(
-                vinile: v,
-                onTap: () => _apriDettaglioCollezione(v),
-              ),
+              onTap: _apriDettaglioCollezione,
             ),
-            Text('I Più Collezionati', style: headline),
-            const SizedBox(height: 6),
-            _HorizontalList(
+
+            _buildSection(
+              title: 'I Più Collezionati',
               vinili: _piuCollezionati,
-              itemWidth: cardWidth,
+              cardWidth: cardWidth,
               listHeight: listHeight,
-              itemBuilder: (v) => SuggestionTile(
-                vinile: v,
-                onTap: () => _apriDettaglioSuggested(context, v),
-              ),
+              onTap: (v) => _apriDettaglioSuggested(context, v),
             ),
-            Text('Le Prossime Uscite', style: headline),
-            const SizedBox(height: 6),
-            _HorizontalList(
+
+            _buildSection(
+              title: 'Le Prossime Uscite',
               vinili: _ultimiInseriti,
-              itemWidth: cardWidth,
+              cardWidth: cardWidth,
               listHeight: listHeight,
-              itemBuilder: (v) => SuggestionTile(
-                vinile: v,
-                onTap: () => _apriDettaglioSuggested(context, v),
-              ),
+              onTap: (v) => _apriDettaglioSuggested(context, v),
             ),
-            Text('Le Ultime Aggiunte su Discogs', style: headline),
-            const SizedBox(height: 6),
-            _HorizontalList(
+
+            _buildSection(
+              title: 'Ultime Aggiunte su Discogs',
               vinili: _ultimeAggiunte,
-              itemWidth: cardWidth,
+              cardWidth: cardWidth,
               listHeight: listHeight,
-              itemBuilder: (v) => SuggestionTile(
-                vinile: v,
-                onTap: () => _apriDettaglioSuggested(context, v),
-              ),
+              onTap: (v) => _apriDettaglioSuggested(context, v),
             ),
           ],
         ),
       ),
     );
   }
-}
 
+  Widget _buildSection({
+    required String title,
+    required List<Vinile> vinili,
+    required double cardWidth,
+    required double listHeight,
+    required Function(Vinile) onTap,
+  }) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(title, style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+              if (vinili.isNotEmpty)
+                Icon(Icons.arrow_forward_ios_rounded, size: 16, color: theme.colorScheme.primary),
+            ],
+          ),
+        ),
+        Material(
+          color: theme.colorScheme.surfaceVariant.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: _HorizontalList(
+              vinili: vinili,
+              itemWidth: cardWidth,
+              listHeight: listHeight,
+              itemBuilder: (v) => SuggestionTile(vinile: v, onTap: () => onTap(v)),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
 // La classe _HorizontalList rimane invariata rispetto all'ultima modifica
 // in cui accetta listHeight come parametro.
 

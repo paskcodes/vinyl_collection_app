@@ -305,4 +305,27 @@ class DatabaseHelper {
     return result.isNotEmpty ? result.first['nome'] as String? : null;
   }
 
+  Future<List<Map<String, dynamic>>> generiFiltrati() async {
+    List<Map<String, dynamic>> listaCompleta =
+    await getCategorieConConteggio();
+
+    List<Map<String, dynamic>> listaFiltrata = [];
+    for (final Map<String, dynamic> genere in listaCompleta) {
+      if ((genere['conteggio'] as int? ?? 0) > 0) {
+        listaFiltrata.add(genere);
+      }
+    }
+    return listaFiltrata;
+  }
+
+  Future<bool> genereEsiste(String nome) async{
+    final db = await database;
+    final result= await db.query('generi',
+      where: 'nome = ?',
+      whereArgs: [nome],
+      limit: 1,);
+
+    return result.isNotEmpty;
+  }
+
 }

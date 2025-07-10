@@ -103,7 +103,7 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
                     child: Container(
                       width: 140,
                       height: 140,
-                      color: theme.colorScheme.surfaceVariant,
+                      color: theme.colorScheme.surfaceContainerHighest,
                       child: _coverFile != null
                           ? Image.file(_coverFile!, fit: BoxFit.cover)
                           : Image.asset('assets/immagini/vinilee.png', fit: BoxFit.cover),

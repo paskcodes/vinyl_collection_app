@@ -122,7 +122,7 @@ class _SchermataModificaState extends State<SchermataModifica> {
                     child: Container(
                       width: 140,
                       height: 140,
-                      color: theme.colorScheme.surfaceVariant,
+                      color: theme.colorScheme.surfaceContainerHighest,
                       child: _coverFile != null
                           ? Image.file(_coverFile!, fit: BoxFit.cover)
                           : widget.vinile.coverWidget,

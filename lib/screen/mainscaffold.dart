@@ -62,7 +62,14 @@ class _MainScaffoldState extends State<MainScaffold> {
       floatingActionButton: _currentIndex == 3
           ? FloatingActionButton(
         tooltip: 'Aggiungi nuova categoria',
-        onPressed: _categorieKey.currentState?.vaiAggiuntaCategoria,
+        onPressed: () async {
+          final aggiunto = await _categorieKey.currentState?.vaiAggiuntaCategoria();
+          if (aggiunto == true) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Categoria aggiunta con successo")),
+            );
+          }
+        },
         child: const Icon(Icons.create_new_folder),
       )
           : Tooltip(

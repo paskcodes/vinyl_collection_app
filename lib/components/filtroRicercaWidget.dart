@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vinyl_collection_app/database/databasehelper.dart';
 
 import '../categoria/genere.dart';
 import '../vinile/condizione.dart';
@@ -61,7 +62,7 @@ class _FiltroRicercaWidgetState extends State<FiltroRicercaWidget> {
   }
 
   Future<void> aggiornaGeneri() async {
-    final listaMappe = await Genere.generiFiltrati();
+    final listaMappe = await DatabaseHelper.instance.generiFiltrati();
     setState(() {
       _listaGeneri = listaMappe.map((m) => Genere.fromMap(m)).toList();
     });

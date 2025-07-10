@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vinyl_collection_app/components/genere_tile.dart';
 import 'package:vinyl_collection_app/screen/schermatapercategoria.dart';
-import '../categoria/genere.dart';
 import '../database/databasehelper.dart';
 
 class SchermataCategorie extends StatefulWidget {
@@ -29,8 +28,8 @@ class SchermataCategorieState extends State<SchermataCategorie> {
   Future<void> aggiornaGeneri() async {
     final db = DatabaseHelper.instance;
     List<Map<String, dynamic>> listaBase = _mostraTutte
-        ? await Genere.tuttiGeneri()
-        : await Genere.generiFiltrati();
+        ? await DatabaseHelper.instance.getCategorieConConteggio()
+        : await DatabaseHelper.instance.generiFiltrati();
 
     // Aggiungi le copertine per ogni genere
     List<Map<String, dynamic>> listaCompleta = [];
@@ -52,13 +51,70 @@ class SchermataCategorieState extends State<SchermataCategorie> {
     aggiornaGeneri();
   }
 
-  void vaiAggiuntaCategoria() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Funzione da implementare: aggiunta categoria"),
-      ),
+  Future<bool> vaiAggiuntaCategoria() async {
+    final controller = TextEditingController();
+    String? errore;
+
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text("Aggiungi nuova categoria"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: controller,
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      labelText: "Nome categoria",
+                      errorText: errore,
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text("Annulla"),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    final nuovoNome = controller.text.trim();
+                    if (nuovoNome.isEmpty) {
+                      setState(() => errore = "Inserisci un nome.");
+                      return;
+                    }
+
+                    final esisteGia = _listaFiltrata?.any((genere) =>
+                    genere['nome'].toLowerCase() == nuovoNome.toLowerCase());
+
+                    if (esisteGia == true) {
+                      setState(() =>
+                      errore = "Categoria già esistente.");
+                      return;
+                    }
+
+                    await DatabaseHelper.instance.inserisciGenere(nuovoNome);
+                    await aggiornaGeneri();
+                    Navigator.pop(context, true);
+                  },
+                  child: const Text("Salva"),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
+
+    return result == true;
   }
+
+
 
   void onTileTap(int id, String nome, int conteggio) {
     if (_modalitaSelezione) {
@@ -224,7 +280,7 @@ class SchermataCategorieState extends State<SchermataCategorie> {
               )
             : null,
         actions: _modalitaSelezione
-      ? [
+            ? [
           if (_categorieSelezionate.length == 1)
             IconButton(
               icon: const Icon(Icons.edit),
@@ -237,7 +293,18 @@ class SchermataCategorieState extends State<SchermataCategorie> {
             onPressed: eliminaCategorieSelezionate,
           ),
         ]
-      : [],
+            : [
+          IconButton(
+            tooltip: mostraTutte
+                ? "Mostra solo categorie con vinili"
+                : "Mostra tutte le categorie",
+            icon: Icon(
+              mostraTutte ? Icons.visibility : Icons.visibility_off,
+            ),
+            onPressed: toggleMostraTutte,
+          ),
+        ],
+
       ),
       body: _listaFiltrata == null
           ? const Center(child: CircularProgressIndicator())

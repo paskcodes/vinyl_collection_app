@@ -1,4 +1,3 @@
-import '../database/databasehelper.dart';
 
 class Genere{
   final int? id;
@@ -14,29 +13,7 @@ class Genere{
     'nome': nome,
   };
 
-  static Future<List<Map<String, dynamic>>> generiFiltrati() async {
-    List<Map<String, dynamic>> listaCompleta =
-    await DatabaseHelper.instance.getCategorieConConteggio();
 
-    List<Map<String, dynamic>> listaFiltrata = [];
-    for (final Map<String, dynamic> genere in listaCompleta) {
-      if ((genere['conteggio'] as int? ?? 0) > 0) {
-        listaFiltrata.add(genere);
-      }
-    }
-    return listaFiltrata;
-  }
-
-  static Future<List<Map<String, dynamic>>> tuttiGeneri() async {
-    return await DatabaseHelper.instance.getCategorieConConteggio();
-  }
-
-  Genere copyWith({int? id, String? nome}) {
-    return Genere(
-      id: id ?? this.id,
-      nome: nome ?? this.nome,
-    );
-  }
 
 }
 

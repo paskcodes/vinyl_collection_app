@@ -94,13 +94,21 @@ class GenereTile extends StatelessWidget {
           }).toList(),
         ),
       );
-    } else {
+    } else if(copertineVinili.isNotEmpty){
       return ClipRRect(
         borderRadius: BorderRadius.circular(12),
         child: Image.network(
-          copertineVinili.isNotEmpty
-              ? copertineVinili.first
-              : 'https://via.placeholder.com/300',
+              copertineVinili.first,
+          width: dimensione,
+          height: dimensione,
+          fit: BoxFit.cover,
+          errorBuilder: (_, _, _) => Container(color: Colors.grey),
+        ),
+      );
+    }else{
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Image.asset('assets/immagini/vinilee.png',
           width: dimensione,
           height: dimensione,
           fit: BoxFit.cover,

@@ -39,13 +39,17 @@ class _MainScaffoldState extends State<MainScaffold> {
     super.dispose();
   }
 
+  void _aggiornaPagine() async {
+    _homeKey.currentState?.caricaDati();
+    _collezioneKey.currentState?.caricaVinili();
+    _categorieKey.currentState?.aggiornaGeneri();
+  }
+
   // se devi richiamare ricariche dopo un’aggiunta
   void _vaiSchermataAggiunta() async {
     final aggiunto = await Navigator.pushNamed(context, '/aggiunta') as bool?;
     if (aggiunto == true) {
-      _homeKey.currentState?.caricaDati();
-      _collezioneKey.currentState?.caricaVinili();
-      _categorieKey.currentState?.aggiornaGeneri();
+      _aggiornaPagine();
     }
   }
 
@@ -99,6 +103,7 @@ class _MainScaffoldState extends State<MainScaffold> {
             duration: const Duration(milliseconds: 300),
             curve: Curves.ease,
           );
+            _aggiornaPagine();
         },
         items: const [
           BottomNavigationBarItem(

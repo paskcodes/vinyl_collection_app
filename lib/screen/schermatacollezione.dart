@@ -190,54 +190,44 @@ class SchermataCollezioneState extends State<SchermataCollezione> {
             : null,
         actions: [
           if (!_modalitaSelezione) ...[
-            IconButton(
-              icon: const Icon(Icons.analytics),
-              tooltip: 'Analisi vinili',
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const AnalisiViniliScreen()),
-                );
-              },
-            ),
-            IconButton(
-              icon: Icon(_mostraFiltri ? Icons.close : Icons.search),
-              tooltip: 'Filtri di ricerca',
-              onPressed: _toggleFiltroRicerca,
-            ),
+            if (_tuttiIVinili.isNotEmpty) // <-- solo se ci sono vinili nella collezione
+              IconButton(
+                icon: const Icon(Icons.analytics),
+                tooltip: 'Analisi vinili',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AnalisiViniliScreen()),
+                  );
+                },
+              ),
+              IconButton(
+                icon: Icon(_mostraFiltri ? Icons.close : Icons.search),
+                tooltip: 'Filtri di ricerca',
+                onPressed: _toggleFiltroRicerca,
+              ),
           ] else ...[
-            IconButton(
-              tooltip: 'Seleziona tutti',
-              icon: const Icon(Icons.select_all),
-              onPressed: _selezionaTutti,
-            ),
-            IconButton(
-              tooltip: 'Deseleziona tutti',
-              icon: const Icon(Icons.remove_done),
-              onPressed: _deselezionaTutti,
-            ),
-            IconButton(
-              tooltip: 'Elimina selezionati',
-              icon: const Icon(Icons.delete),
-              onPressed: _eliminaSelezionati,
-            ),
+              IconButton(
+                tooltip: 'Seleziona tutti',
+                icon: const Icon(Icons.select_all),
+                onPressed: _selezionaTutti,
+              ),
+              IconButton(
+                tooltip: 'Deseleziona tutti',
+                icon: const Icon(Icons.remove_done),
+                onPressed: _deselezionaTutti,
+              ),
+              IconButton(
+                tooltip: 'Elimina selezionati',
+                icon: const Icon(Icons.delete),
+                onPressed: _eliminaSelezionati,
+              ),
           ]
         ],
       ),
 
-      body: Column(
+    body: Column(
         children: [
-          if (_listaVinili.isNotEmpty || _tuttiIVinili.isNotEmpty)
-            FilledButton.icon(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const AnalisiViniliScreen()),
-                );
-              },
-              icon: const Icon(Icons.analytics),
-              label: const Text('Mostra Analisi Vinili'),
-            ),
           if (_mostraFiltri)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

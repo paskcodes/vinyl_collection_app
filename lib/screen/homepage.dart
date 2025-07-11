@@ -14,7 +14,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => HomeScreenState();
 }
 
-class HomeScreenState extends State<HomeScreen> {
+class HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMixin {
   final _db = DatabaseHelper.instance;
   final _discogs = DiscogsService();
 
@@ -27,13 +27,15 @@ class HomeScreenState extends State<HomeScreen> {
   List<Vinile> _randomCollection = [];
   List<Vinile> _ultimeAggiunte = [];
 
-
   bool _isLoading = true;
+
+  @override
+  bool get wantKeepAlive => true; // ✅ Mantieni viva la schermata
 
   @override
   void initState() {
     super.initState();
-    caricaDati();
+    caricaDati(); // ✅ verrà chiamato solo al primo avvio
   }
 
   Future<void> caricaDati() async {
@@ -53,7 +55,6 @@ class HomeScreenState extends State<HomeScreen> {
     final prossimeUscite = await _discogs.prossimeUscite(limit: 10);
     final ultimeAggiunte = await _discogs.ultimeReleaseAggiunte(limit: 10);
 
-    // ✅ CONTROLLA SE IL WIDGET È ANCORA MONTATO
     if (!mounted) return;
 
     setState(() {
@@ -85,16 +86,13 @@ class HomeScreenState extends State<HomeScreen> {
       MaterialPageRoute(builder: (_) => DettaglioVinileCollezione(vinile: v)),
     );
     if ((aggiorna == true || aggiorna == null) && mounted) {
-      logger.i("\n\n\n\nAggiorno!\n\n\n");
       await caricaDati();
-    } else {
-      logger.i("\n\n\n Non Aggiorno\n\n\n");
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
+    super.build(context); // ✅ Necessario con KeepAlive
     final theme = Theme.of(context);
     final double cardWidth = (context.screenWidth - 48) / 2.5;
     final double estimatedTextHeight = 50.0;
@@ -117,70 +115,14 @@ class HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
           children: [
             SizedBox(height: MediaQuery.of(context).padding.top),
-
-            _buildSection(
-              title: 'Ultimi Vinili Aggiunti',
-              vinili: _recent,
-              cardWidth: cardWidth,
-              listHeight: listHeight,
-              onTap: _apriDettaglioCollezione,
-            ),
-
-            _buildSection(
-              title: 'Ultimi Trend',
-              vinili: _suggested,
-              cardWidth: cardWidth,
-              listHeight: listHeight,
-              onTap: (v) => _apriDettaglioSuggested(context, v),
-            ),
-
-            _buildSection(
-              title: 'I tuoi Preferiti',
-              vinili: _preferiti,
-              cardWidth: cardWidth,
-              listHeight: listHeight,
-              onTap: _apriDettaglioCollezione,
-            ),
-
-            _buildSection(
-              title: 'Potrebbero Piacerti',
-              vinili: _potrebberoPiacerti,
-              cardWidth: cardWidth,
-              listHeight: listHeight,
-              onTap: (v) => _apriDettaglioSuggested(context, v),
-            ),
-
-            _buildSection(
-              title: 'Scelte Casuali dalla tua Collezione',
-              vinili: _randomCollection,
-              cardWidth: cardWidth,
-              listHeight: listHeight,
-              onTap: _apriDettaglioCollezione,
-            ),
-
-            _buildSection(
-              title: 'I Più Collezionati',
-              vinili: _piuCollezionati,
-              cardWidth: cardWidth,
-              listHeight: listHeight,
-              onTap: (v) => _apriDettaglioSuggested(context, v),
-            ),
-
-            _buildSection(
-              title: 'Le Prossime Uscite',
-              vinili: _ultimiInseriti,
-              cardWidth: cardWidth,
-              listHeight: listHeight,
-              onTap: (v) => _apriDettaglioSuggested(context, v),
-            ),
-
-            _buildSection(
-              title: 'Ultime Aggiunte su Discogs',
-              vinili: _ultimeAggiunte,
-              cardWidth: cardWidth,
-              listHeight: listHeight,
-              onTap: (v) => _apriDettaglioSuggested(context, v),
-            ),
+            _buildSection(title: 'Ultimi Vinili Aggiunti', vinili: _recent, cardWidth: cardWidth, listHeight: listHeight, onTap: _apriDettaglioCollezione),
+            _buildSection(title: 'Ultimi Trend', vinili: _suggested, cardWidth: cardWidth, listHeight: listHeight, onTap: (v) => _apriDettaglioSuggested(context, v)),
+            _buildSection(title: 'I tuoi Preferiti', vinili: _preferiti, cardWidth: cardWidth, listHeight: listHeight, onTap: _apriDettaglioCollezione),
+            _buildSection(title: 'Potrebbero Piacerti', vinili: _potrebberoPiacerti, cardWidth: cardWidth, listHeight: listHeight, onTap: (v) => _apriDettaglioSuggested(context, v)),
+            _buildSection(title: 'Scelte Casuali dalla tua Collezione', vinili: _randomCollection, cardWidth: cardWidth, listHeight: listHeight, onTap: _apriDettaglioCollezione),
+            _buildSection(title: 'I Più Collezionati', vinili: _piuCollezionati, cardWidth: cardWidth, listHeight: listHeight, onTap: (v) => _apriDettaglioSuggested(context, v)),
+            _buildSection(title: 'Le Prossime Uscite', vinili: _ultimiInseriti, cardWidth: cardWidth, listHeight: listHeight, onTap: (v) => _apriDettaglioSuggested(context, v)),
+            _buildSection(title: 'Ultime Aggiunte su Discogs', vinili: _ultimeAggiunte, cardWidth: cardWidth, listHeight: listHeight, onTap: (v) => _apriDettaglioSuggested(context, v)),
           ],
         ),
       ),
@@ -226,14 +168,12 @@ class HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-// La classe _HorizontalList rimane invariata rispetto all'ultima modifica
-// in cui accetta listHeight come parametro.
 
 class _HorizontalList extends StatelessWidget {
   final List<Vinile> vinili;
   final Widget Function(Vinile) itemBuilder;
   final double itemWidth;
-  final double listHeight; // Aggiungi questo parametro per l'altezza
+  final double listHeight;
 
   const _HorizontalList({
     required this.vinili,
@@ -252,19 +192,13 @@ class _HorizontalList extends StatelessWidget {
       content = ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: vinili.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 12),
+        separatorBuilder: (_, __) => const SizedBox(width: 12),
         itemBuilder: (_, i) {
-          return SizedBox(
-            width: itemWidth,
-            child: itemBuilder(vinili[i]),
-          );
+          return SizedBox(width: itemWidth, child: itemBuilder(vinili[i]));
         },
       );
     }
 
-    return SizedBox(
-      height: listHeight, // Usa l'altezza calcolata e passata
-      child: content,
-    );
+    return SizedBox(height: listHeight, child: content);
   }
 }

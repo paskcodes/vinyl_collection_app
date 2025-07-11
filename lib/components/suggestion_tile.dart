@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import '../vinile/vinile.dart';
 import '../utils/dimensionischermo.dart';
@@ -48,6 +49,11 @@ class SuggestionTile extends StatelessWidget {
                   vinile.immagine!,
                   fit: BoxFit.cover,
                 )
+                    : vinile.immagine!.startsWith('file://')
+                    ? Image.file(
+                  File(vinile.immagine!.substring(7)), // rimuovo 'file://'
+                  fit: BoxFit.cover,
+                )
                     : Image.network(
                   vinile.immagine!,
                   fit: BoxFit.cover,
@@ -59,7 +65,7 @@ class SuggestionTile extends StatelessWidget {
                     : Image.asset(
                   'assets/immagini/vinilee.png',
                   fit: BoxFit.cover,
-                ), // Dimensione icona proporzionale
+                ),
               ),
             ),
             const SizedBox(height: 6),

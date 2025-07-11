@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:vinyl_collection_app/utils/dimensionischermo.dart';
 
@@ -73,48 +74,76 @@ class GenereTile extends StatelessWidget {
   }
 
   Widget _buildCopertina(BuildContext context, double dimensione) {
-    if (copertineVinili.length >= 4) {
-      return SizedBox(
-        width: dimensione,
-        height: dimensione,
-        child: GridView.count(
-          crossAxisCount: 2,
-          physics: const NeverScrollableScrollPhysics(),
-          padding: EdgeInsets.zero,
-          shrinkWrap: true,
-          children: copertineVinili.take(4).map((copertina) {
-            return ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: Image.network(
-                copertina,
-                fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => Container(color: Colors.grey),
-              ),
-            );
-          }).toList(),
-        ),
-      );
-    } else if(copertineVinili.isNotEmpty){
+    final copertine = copertineVinili.take(4).toList();
+
+    Widget buildImage(String copertina) {
+      if (copertina.startsWith('file://')) {
+        return Image.file(
+          File(copertina.substring(7)),
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => Container(color: Colors.grey),
+        );
+      } else {
+        return Image.network(
+          copertina,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => Container(color: Colors.grey),
+        );
+      }
+    }
+
+    // Nessuna copertina
+    if (copertine.isEmpty) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        child: Image.network(
-              copertineVinili.first,
+        child: Image.asset(
+          'assets/immagini/vinilee.png',
           width: dimensione,
           height: dimensione,
           fit: BoxFit.cover,
-          errorBuilder: (_, _, _) => Container(color: Colors.grey),
-        ),
-      );
-    }else{
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: Image.asset('assets/immagini/vinilee.png',
-          width: dimensione,
-          height: dimensione,
-          fit: BoxFit.cover,
-          errorBuilder: (_, _, _) => Container(color: Colors.grey),
         ),
       );
     }
+
+    // Meno di 4 copertine → mostra solo la prima come immagine singola
+    if (copertine.length < 4) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: SizedBox(
+          width: dimensione,
+          height: dimensione,
+          child: buildImage(copertine.first),
+        ),
+      );
+    }
+
+    // 4 o più copertine → mostra GridView 2x2
+    const int crossAxisCount = 2;
+    const double spacing = 4;
+    final double gridItemSize = (dimensione - spacing) / crossAxisCount;
+
+    return SizedBox(
+      width: dimensione,
+      height: dimensione,
+      child: GridView.builder(
+        physics: const NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.zero,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: crossAxisCount,
+          crossAxisSpacing: spacing,
+          mainAxisSpacing: spacing,
+          childAspectRatio: 1,
+        ),
+        itemCount: 4,
+        itemBuilder: (context, index) {
+          return ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: buildImage(copertine[index]),
+          );
+        },
+        shrinkWrap: true,
+      ),
+    );
   }
+
 }

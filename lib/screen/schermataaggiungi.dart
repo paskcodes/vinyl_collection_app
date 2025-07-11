@@ -43,9 +43,41 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
     });
   }
 
-  Future<void> _pickImage() async {
-    final picked = await _picker.pickImage(source: ImageSource.gallery);
-    if (picked != null) setState(() => _coverFile = File(picked.path));
+  Future<void> _showImageSourceActionSheet() async {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Galleria'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _pickImage(ImageSource.gallery);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text('Fotocamera'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _pickImage(ImageSource.camera);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    final picked = await _picker.pickImage(source: source);
+    if (picked != null) {
+      setState(() => _coverFile = File(picked.path));
+    }
   }
 
   Future<void> _aggiungi() async {
@@ -105,16 +137,17 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
             children: [
               Center(
                 child: GestureDetector(
-                  onTap: _pickImage,
-                  child: Container(
-                    width: context.screenWidth * 0.7,
-                    height: context.screenHeight * 0.3,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      color: theme.colorScheme.surfaceContainerHighest,
-                      image: _coverFile != null
-                          ? DecorationImage(image: FileImage(_coverFile!), fit: BoxFit.cover)
-                          : const DecorationImage(image: AssetImage('assets/immagini/vinilee.png'), fit: BoxFit.cover),
+                  onTap: _showImageSourceActionSheet, // cambia da _pickImage a _showImageSourceActionSheet
+                  child: Material(
+                    elevation: 8,
+                    borderRadius: BorderRadius.circular(20),
+                    clipBehavior: Clip.antiAlias,
+                    child: SizedBox(
+                      width: context.screenWidth * 0.8,
+                      height: context.screenWidth * 0.8,
+                      child: _coverFile != null
+                          ? Image.file(_coverFile!, fit: BoxFit.cover)
+                          : Image.asset('assets/immagini/vinilee.png', fit: BoxFit.cover),
                     ),
                   ),
                 ),
@@ -216,16 +249,19 @@ class _M3TextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      validator: validator ?? (v) => v == null || v.trim().isEmpty ? 'Campo obbligatorio' : null,
-      decoration: InputDecoration(
-        labelText: label,
-        border: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(12)),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),  // spazio sotto
+      child: TextFormField(
+        controller: controller,
+        keyboardType: keyboardType,
+        validator: validator ?? (v) => v == null || v.trim().isEmpty ? 'Campo obbligatorio' : null,
+        decoration: InputDecoration(
+          labelText: label,
+          border: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(12)),
+          ),
+          filled: true,
         ),
-        filled: true,
       ),
     );
   }

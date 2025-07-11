@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../categoria/genere.dart';
-import '../database/databasehelper.dart';
-import '../vinile/vinile.dart';
-import '../screen/schermatamodifica.dart';
-import '../screen/dettagliovinilecollezione.dart';
-import '../utils/dimensionischermo.dart';
+import '../../components/selezionegenere.dart';
+import '../../database/databasehelper.dart';
+import '../../vinile/vinile.dart';
+import 'schermatamodifica.dart';
+import 'dettagliovinilecollezione.dart';
+import '../../utils/dimensionischermo.dart';
 
 class SchermataViniliPerCategoria extends StatefulWidget {
   final int genereId;
@@ -100,7 +100,7 @@ class _SchermataViniliPerCategoriaState
   Future<void> _cambiaGenereMultiplo() async {
     final nuovoGenereId = await showDialog<int>(
       context: context,
-      builder: (_) => _DialogSelezioneGenere(),
+      builder: (_) => DialogSelezioneGenere(),
     );
 
     if (nuovoGenereId != null) {
@@ -211,7 +211,7 @@ class _SchermataViniliPerCategoriaState
         return;
       }
 
-      await DatabaseHelper.instance.rinominaCategoria(
+      await DatabaseHelper.instance.rinominaGenere(
         widget.genereId,
         nuovoNome,
       );
@@ -223,8 +223,8 @@ class _SchermataViniliPerCategoriaState
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final selectedBackgroundColor = isDarkMode
-        ? Theme.of(context).colorScheme.primary.withOpacity(0.4)
-        : Theme.of(context).colorScheme.primary.withOpacity(0.2);
+        ? Theme.of(context).colorScheme.primary.withValues()
+        : Theme.of(context).colorScheme.primary.withValues();
     final selectedTextColor = isDarkMode ? Colors.white : Colors.black;
     final double leadingSize = context.screenWidth * 0.12;
 
@@ -328,35 +328,6 @@ class _SchermataViniliPerCategoriaState
                 );
               },
             ),
-    );
-  }
-}
-
-class _DialogSelezioneGenere extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<List<Genere>>(
-      future: DatabaseHelper.instance.getGeneri(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData)
-          return const Center(child: CircularProgressIndicator());
-        final generi = snapshot.data!;
-
-        return AlertDialog(
-          title: const Text("Scegli un genere"),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: generi.length,
-              itemBuilder: (_, index) => ListTile(
-                title: Text(generi[index].nome),
-                onTap: () => Navigator.pop(context, generi[index].id),
-              ),
-            ),
-          ),
-        );
-      },
     );
   }
 }

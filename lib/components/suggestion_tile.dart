@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import '../vinile/vinile.dart';
 import '../utils/dimensionischermo.dart';
 
-class SuggestionTile extends StatelessWidget {
+class SuggeritoTile extends StatelessWidget {
   final Vinile vinile;
   final VoidCallback onTap;
 
-  const SuggestionTile({super.key, required this.vinile, required this.onTap});
+  const SuggeritoTile({super.key, required this.vinile, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +54,7 @@ class SuggestionTile extends StatelessWidget {
                           : Image.network(
                               vinile.immagine!,
                               fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Image.asset(
+                              errorBuilder: (_, _, _) => Image.asset(
                                 'assets/immagini/vinilee.png',
                                 fit: BoxFit.cover,
                               ),

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:vinyl_collection_app/screen/dettagliovinilecollezione.dart';
+import 'package:vinyl_collection_app/screen/schermateSecondarie/dettagliovinilecollezione.dart';
 import 'package:vinyl_collection_app/utils/dimensionischermo.dart';
-import '../components/suggestion_tile.dart';
-import '../database/databasehelper.dart';
-import '../service/discogs_service.dart';
-import '../vinile/vinile.dart';
-import 'dettagliovinilesuggested.dart';
+import '../../components/suggestion_tile.dart';
+import '../../database/databasehelper.dart';
+import '../../service/discogs_service.dart';
+import '../../vinile/vinile.dart';
+import '../schermateSecondarie/dettagliovinilesuggerito.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -219,7 +219,7 @@ class HomeScreenState extends State<HomeScreen>
                     final v = vinili[i];
                     return SizedBox(
                       width: cardWidth,
-                      child: SuggestionTile(vinile: v, onTap: () => onTap(v)),
+                      child: SuggeritoTile(vinile: v, onTap: () => onTap(v)),
                     );
                   },
                 ),

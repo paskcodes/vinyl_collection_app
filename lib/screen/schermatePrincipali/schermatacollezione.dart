@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:vinyl_collection_app/database/databasehelper.dart';
-import 'package:vinyl_collection_app/screen/schermataanalisivinili.dart';
-import 'package:vinyl_collection_app/screen/schermatamodifica.dart';
-import 'package:vinyl_collection_app/screen/dettagliovinilecollezione.dart';
+import 'package:vinyl_collection_app/screen/schermateSecondarie/schermataanalisivinili.dart';
+import 'package:vinyl_collection_app/screen/schermateSecondarie/schermatamodifica.dart';
+import 'package:vinyl_collection_app/screen/schermateSecondarie/dettagliovinilecollezione.dart';
 import 'package:vinyl_collection_app/utils/dimensionischermo.dart';
 import 'package:vinyl_collection_app/vinile/vinile.dart';
-import '../components/filtroricercawidget.dart';
-import '../vinile/condizione.dart';
+import '../../components/filtroricercawidget.dart';
+import '../../vinile/condizione.dart';
 
 class SchermataCollezione extends StatefulWidget {
   const SchermataCollezione({super.key});
@@ -21,11 +21,11 @@ class SchermataCollezioneState extends State<SchermataCollezione> {
   bool _mostraFiltri = false;
 
   // Filtri
-  String _query = '';
+  final String _query = '';
   int? _genereId;
   Condizione? _condizione;
   int? _anno;
-  bool _soloPreferiti = false;
+  final bool _soloPreferiti = false;
 
   // Selezione multipla
   bool _modalitaSelezione = false;
@@ -219,8 +219,8 @@ class SchermataCollezioneState extends State<SchermataCollezione> {
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final selectedBackgroundColor = isDarkMode
-        ? Theme.of(context).colorScheme.primary.withOpacity(0.4)
-        : Theme.of(context).colorScheme.primary.withOpacity(0.2);
+        ? Theme.of(context).colorScheme.primary.withValues()
+        : Theme.of(context).colorScheme.primary.withValues();
     final selectedTextColor = isDarkMode ? Colors.white : Colors.black;
     final double leadingImageSize = context.screenWidth * 0.12;
     return Scaffold(

@@ -3,7 +3,7 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:logger/logger.dart';
 
-import '../categoria/genere.dart';
+import '../vinile/genere.dart';
 import '../vinile/vinile.dart';
 
 final logger = Logger();
@@ -243,12 +243,12 @@ class DatabaseHelper {
     return maps.map(Vinile.fromMap).toList();
   }
 
-  Future<void> eliminaCategoria(int id) async {
+  Future<void> eliminaGenere(int id) async {
     final db = await DatabaseHelper.instance.database;
     await db.delete('generi', where: 'id = ?', whereArgs: [id]);
   }
 
-  Future<void> rinominaCategoria(int id, String nuovoNome) async {
+  Future<void> rinominaGenere(int id, String nuovoNome) async {
     final db = await DatabaseHelper.instance.database;
     await db.update(
       'generi',

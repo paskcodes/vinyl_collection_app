@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:vinyl_collection_app/database/databasehelper.dart';
-import 'package:vinyl_collection_app/screen/schermatamodifica.dart';
-import 'package:vinyl_collection_app/utils/dimensioniSchermo.dart';
-import '../vinile/vinile.dart';
+import 'package:vinyl_collection_app/screen/schermateSecondarie/schermatamodifica.dart';
+import 'package:vinyl_collection_app/utils/dimensionischermo.dart';
+import '../../vinile/vinile.dart';
 
 class DettaglioVinileSuggested extends StatefulWidget {
   final Vinile vinile;
@@ -17,7 +17,6 @@ class DettaglioVinileSuggested extends StatefulWidget {
 class _DettaglioVinileSuggestedState extends State<DettaglioVinileSuggested> {
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final double spacing = context.screenHeight * 0.03;
     final double horizontalPadding = context.screenWidth * 0.05;
 

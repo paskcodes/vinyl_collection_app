@@ -81,13 +81,13 @@ class GenereTile extends StatelessWidget {
         return Image.file(
           File(copertina.substring(7)),
           fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => Container(color: Colors.grey),
+          errorBuilder: (_, _, _) => Container(color: Colors.grey),
         );
       } else {
         return Image.network(
           copertina,
           fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => Container(color: Colors.grey),
+          errorBuilder: (_, _, _) => Container(color: Colors.grey),
         );
       }
     }
@@ -120,7 +120,6 @@ class GenereTile extends StatelessWidget {
     // 4 o più copertine → mostra GridView 2x2
     const int crossAxisCount = 2;
     const double spacing = 4;
-    final double gridItemSize = (dimensione - spacing) / crossAxisCount;
 
     return SizedBox(
       width: dimensione,

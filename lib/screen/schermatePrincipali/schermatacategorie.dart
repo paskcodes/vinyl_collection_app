@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:vinyl_collection_app/components/genere_tile.dart';
-import 'package:vinyl_collection_app/screen/schermatapercategoria.dart';
-import '../database/databasehelper.dart';
-import '../vinile/vinile.dart';
+import 'package:vinyl_collection_app/screen/schermateSecondarie/schermatavinilipercategoria.dart';
+import '../../database/databasehelper.dart';
+import '../../vinile/vinile.dart';
 
 class SchermataCategorie extends StatefulWidget {
   const SchermataCategorie({super.key});
@@ -13,7 +13,7 @@ class SchermataCategorie extends StatefulWidget {
 
 class SchermataCategorieState extends State<SchermataCategorie> {
   List<Map<String, dynamic>>? _listaFiltrata;
-  final Set<int> _categorieSelezionate = {};
+  final Set<int> _genereSelezionate = {};
   bool _modalitaSelezione = false;
   bool _mostraTutte = false;
 
@@ -143,11 +143,11 @@ class SchermataCategorieState extends State<SchermataCategorie> {
   void onTileTap(int id, String nome, int conteggio) {
     if (_modalitaSelezione) {
       setState(() {
-        if (_categorieSelezionate.contains(id)) {
-          _categorieSelezionate.remove(id);
-          if (_categorieSelezionate.isEmpty) _modalitaSelezione = false;
+        if (_genereSelezionate.contains(id)) {
+          _genereSelezionate.remove(id);
+          if (_genereSelezionate.isEmpty) _modalitaSelezione = false;
         } else {
-          _categorieSelezionate.add(id);
+          _genereSelezionate.add(id);
         }
       });
     } else {
@@ -158,7 +158,7 @@ class SchermataCategorieState extends State<SchermataCategorie> {
   void onTileLongPress(int id) {
     setState(() {
       _modalitaSelezione = true;
-      _categorieSelezionate.add(id);
+      _genereSelezionate.add(id);
     });
   }
 
@@ -179,7 +179,7 @@ class SchermataCategorieState extends State<SchermataCategorie> {
     List<Map<String, dynamic>> eliminabili = _listaFiltrata!
         .where(
           (genere) =>
-              _categorieSelezionate.contains(genere['id']) &&
+              _genereSelezionate.contains(genere['id']) &&
               genere['conteggio'] == 0,
         )
         .toList();
@@ -187,7 +187,7 @@ class SchermataCategorieState extends State<SchermataCategorie> {
     final nonEliminabili = _listaFiltrata!
         .where(
           (genere) =>
-              _categorieSelezionate.contains(genere['id']) &&
+              _genereSelezionate.contains(genere['id']) &&
               genere['conteggio'] > 0,
         )
         .toList();
@@ -229,17 +229,17 @@ class SchermataCategorieState extends State<SchermataCategorie> {
 
     if (conferma) {
       for (var genere in eliminabili) {
-        await DatabaseHelper.instance.eliminaCategoria(genere['id']);
+        await DatabaseHelper.instance.eliminaGenere(genere['id']);
       }
-      _categorieSelezionate.clear();
+      _genereSelezionate.clear();
       _modalitaSelezione = false;
       aggiornaGeneri();
     }
   }
 
   Future<void> modificaCategoria() async {
-    if (_categorieSelezionate.length != 1) return;
-    final id = _categorieSelezionate.first;
+    if (_genereSelezionate.length != 1) return;
+    final id = _genereSelezionate.first;
     final genere = _listaFiltrata!.firstWhere((g) => g['id'] == id);
     final controller = TextEditingController(text: genere['nome']);
 
@@ -281,8 +281,8 @@ class SchermataCategorieState extends State<SchermataCategorie> {
         return;
       }
 
-      await DatabaseHelper.instance.rinominaCategoria(id, nuovoNome);
-      _categorieSelezionate.clear();
+      await DatabaseHelper.instance.rinominaGenere(id, nuovoNome);
+      _genereSelezionate.clear();
       _modalitaSelezione = false;
       aggiornaGeneri();
     }
@@ -294,7 +294,7 @@ class SchermataCategorieState extends State<SchermataCategorie> {
       appBar: AppBar(
         title: Text(
           _modalitaSelezione
-              ? '${_categorieSelezionate.length} categorie selezionate'
+              ? '${_genereSelezionate.length} categorie selezionate'
               : 'Categorie',
         ),
         leading: _modalitaSelezione
@@ -302,7 +302,7 @@ class SchermataCategorieState extends State<SchermataCategorie> {
                 icon: const Icon(Icons.close),
                 onPressed: () {
                   setState(() {
-                    _categorieSelezionate.clear();
+                    _genereSelezionate.clear();
                     _modalitaSelezione = false;
                   });
                 },
@@ -310,7 +310,7 @@ class SchermataCategorieState extends State<SchermataCategorie> {
             : null,
         actions: _modalitaSelezione
             ? [
-                if (_categorieSelezionate.length == 1)
+                if (_genereSelezionate.length == 1)
                   IconButton(
                     icon: const Icon(Icons.edit),
                     tooltip: 'Modifica nome',
@@ -375,10 +375,10 @@ class SchermataCategorieState extends State<SchermataCategorie> {
                           top: 8,
                           right: 8,
                           child: Icon(
-                            _categorieSelezionate.contains(id)
+                            _genereSelezionate.contains(id)
                                 ? Icons.check_circle
                                 : Icons.radio_button_unchecked,
-                            color: _categorieSelezionate.contains(id)
+                            color: _genereSelezionate.contains(id)
                                 ? Theme.of(context).colorScheme.primary
                                 : Colors.grey,
                           ),

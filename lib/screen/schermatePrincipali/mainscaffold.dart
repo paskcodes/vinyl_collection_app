@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'homepage.dart';
-import 'ricerca.dart';
+import 'schermataricerca.dart';
 import 'schermatacategorie.dart';
 import 'schermatacollezione.dart';
 

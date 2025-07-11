@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vinyl_collection_app/database/databasehelper.dart';
-
-import '../categoria/genere.dart';
+import '../vinile/genere.dart';
 import '../vinile/condizione.dart';
 
 class FiltroRicercaWidget extends StatefulWidget {

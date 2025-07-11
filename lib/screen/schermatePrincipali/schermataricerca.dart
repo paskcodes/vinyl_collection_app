@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:vinyl_collection_app/screen/dettagliovinilesuggested.dart';
+import 'package:vinyl_collection_app/screen/schermateSecondarie/dettagliovinilesuggerito.dart';
 import 'package:vinyl_collection_app/vinile/vinile.dart';
-import '../service/discogs_service.dart';
+import '../../service/discogs_service.dart';
 
 // Importa la tua estensione per le dimensioni dello schermo
-import '../utils/dimensionischermo.dart'; // Assicurati che il percorso sia corretto
+import '../../utils/dimensionischermo.dart'; // Assicurati che il percorso sia corretto
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});

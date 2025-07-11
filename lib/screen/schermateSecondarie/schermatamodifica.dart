@@ -1,20 +1,43 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:vinyl_collection_app/utils/dimensioniSchermo.dart';
-import '../categoria/genere.dart';
-import '../database/databasehelper.dart';
-import '../vinile/condizione.dart';
-import '../vinile/vinile.dart';
+import 'package:vinyl_collection_app/utils/dimensionischermo.dart';
+import '../../vinile/genere.dart';
+import '../../database/databasehelper.dart';
+import '../../vinile/condizione.dart';
+import '../../vinile/vinile.dart';
 
-class SchermataAggiungi extends StatefulWidget {
-  const SchermataAggiungi({super.key});
+class SchermataModifica extends StatefulWidget {
+  final Vinile vinile;
+  final bool suggested;
+
+  const SchermataModifica({
+    super.key,
+    required this.vinile,
+    required this.suggested,
+  });
 
   @override
-  State<SchermataAggiungi> createState() => _SchermataAggiungiState();
+  State<SchermataModifica> createState() => _SchermataModificaState();
 }
 
-class _SchermataAggiungiState extends State<SchermataAggiungi> {
+ImageProvider _buildImageProvider(String? path) {
+  if (path == null || path.isEmpty) {
+    return const AssetImage('assets/immagini/vinilee.png');
+  }
+
+  if (path.startsWith('file://')) {
+    return FileImage(File(Uri.parse(path).toFilePath()));
+  }
+
+  if (path.startsWith('http')) {
+    return NetworkImage(path);
+  }
+
+  return AssetImage(path);
+}
+
+class _SchermataModificaState extends State<SchermataModifica> {
   final _formKey = GlobalKey<FormState>();
   final _titolo = TextEditingController();
   final _artista = TextEditingController();
@@ -32,59 +55,41 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
   @override
   void initState() {
     super.initState();
+    final v = widget.vinile;
+    _titolo.text = v.titolo;
+    _artista.text = v.artista;
+    _anno.text = v.anno?.toString() ?? '';
+    _etichetta.text = v.etichettaDiscografica ?? '';
+    _copie = v.copie ?? 1;
+    _genereId = v.genere;
+    _condizioneIdx = v.condizione?.index ?? 0;
+    _preferito = v.preferito;
     _loadGeneri();
   }
 
   Future<void> _loadGeneri() async {
     final list = await DatabaseHelper.instance.getGeneri();
+    if (!mounted) return;
     setState(() {
       _generi = list;
-      if (_genereId == null && list.isNotEmpty) _genereId = list.first.id;
+      _genereId ??= list.isNotEmpty ? list.first.id : null;
     });
   }
 
-  Future<void> _showImageSourceActionSheet() async {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return SafeArea(
-          child: Wrap(
-            children: [
-              ListTile(
-                leading: const Icon(Icons.photo_library),
-                title: const Text('Galleria'),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  _pickImage(ImageSource.gallery);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.camera_alt),
-                title: const Text('Fotocamera'),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  _pickImage(ImageSource.camera);
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Future<void> _pickImage(ImageSource source) async {
-    final picked = await _picker.pickImage(source: source);
-    if (picked != null) {
+  Future<void> _pickImage() async {
+    final picked = await _picker.pickImage(source: ImageSource.gallery);
+    if (picked != null && mounted) {
       setState(() => _coverFile = File(picked.path));
     }
   }
 
-  Future<void> _aggiungi() async {
-    final valid = _formKey.currentState?.validate() ?? false;
-    if (!valid || _genereId == null) return;
+  bool get _formValid =>
+      _formKey.currentState?.validate() == true && _genereId != null;
 
+  Future<void> _salva() async {
+    if (!_formValid) return;
     final nuovo = Vinile(
+      id: widget.suggested ? null : widget.vinile.id,
       titolo: _titolo.text.trim(),
       artista: _artista.text.trim(),
       anno: int.tryParse(_anno.text),
@@ -92,18 +97,33 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
       etichettaDiscografica: _etichetta.text.trim(),
       copie: _copie,
       condizione: Condizione.values[_condizioneIdx],
-      immagine: _coverFile != null ? 'file://${_coverFile!.path}' : null,
+      immagine: _coverFile != null
+          ? 'file://${_coverFile!.path}'
+          : widget.vinile.immagine,
       preferito: _preferito,
     );
 
-    if (await DatabaseHelper.instance.vinileEsiste(nuovo)) {
-      if (mounted)
-        _showAlert('Attenzione', 'Hai già questo vinile nella tua collezione.');
-      return;
+    if (widget.suggested) {
+      final esiste = await DatabaseHelper.instance.vinileEsiste(nuovo);
+      if (esiste) {
+        if (mounted) {
+          _showAlert(
+            'Attenzione',
+            'Hai già questo vinile nella tua collezione.',
+          );
+        }
+        return;
+      }
+      await DatabaseHelper.instance.aggiungiVinile(nuovo);
+      if (mounted) Navigator.pop(context, true);
+    } else {
+      if (nuovo == widget.vinile) {
+        Navigator.pop(context, false);
+        return;
+      }
+      final ok = await DatabaseHelper.instance.modificaVinile(nuovo);
+      if (ok && mounted) Navigator.pop(context, true);
     }
-
-    await DatabaseHelper.instance.aggiungiVinile(nuovo);
-    if (mounted) Navigator.pop(context, true);
   }
 
   void _showAlert(String title, String msg) => showDialog(
@@ -123,55 +143,56 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
-      appBar: AppBar(title: const Text('Aggiungi Vinile'), centerTitle: true),
+      appBar: AppBar(
+        title: Text(widget.suggested ? 'Aggiungi vinile' : 'Modifica vinile'),
+      ),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(
-            horizontal: context.screenWidth * 0.05,
-            vertical: 24,
-          ),
+          padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(
                 child: GestureDetector(
-                  onTap: _showImageSourceActionSheet,
-                  // cambia da _pickImage a _showImageSourceActionSheet
-                  child: Material(
-                    elevation: 8,
-                    borderRadius: BorderRadius.circular(20),
-                    clipBehavior: Clip.antiAlias,
-                    child: SizedBox(
-                      width: context.screenWidth * 0.8,
-                      height: context.screenWidth * 0.8,
-                      child: _coverFile != null
-                          ? Image.file(_coverFile!, fit: BoxFit.cover)
-                          : Image.asset(
-                              'assets/immagini/vinilee.png',
-                              fit: BoxFit.cover,
-                            ),
+                  onTap: _pickImage,
+                  child: Container(
+                    width: context.screenWidth * 0.7,
+                    height: context.screenHeight * 0.3,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      image: DecorationImage(
+                        fit: BoxFit.cover,
+                        image: _coverFile != null
+                            ? FileImage(_coverFile!)
+                            : _buildImageProvider(widget.vinile.immagine),
+                      ),
                     ),
                   ),
                 ),
               ),
               const SizedBox(height: 24),
-
               _M3TextField(controller: _titolo, label: 'Titolo'),
+              const SizedBox(height: 16),
               _M3TextField(controller: _artista, label: 'Artista'),
+              const SizedBox(height: 16),
               _M3TextField(
                 controller: _anno,
                 label: 'Anno',
                 keyboardType: TextInputType.number,
                 validator: (v) {
                   final y = int.tryParse(v ?? '');
-                  if (y == null || y < 1948 || y > DateTime.now().year)
+                  if (y == null || y < 1948 || y > DateTime.now().year) {
                     return 'Anno non valido';
+                  }
                   return null;
                 },
               ),
+              const SizedBox(height: 16),
               _M3TextField(controller: _etichetta, label: 'Etichetta'),
               const SizedBox(height: 16),
               DropdownButtonFormField<int>(
@@ -252,12 +273,13 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
               ),
               const SizedBox(height: 32),
               Center(
-                child: SizedBox(
-                  width: context.screenWidth * 0.8,
-                  child: FilledButton.icon(
-                    onPressed: _aggiungi, // sempre attivo
-                    icon: const Icon(Icons.add),
-                    label: const Text('Aggiungi alla collezione'),
+                child: FilledButton.icon(
+                  onPressed: _formValid ? _salva : null,
+                  icon: Icon(widget.suggested ? Icons.add : Icons.check),
+                  label: Text(
+                    widget.suggested
+                        ? 'Aggiungi alla collezione'
+                        : 'Salva modifiche',
                   ),
                 ),
               ),
@@ -269,6 +291,7 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
   }
 }
 
+// ------------ widget helper --------------
 class _M3TextField extends StatelessWidget {
   final TextEditingController controller;
   final String label;
@@ -283,23 +306,18 @@ class _M3TextField extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16), // spazio sotto
-      child: TextFormField(
-        controller: controller,
-        keyboardType: keyboardType,
-        validator:
-            validator ??
-            (v) => v == null || v.trim().isEmpty ? 'Campo obbligatorio' : null,
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(12)),
-          ),
-          filled: true,
-        ),
+  Widget build(BuildContext context) => TextFormField(
+    controller: controller,
+    keyboardType: keyboardType,
+    validator:
+        validator ??
+        (v) => v == null || v.trim().isEmpty ? 'Campo obbligatorio' : null,
+    decoration: InputDecoration(
+      labelText: label,
+      border: const OutlineInputBorder(
+        borderRadius: BorderRadius.all(Radius.circular(12)),
       ),
-    );
-  }
+      filled: true,
+    ),
+  );
 }

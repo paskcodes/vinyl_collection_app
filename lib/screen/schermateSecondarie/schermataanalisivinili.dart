@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:vinyl_collection_app/utils/dimensioniSchermo.dart';
-import '../database/databasehelper.dart';
-import '../vinile/vinile.dart';
+import 'package:vinyl_collection_app/utils/dimensionischermo.dart';
+import '../../database/databasehelper.dart';
+import '../../vinile/vinile.dart';
 
 class AnalisiViniliScreen extends StatefulWidget {
   const AnalisiViniliScreen({super.key});

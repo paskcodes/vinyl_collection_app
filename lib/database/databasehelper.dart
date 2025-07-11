@@ -160,17 +160,15 @@ class DatabaseHelper {
     return result == 1;
   }
 
-  /*Future<List<Vinile>> getViniliPreferiti() async {
-    final db = DatabaseHelper.instance;
-
-    final List<Map<String, dynamic>> maps = await db.database.then( (db) => db.query(
+  Future<List<Vinile>> getViniliPreferiti() async {
+    final db = await database; // await qui
+    final List<Map<String, dynamic>> maps = await db.query(
       'collezioneVinili',
       where: 'preferito = ?',
       whereArgs: [1],
-    ));
-
-    return maps.map((map)=> Vinile.fromMap(map)).toList();
-  }*/
+    );
+    return maps.map((map) => Vinile.fromMap(map)).toList();
+  }
 
   Future<bool> vinileEsiste(Vinile vinile) async {
     final db = await DatabaseHelper.instance.database;
@@ -218,15 +216,6 @@ class DatabaseHelper {
       GROUP BY g.id, g.nome
       ORDER BY g.nome;
     ''');
-
-  /*Future<String> getGenere(int id) async{
-    final db= await DatabaseHelper.instance.database;
-    final maps= await db.query('generi',
-      where:"id = ?",
-      whereArgs:[id] ,
-    );
-    return maps.map(Genere.fromMap).first.nome;
-  }*/
 
   Future<int?> controlloGenere(String? nome) async {
     if (nome == null || nome.trim().isEmpty) return null;

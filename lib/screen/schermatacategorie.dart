@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:vinyl_collection_app/components/genere_tile.dart';
 import 'package:vinyl_collection_app/screen/schermatapercategoria.dart';
 import '../database/databasehelper.dart';
+import '../vinile/vinile.dart';
 
 class SchermataCategorie extends StatefulWidget {
   const SchermataCategorie({super.key});
@@ -27,12 +28,34 @@ class SchermataCategorieState extends State<SchermataCategorie> {
 
   Future<void> aggiornaGeneri() async {
     final db = DatabaseHelper.instance;
-    List<Map<String, dynamic>> listaBase = _mostraTutte
-        ? await DatabaseHelper.instance.getCategorieConConteggio()
-        : await DatabaseHelper.instance.generiFiltrati();
 
-    // Aggiungi le copertine per ogni genere
+    // Ottieni preferiti
+    List<Vinile> viniliPreferiti = await db.getViniliPreferiti();
+
+    List<Map<String, dynamic>> listaBase = _mostraTutte
+        ? await db.getCategorieConConteggio()
+        : await db.generiFiltrati();
+
+    // Crea lista completa con copertine
     List<Map<String, dynamic>> listaCompleta = [];
+
+    // Se ci sono preferiti, aggiungi la tile "Preferiti" in cima
+    if (viniliPreferiti.isNotEmpty) {
+      List<String> copertinePreferiti = viniliPreferiti
+          .take(4)
+          .map((v) => v.immagine ?? '')
+          .where((img) => img.isNotEmpty)
+          .toList();
+
+      listaCompleta.add({
+        'id': -1, // id speciale per preferiti
+        'nome': 'Preferiti',
+        'conteggio': viniliPreferiti.length,
+        'copertine': copertinePreferiti,
+      });
+    }
+
+    // Aggiungi le categorie normalmente
     for (var genere in listaBase) {
       int id = genere['id'];
       List<String> copertine = await db.getCopertineViniliByGenere(id);
@@ -43,6 +66,7 @@ class SchermataCategorieState extends State<SchermataCategorie> {
       _listaFiltrata = listaCompleta;
     });
   }
+
 
   void toggleMostraTutte() {
     setState(() {
@@ -268,6 +292,11 @@ class SchermataCategorieState extends State<SchermataCategorie> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: Text(
+          _modalitaSelezione
+              ? '${_categorieSelezionate.length} categorie selezionate'
+              : 'Categorie',
+        ),
         leading: _modalitaSelezione
             ? IconButton(
                 icon: const Icon(Icons.close),
@@ -349,7 +378,9 @@ class SchermataCategorieState extends State<SchermataCategorie> {
                             _categorieSelezionate.contains(id)
                                 ? Icons.check_circle
                                 : Icons.radio_button_unchecked,
-                            color: _categorieSelezionate.contains(id) ? Theme.of(context).colorScheme.primary : Colors.grey,
+                            color: _categorieSelezionate.contains(id)
+                                ? Theme.of(context).colorScheme.primary
+                                : Colors.grey,
                           ),
                         ),
                     ],

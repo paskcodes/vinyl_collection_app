@@ -10,7 +10,12 @@ import '../vinile/vinile.dart';
 class SchermataModifica extends StatefulWidget {
   final Vinile vinile;
   final bool suggested;
-  const SchermataModifica({super.key, required this.vinile, required this.suggested});
+
+  const SchermataModifica({
+    super.key,
+    required this.vinile,
+    required this.suggested,
+  });
 
   @override
   State<SchermataModifica> createState() => _SchermataModificaState();
@@ -92,8 +97,9 @@ class _SchermataModificaState extends State<SchermataModifica> {
       etichettaDiscografica: _etichetta.text.trim(),
       copie: _copie,
       condizione: Condizione.values[_condizioneIdx],
-      immagine: _coverFile != null ? 'file://${_coverFile!.path}' : widget
-          .vinile.immagine,
+      immagine: _coverFile != null
+          ? 'file://${_coverFile!.path}'
+          : widget.vinile.immagine,
       preferito: _preferito,
     );
 
@@ -102,7 +108,9 @@ class _SchermataModificaState extends State<SchermataModifica> {
       if (esiste) {
         if (mounted) {
           _showAlert(
-            'Attenzione', 'Hai già questo vinile nella tua collezione.');
+            'Attenzione',
+            'Hai già questo vinile nella tua collezione.',
+          );
         }
         return;
       }
@@ -118,19 +126,19 @@ class _SchermataModificaState extends State<SchermataModifica> {
     }
   }
 
-  void _showAlert(String title, String msg) =>
-      showDialog(
-        context: context,
-        builder: (_) =>
-            AlertDialog(
-              title: Text(title),
-              content: Text(msg),
-              actions: [
-                TextButton(onPressed: () => Navigator.pop(context),
-                    child: const Text('OK')),
-              ],
-            ),
-      );
+  void _showAlert(String title, String msg) => showDialog(
+    context: context,
+    builder: (_) => AlertDialog(
+      title: Text(title),
+      content: Text(msg),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('OK'),
+        ),
+      ],
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -178,7 +186,8 @@ class _SchermataModificaState extends State<SchermataModifica> {
                 keyboardType: TextInputType.number,
                 validator: (v) {
                   final y = int.tryParse(v ?? '');
-                  if (y == null || y < 1948 || y > DateTime.now().year) return 'Anno non valido';
+                  if (y == null || y < 1948 || y > DateTime.now().year)
+                    return 'Anno non valido';
                   return null;
                 },
               ),
@@ -188,10 +197,15 @@ class _SchermataModificaState extends State<SchermataModifica> {
               DropdownButtonFormField<int>(
                 value: _genereId,
                 items: _generi
-                    .map((g) => DropdownMenuItem<int>(
-                  value: g.id,
-                  child: Text(g.nome, style: const TextStyle(fontSize: 16)),
-                ))
+                    .map(
+                      (g) => DropdownMenuItem<int>(
+                        value: g.id,
+                        child: Text(
+                          g.nome,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ),
+                    )
                     .toList(),
                 onChanged: (v) => setState(() => _genereId = v),
                 decoration: const InputDecoration(
@@ -200,7 +214,10 @@ class _SchermataModificaState extends State<SchermataModifica> {
                     borderRadius: BorderRadius.all(Radius.circular(12)),
                   ),
                   filled: true,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 20,
+                  ),
                 ),
                 dropdownColor: Theme.of(context).colorScheme.surface,
                 menuMaxHeight: 300,
@@ -209,8 +226,12 @@ class _SchermataModificaState extends State<SchermataModifica> {
               Center(
                 child: SegmentedButton<int>(
                   segments: Condizione.values
-                      .map((c) =>
-                      ButtonSegment(value: c.index, label: Text(c.descrizione)))
+                      .map(
+                        (c) => ButtonSegment(
+                          value: c.index,
+                          label: Text(c.descrizione),
+                        ),
+                      )
                       .toList(),
                   selected: {_condizioneIdx},
                   onSelectionChanged: (s) =>
@@ -239,8 +260,9 @@ class _SchermataModificaState extends State<SchermataModifica> {
                   ),
                   IconButton(
                     icon: Icon(
-                      _preferito ? Icons.star_rounded : Icons
-                          .star_border_rounded,
+                      _preferito
+                          ? Icons.star_rounded
+                          : Icons.star_border_rounded,
                       color: Colors.amber,
                       size: 32,
                     ),
@@ -253,9 +275,11 @@ class _SchermataModificaState extends State<SchermataModifica> {
                 child: FilledButton.icon(
                   onPressed: _formValid ? _salva : null,
                   icon: Icon(widget.suggested ? Icons.add : Icons.check),
-                  label: Text(widget.suggested
-                      ? 'Aggiungi alla collezione'
-                      : 'Salva modifiche'),
+                  label: Text(
+                    widget.suggested
+                        ? 'Aggiungi alla collezione'
+                        : 'Salva modifiche',
+                  ),
                 ),
               ),
             ],
@@ -272,16 +296,26 @@ class _M3TextField extends StatelessWidget {
   final String label;
   final TextInputType? keyboardType;
   final String? Function(String?)? validator;
-  const _M3TextField({required this.controller, required this.label, this.keyboardType, this.validator});
+
+  const _M3TextField({
+    required this.controller,
+    required this.label,
+    this.keyboardType,
+    this.validator,
+  });
 
   @override
   Widget build(BuildContext context) => TextFormField(
     controller: controller,
     keyboardType: keyboardType,
-    validator: validator ?? (v) => v == null || v.trim().isEmpty ? 'Campo obbligatorio' : null,
+    validator:
+        validator ??
+        (v) => v == null || v.trim().isEmpty ? 'Campo obbligatorio' : null,
     decoration: InputDecoration(
       labelText: label,
-      border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+      border: const OutlineInputBorder(
+        borderRadius: BorderRadius.all(Radius.circular(12)),
+      ),
       filled: true,
     ),
   );

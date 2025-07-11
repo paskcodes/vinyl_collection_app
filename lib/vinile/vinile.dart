@@ -16,7 +16,7 @@ class Vinile {
   final Condizione? condizione;
   final String? immagine;
   bool preferito;
-  final String creatoIl;// ISO‑8601
+  final String creatoIl; // ISO‑8601
 
   Vinile({
     this.id,
@@ -32,7 +32,6 @@ class Vinile {
     String? creatoIl,
   }) : creatoIl = creatoIl ?? DateTime.now().toIso8601String();
 
-
   Widget get coverWidget {
     if (immagine == null) {
       return const Icon(Icons.album, size: 40);
@@ -41,12 +40,13 @@ class Vinile {
       return Image.network(immagine!, fit: BoxFit.cover);
     }
     if (immagine!.startsWith('/') || immagine!.startsWith('file://')) {
-      return Image.file(File(immagine!.replaceFirst('file://', '')),
-          fit: BoxFit.cover);
+      return Image.file(
+        File(immagine!.replaceFirst('file://', '')),
+        fit: BoxFit.cover,
+      );
     }
     return Image.asset(immagine!, fit: BoxFit.cover);
   }
-
 
   Map<String, Object?> toMap() => {
     'id': id,
@@ -91,7 +91,6 @@ class Vinile {
     // Cast
     final Vinile altroVinile = other as Vinile;
 
-
     return titolo == altroVinile.titolo &&
         artista == altroVinile.artista &&
         anno == altroVinile.anno &&
@@ -100,7 +99,9 @@ class Vinile {
         copie == altroVinile.copie &&
         condizione == altroVinile.condizione &&
         immagine == altroVinile.immagine && // Confronta anche l'immagine
-        preferito == altroVinile.preferito;// creatoIl non viene confrontato perché è un timestamp di creazione
+        preferito ==
+            altroVinile
+                .preferito; // creatoIl non viene confrontato perché è un timestamp di creazione
   }
 
   @override
@@ -118,6 +119,4 @@ class Vinile {
       preferito,
     );
   }
-
-
 }

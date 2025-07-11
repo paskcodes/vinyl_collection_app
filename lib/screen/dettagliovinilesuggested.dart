@@ -6,10 +6,12 @@ import '../vinile/vinile.dart';
 
 class DettaglioVinileSuggested extends StatefulWidget {
   final Vinile vinile;
+
   const DettaglioVinileSuggested({super.key, required this.vinile});
 
   @override
-  State<DettaglioVinileSuggested> createState() => _DettaglioVinileSuggestedState();
+  State<DettaglioVinileSuggested> createState() =>
+      _DettaglioVinileSuggestedState();
 }
 
 class _DettaglioVinileSuggestedState extends State<DettaglioVinileSuggested> {
@@ -20,12 +22,12 @@ class _DettaglioVinileSuggestedState extends State<DettaglioVinileSuggested> {
     final double horizontalPadding = context.screenWidth * 0.05;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.vinile.titolo),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: Text(widget.vinile.titolo), centerTitle: true),
       body: ListView(
-        padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: spacing),
+        padding: EdgeInsets.symmetric(
+          horizontal: horizontalPadding,
+          vertical: spacing,
+        ),
         children: [
           // Cover con effetto vetrina
           Center(
@@ -59,7 +61,9 @@ class _DettaglioVinileSuggestedState extends State<DettaglioVinileSuggested> {
             value: widget.vinile.etichettaDiscografica ?? '–',
           ),
           FutureBuilder<String?>(
-            future: DatabaseHelper.instance.getGenereNomeById(widget.vinile.genere ?? -1),
+            future: DatabaseHelper.instance.getGenereNomeById(
+              widget.vinile.genere ?? -1,
+            ),
             builder: (context, snapshot) {
               String value;
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -107,7 +111,8 @@ class _DettaglioVinileSuggestedState extends State<DettaglioVinileSuggested> {
             final added = await Navigator.push<bool>(
               context,
               MaterialPageRoute(
-                builder: (_) => SchermataModifica(vinile: widget.vinile, suggested: true),
+                builder: (_) =>
+                    SchermataModifica(vinile: widget.vinile, suggested: true),
               ),
             );
             if (added == true && mounted) Navigator.pop(context, true);
@@ -150,14 +155,18 @@ class _ModernInfoBox extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label,
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    )),
+                Text(
+                  label,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
                 SizedBox(height: context.screenHeight * 0.004),
                 Text(
                   value,
-                  style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
             ),

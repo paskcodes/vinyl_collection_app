@@ -89,12 +89,14 @@ class SchermataCategorieState extends State<SchermataCategorie> {
                       return;
                     }
 
-                    final esisteGia = _listaFiltrata?.any((genere) =>
-                    genere['nome'].toLowerCase() == nuovoNome.toLowerCase());
+                    final esisteGia = _listaFiltrata?.any(
+                      (genere) =>
+                          genere['nome'].toLowerCase() ==
+                          nuovoNome.toLowerCase(),
+                    );
 
                     if (esisteGia == true) {
-                      setState(() =>
-                      errore = "Categoria già esistente.");
+                      setState(() => errore = "Categoria già esistente.");
                       return;
                     }
 
@@ -113,8 +115,6 @@ class SchermataCategorieState extends State<SchermataCategorie> {
 
     return result == true;
   }
-
-
 
   void onTileTap(int id, String nome, int conteggio) {
     if (_modalitaSelezione) {
@@ -281,83 +281,82 @@ class SchermataCategorieState extends State<SchermataCategorie> {
             : null,
         actions: _modalitaSelezione
             ? [
-          if (_categorieSelezionate.length == 1)
-            IconButton(
-              icon: const Icon(Icons.edit),
-              tooltip: 'Modifica nome',
-              onPressed: modificaCategoria,
-            ),
-          IconButton(
-            icon: const Icon(Icons.delete),
-            tooltip: 'Elimina (solo vuote)',
-            onPressed: eliminaCategorieSelezionate,
-          ),
-        ]
+                if (_categorieSelezionate.length == 1)
+                  IconButton(
+                    icon: const Icon(Icons.edit),
+                    tooltip: 'Modifica nome',
+                    onPressed: modificaCategoria,
+                  ),
+                IconButton(
+                  icon: const Icon(Icons.delete),
+                  tooltip: 'Elimina (solo vuote)',
+                  onPressed: eliminaCategorieSelezionate,
+                ),
+              ]
             : [
-          IconButton(
-            tooltip: mostraTutte
-                ? "Mostra solo categorie con vinili"
-                : "Mostra tutte le categorie",
-            icon: Icon(
-              mostraTutte ? Icons.visibility : Icons.visibility_off,
-            ),
-            onPressed: toggleMostraTutte,
-          ),
-        ],
-
+                IconButton(
+                  tooltip: mostraTutte
+                      ? "Mostra solo categorie con vinili"
+                      : "Mostra tutte le categorie",
+                  icon: Icon(
+                    mostraTutte ? Icons.visibility : Icons.visibility_off,
+                  ),
+                  onPressed: toggleMostraTutte,
+                ),
+              ],
       ),
       body: _listaFiltrata == null
           ? const Center(child: CircularProgressIndicator())
           : _listaFiltrata!.isEmpty
-              ? const Center(
-                  child: Text("Aggiungi vinili per visualizzare le categorie."),
-                )
-              : GridView.builder(
-                  padding: const EdgeInsets.all(16),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: 0.7,
-                  ),
-                  itemCount: _listaFiltrata!.length,
-                  itemBuilder: (context, index) {
-                    final genereMap = _listaFiltrata![index];
-                    final int id = genereMap['id'];
-                    final String nome = genereMap['nome'];
-                    final int conteggio = genereMap['conteggio'];
-                    final List<String> copertine = List<String>.from(
-                      genereMap['copertine'] ?? [],
-                    );
+          ? const Center(
+              child: Text("Aggiungi vinili per visualizzare le categorie."),
+            )
+          : GridView.builder(
+              padding: const EdgeInsets.all(16),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                childAspectRatio: 0.7,
+              ),
+              itemCount: _listaFiltrata!.length,
+              itemBuilder: (context, index) {
+                final genereMap = _listaFiltrata![index];
+                final int id = genereMap['id'];
+                final String nome = genereMap['nome'];
+                final int conteggio = genereMap['conteggio'];
+                final List<String> copertine = List<String>.from(
+                  genereMap['copertine'] ?? [],
+                );
 
-                    return GestureDetector(
-                      onTap: () => onTileTap(id, nome, conteggio),
-                      onLongPress: () => onTileLongPress(id),
-                      child: Stack(
-                        children: [
-                          GenereTile(
-                            genereId: id,
-                            nomeGenere: nome,
-                            numeroVinili: conteggio,
-                            copertineVinili: copertine,
-                            onTap: () => onTileTap(id, nome, conteggio),
-                          ),
-                          if (_modalitaSelezione)
-                            Positioned(
-                              top: 8,
-                              right: 8,
-                              child: Icon(
-                                _categorieSelezionate.contains(id)
-                                    ? Icons.check_circle
-                                    : Icons.radio_button_unchecked,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                            ),
-                        ],
+                return GestureDetector(
+                  onTap: () => onTileTap(id, nome, conteggio),
+                  onLongPress: () => onTileLongPress(id),
+                  child: Stack(
+                    children: [
+                      GenereTile(
+                        genereId: id,
+                        nomeGenere: nome,
+                        numeroVinili: conteggio,
+                        copertineVinili: copertine,
+                        onTap: () => onTileTap(id, nome, conteggio),
                       ),
-                    );
-                  },
-                ),
+                      if (_modalitaSelezione)
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: Icon(
+                            _categorieSelezionate.contains(id)
+                                ? Icons.check_circle
+                                : Icons.radio_button_unchecked,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                    ],
+                  ),
+                );
+              },
+            ),
     );
   }
 }

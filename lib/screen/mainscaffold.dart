@@ -6,6 +6,7 @@ import 'schermatacollezione.dart';
 
 class MainScaffold extends StatefulWidget {
   const MainScaffold({super.key});
+
   @override
   State<MainScaffold> createState() => _MainScaffoldState();
 }
@@ -14,9 +15,9 @@ class _MainScaffoldState extends State<MainScaffold> {
   late final PageController _pageController;
   int _currentIndex = 0;
 
-  final _homeKey       = GlobalKey<HomeScreenState>();
+  final _homeKey = GlobalKey<HomeScreenState>();
   final _collezioneKey = GlobalKey<SchermataCollezioneState>();
-  final _categorieKey  = GlobalKey<SchermataCategorieState>();
+  final _categorieKey = GlobalKey<SchermataCategorieState>();
 
   late final List<Widget> _pages;
 
@@ -61,27 +62,30 @@ class _MainScaffoldState extends State<MainScaffold> {
 
       floatingActionButton: _currentIndex == 3
           ? FloatingActionButton(
-        tooltip: 'Aggiungi nuova categoria',
-        onPressed: () async {
-          final aggiunto = await _categorieKey.currentState?.vaiAggiuntaCategoria();
-          if (aggiunto == true) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Categoria aggiunta con successo")),
-            );
-          }
-        },
-        child: const Icon(Icons.create_new_folder),
-      )
+              tooltip: 'Aggiungi nuova categoria',
+              onPressed: () async {
+                final aggiunto = await _categorieKey.currentState
+                    ?.vaiAggiuntaCategoria();
+                if (aggiunto == true) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Categoria aggiunta con successo"),
+                    ),
+                  );
+                }
+              },
+              child: const Icon(Icons.create_new_folder),
+            )
           : Tooltip(
-        message: 'Aggiungi un nuovo vinile',
-        waitDuration: const Duration(milliseconds: 300),
-        child: FloatingActionButton(
-          heroTag: 'SchermataAggiunta',
-          tooltip: 'Aggiungi nuovo vinile',
-          onPressed: _vaiSchermataAggiunta,
-          child: const Icon(Icons.add),
-        ),
-      ),
+              message: 'Aggiungi un nuovo vinile',
+              waitDuration: const Duration(milliseconds: 300),
+              child: FloatingActionButton(
+                heroTag: 'SchermataAggiunta',
+                tooltip: 'Aggiungi nuovo vinile',
+                onPressed: _vaiSchermataAggiunta,
+                child: const Icon(Icons.add),
+              ),
+            ),
 
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
@@ -102,10 +106,7 @@ class _MainScaffoldState extends State<MainScaffold> {
             activeIcon: Icon(Icons.home),
             label: 'Home',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Cerca',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Cerca'),
           BottomNavigationBarItem(
             icon: Icon(Icons.library_music_outlined),
             activeIcon: Icon(Icons.library_music),

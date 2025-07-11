@@ -97,7 +97,8 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
     );
 
     if (await DatabaseHelper.instance.vinileEsiste(nuovo)) {
-      if (mounted) _showAlert('Attenzione', 'Hai già questo vinile nella tua collezione.');
+      if (mounted)
+        _showAlert('Attenzione', 'Hai già questo vinile nella tua collezione.');
       return;
     }
 
@@ -114,7 +115,7 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
         TextButton(
           onPressed: () => Navigator.pop(context),
           child: const Text('OK'),
-        )
+        ),
       ],
     ),
   );
@@ -137,7 +138,8 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
             children: [
               Center(
                 child: GestureDetector(
-                  onTap: _showImageSourceActionSheet, // cambia da _pickImage a _showImageSourceActionSheet
+                  onTap: _showImageSourceActionSheet,
+                  // cambia da _pickImage a _showImageSourceActionSheet
                   child: Material(
                     elevation: 8,
                     borderRadius: BorderRadius.circular(20),
@@ -147,7 +149,10 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
                       height: context.screenWidth * 0.8,
                       child: _coverFile != null
                           ? Image.file(_coverFile!, fit: BoxFit.cover)
-                          : Image.asset('assets/immagini/vinilee.png', fit: BoxFit.cover),
+                          : Image.asset(
+                              'assets/immagini/vinilee.png',
+                              fit: BoxFit.cover,
+                            ),
                     ),
                   ),
                 ),
@@ -162,7 +167,8 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
                 keyboardType: TextInputType.number,
                 validator: (v) {
                   final y = int.tryParse(v ?? '');
-                  if (y == null || y < 1948 || y > DateTime.now().year) return 'Anno non valido';
+                  if (y == null || y < 1948 || y > DateTime.now().year)
+                    return 'Anno non valido';
                   return null;
                 },
               ),
@@ -171,10 +177,15 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
               DropdownButtonFormField<int>(
                 value: _genereId,
                 items: _generi
-                    .map((g) => DropdownMenuItem<int>(
-                  value: g.id,
-                  child: Text(g.nome, style: const TextStyle(fontSize: 16)),
-                ))
+                    .map(
+                      (g) => DropdownMenuItem<int>(
+                        value: g.id,
+                        child: Text(
+                          g.nome,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ),
+                    )
                     .toList(),
                 onChanged: (v) => setState(() => _genereId = v),
                 decoration: const InputDecoration(
@@ -183,7 +194,10 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
                     borderRadius: BorderRadius.all(Radius.circular(12)),
                   ),
                   filled: true,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 20,
+                  ),
                 ),
                 dropdownColor: Theme.of(context).colorScheme.surface,
                 menuMaxHeight: 300,
@@ -192,10 +206,16 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
               Center(
                 child: SegmentedButton<int>(
                   segments: Condizione.values
-                      .map((c) => ButtonSegment(value: c.index, label: Text(c.descrizione)))
+                      .map(
+                        (c) => ButtonSegment(
+                          value: c.index,
+                          label: Text(c.descrizione),
+                        ),
+                      )
                       .toList(),
                   selected: {_condizioneIdx},
-                  onSelectionChanged: (s) => setState(() => _condizioneIdx = s.first),
+                  onSelectionChanged: (s) =>
+                      setState(() => _condizioneIdx = s.first),
                 ),
               ),
               const SizedBox(height: 16),
@@ -204,21 +224,36 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
                   Expanded(
                     child: Row(
                       children: [
-                        IconButton(icon: const Icon(Icons.remove_circle_outline), onPressed: _copie > 1 ? () => setState(() => _copie--) : null),
+                        IconButton(
+                          icon: const Icon(Icons.remove_circle_outline),
+                          onPressed: _copie > 1
+                              ? () => setState(() => _copie--)
+                              : null,
+                        ),
                         Text('$_copie copie'),
-                        IconButton(icon: const Icon(Icons.add_circle_outline), onPressed: () => setState(() => _copie++)),
+                        IconButton(
+                          icon: const Icon(Icons.add_circle_outline),
+                          onPressed: () => setState(() => _copie++),
+                        ),
                       ],
                     ),
                   ),
                   IconButton(
-                    icon: Icon(_preferito ? Icons.star_rounded : Icons.star_border_rounded, color: Colors.amber, size: 32),
+                    icon: Icon(
+                      _preferito
+                          ? Icons.star_rounded
+                          : Icons.star_border_rounded,
+                      color: Colors.amber,
+                      size: 32,
+                    ),
                     onPressed: () => setState(() => _preferito = !_preferito),
-                  )
+                  ),
                 ],
               ),
               const SizedBox(height: 32),
               Center(
-                child:SizedBox(width: context.screenWidth * 0.8,
+                child: SizedBox(
+                  width: context.screenWidth * 0.8,
                   child: FilledButton.icon(
                     onPressed: _aggiungi, // sempre attivo
                     icon: const Icon(Icons.add),
@@ -250,11 +285,13 @@ class _M3TextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),  // spazio sotto
+      padding: const EdgeInsets.only(bottom: 16), // spazio sotto
       child: TextFormField(
         controller: controller,
         keyboardType: keyboardType,
-        validator: validator ?? (v) => v == null || v.trim().isEmpty ? 'Campo obbligatorio' : null,
+        validator:
+            validator ??
+            (v) => v == null || v.trim().isEmpty ? 'Campo obbligatorio' : null,
         decoration: InputDecoration(
           labelText: label,
           border: const OutlineInputBorder(
@@ -266,4 +303,3 @@ class _M3TextField extends StatelessWidget {
     );
   }
 }
-

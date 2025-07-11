@@ -27,11 +27,10 @@ class MyApp extends StatelessWidget {
         colorSchemeSeed: Colors.deepPurple,
         brightness: Brightness.dark,
       ),
-      themeMode: ThemeMode.system, //Usa il valore del sistema
+      themeMode: ThemeMode.system,
+      //Usa il valore del sistema
       home: const MainScaffold(),
-      routes: {
-        '/aggiunta': (context) => const SchermataAggiungi(),
-      },
+      routes: {'/aggiunta': (context) => const SchermataAggiungi()},
     );
   }
 }

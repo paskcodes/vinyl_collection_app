@@ -145,5 +145,4 @@ class GenereTile extends StatelessWidget {
       ),
     );
   }
-
 }

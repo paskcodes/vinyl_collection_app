@@ -17,10 +17,12 @@ class SchermataViniliPerCategoria extends StatefulWidget {
   });
 
   @override
-  State<SchermataViniliPerCategoria> createState() => _SchermataViniliPerCategoriaState();
+  State<SchermataViniliPerCategoria> createState() =>
+      _SchermataViniliPerCategoriaState();
 }
 
-class _SchermataViniliPerCategoriaState extends State<SchermataViniliPerCategoria> {
+class _SchermataViniliPerCategoriaState
+    extends State<SchermataViniliPerCategoria> {
   late List<Vinile> _vinili = [];
   Set<int> _viniliSelezionati = {};
   late String _nomeGenere;
@@ -35,7 +37,9 @@ class _SchermataViniliPerCategoriaState extends State<SchermataViniliPerCategori
   }
 
   Future<void> _carica() async {
-    final list = await DatabaseHelper.instance.getViniliByGenere(widget.genereId);
+    final list = await DatabaseHelper.instance.getViniliByGenere(
+      widget.genereId,
+    );
     if (mounted) setState(() => _vinili = list);
   }
 
@@ -64,10 +68,18 @@ class _SchermataViniliPerCategoriaState extends State<SchermataViniliPerCategori
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Conferma eliminazione'),
-        content: Text('Vuoi eliminare ${_viniliSelezionati.length} vinili selezionati?'),
+        content: Text(
+          'Vuoi eliminare ${_viniliSelezionati.length} vinili selezionati?',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Annulla')),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Elimina', style: TextStyle(color: Colors.red))),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Annulla'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Elimina', style: TextStyle(color: Colors.red)),
+          ),
         ],
       ),
     );
@@ -90,7 +102,10 @@ class _SchermataViniliPerCategoriaState extends State<SchermataViniliPerCategori
     if (nuovoGenereId != null) {
       for (final id in _viniliSelezionati) {
         final vinile = _vinili.firstWhere((v) => v.id == id);
-        await DatabaseHelper.instance.aggiornaGenereVinile(vinile.id!, nuovoGenereId);
+        await DatabaseHelper.instance.aggiornaGenereVinile(
+          vinile.id!,
+          nuovoGenereId,
+        );
       }
       _viniliSelezionati.clear();
       await _carica();
@@ -100,7 +115,9 @@ class _SchermataViniliPerCategoriaState extends State<SchermataViniliPerCategori
   Future<void> _modifica(Vinile v) async {
     final mod = await Navigator.push<bool>(
       context,
-      MaterialPageRoute(builder: (_) => SchermataModifica(vinile: v, suggested: false)),
+      MaterialPageRoute(
+        builder: (_) => SchermataModifica(vinile: v, suggested: false),
+      ),
     );
     if (mod == true) await _carica();
   }
@@ -120,8 +137,14 @@ class _SchermataViniliPerCategoriaState extends State<SchermataViniliPerCategori
         title: const Text('Conferma eliminazione'),
         content: Text('Eliminare "${v.titolo}"?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Annulla')),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Elimina', style: TextStyle(color: Colors.red))),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Annulla'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Elimina', style: TextStyle(color: Colors.red)),
+          ),
         ],
       ),
     );
@@ -130,7 +153,9 @@ class _SchermataViniliPerCategoriaState extends State<SchermataViniliPerCategori
   }
 
   Future<void> _rinominaGenere() async {
-    final TextEditingController controller = TextEditingController(text: _nomeGenere);
+    final TextEditingController controller = TextEditingController(
+      text: _nomeGenere,
+    );
     final generiEsistenti = await DatabaseHelper.instance.getGeneri();
 
     final nuovoNome = await showDialog<String>(
@@ -139,13 +164,14 @@ class _SchermataViniliPerCategoriaState extends State<SchermataViniliPerCategori
         title: const Text("Rinomina categoria"),
         content: TextField(
           controller: controller,
-          decoration: const InputDecoration(
-            labelText: 'Nuovo nome categoria',
-          ),
+          decoration: const InputDecoration(labelText: 'Nuovo nome categoria'),
           autofocus: true,
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Annulla")),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Annulla"),
+          ),
           ElevatedButton(
             onPressed: () {
               final input = controller.text.trim();
@@ -159,20 +185,26 @@ class _SchermataViniliPerCategoriaState extends State<SchermataViniliPerCategori
     );
 
     if (nuovoNome != null && nuovoNome != _nomeGenere.trim()) {
-      final giaEsiste = generiEsistenti.any((g) => g.nome.toLowerCase() == nuovoNome.toLowerCase());
+      final giaEsiste = generiEsistenti.any(
+        (g) => g.nome.toLowerCase() == nuovoNome.toLowerCase(),
+      );
 
-    if (giaEsiste) {
-    ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(content: Text("Esiste già una categoria con questo nome.")),
-    );
-    return;
+      if (giaEsiste) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Esiste già una categoria con questo nome."),
+          ),
+        );
+        return;
+      }
+
+      await DatabaseHelper.instance.rinominaCategoria(
+        widget.genereId,
+        nuovoNome,
+      );
+      setState(() => _nomeGenere = nuovoNome);
     }
-
-    await DatabaseHelper.instance.rinominaCategoria(widget.genereId, nuovoNome);
-    setState(() => _nomeGenere = nuovoNome);
   }
-  }
-
 
   @override
   Widget build(BuildContext context) {
@@ -180,62 +212,89 @@ class _SchermataViniliPerCategoriaState extends State<SchermataViniliPerCategori
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_modalitaSelezione ? '${_viniliSelezionati.length} selezionati' : _nomeGenere),
+        title: Text(
+          _modalitaSelezione
+              ? '${_viniliSelezionati.length} selezionati'
+              : _nomeGenere,
+        ),
         actions: _modalitaSelezione
             ? [
-          IconButton(icon: const Icon(Icons.select_all), onPressed: _selezionaTutti),
-          IconButton(icon: const Icon(Icons.remove_done), onPressed: _deselezionaTutti),
-          IconButton(icon: const Icon(Icons.category), onPressed: _cambiaGenereMultiplo),
-          IconButton(icon: const Icon(Icons.delete), onPressed: _eliminaMultipli),
-        ]
+                IconButton(
+                  icon: const Icon(Icons.select_all),
+                  onPressed: _selezionaTutti,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.remove_done),
+                  onPressed: _deselezionaTutti,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.category),
+                  onPressed: _cambiaGenereMultiplo,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete),
+                  onPressed: _eliminaMultipli,
+                ),
+              ]
             : [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: _rinominaGenere,
-            tooltip: 'Rinomina categoria',
-          )
-        ],
+                IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: _rinominaGenere,
+                  tooltip: 'Rinomina categoria',
+                ),
+              ],
       ),
       body: _vinili.isEmpty
           ? const Center(child: Text('Nessun vinile in questa categoria.'))
           : ListView.builder(
-        itemCount: _vinili.length,
-        itemBuilder: (_, i) {
-          final v = _vinili[i];
-          final selezionato = _viniliSelezionati.contains(v.id);
-          return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            child: ListTile(
-              onTap: () => _modalitaSelezione ? _toggleSelezione(v.id!) : _apriDettaglio(v),
-              onLongPress: () => _toggleSelezione(v.id!),
-              selected: selezionato,
-              selectedTileColor: Colors.blue.withValues(),
-              leading: SizedBox(
-                width: leadingSize,
-                height: leadingSize,
-                child: v.coverWidget,
-              ),
-              title: Text(v.titolo),
-              subtitle: Text('${v.artista} (${v.anno ?? '—'})'),
-              trailing: _modalitaSelezione
-                  ? Checkbox(
-                value: selezionato,
-                onChanged: (_) => _toggleSelezione(v.id!),
-              )
-                  : PopupMenuButton<String>(
-                onSelected: (s) {
-                  if (s == 'modifica') _modifica(v);
-                  if (s == 'elimina') _confermaElimina(v);
-                },
-                itemBuilder: (_) => const [
-                  PopupMenuItem(value: 'modifica', child: Text('Modifica')),
-                  PopupMenuItem(value: 'elimina', child: Text('Elimina')),
-                ],
-              ),
+              itemCount: _vinili.length,
+              itemBuilder: (_, i) {
+                final v = _vinili[i];
+                final selezionato = _viniliSelezionati.contains(v.id);
+                return Card(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  child: ListTile(
+                    onTap: () => _modalitaSelezione
+                        ? _toggleSelezione(v.id!)
+                        : _apriDettaglio(v),
+                    onLongPress: () => _toggleSelezione(v.id!),
+                    selected: selezionato,
+                    selectedTileColor: Colors.blue.withValues(),
+                    leading: SizedBox(
+                      width: leadingSize,
+                      height: leadingSize,
+                      child: v.coverWidget,
+                    ),
+                    title: Text(v.titolo),
+                    subtitle: Text('${v.artista} (${v.anno ?? '—'})'),
+                    trailing: _modalitaSelezione
+                        ? Checkbox(
+                            value: selezionato,
+                            onChanged: (_) => _toggleSelezione(v.id!),
+                          )
+                        : PopupMenuButton<String>(
+                            onSelected: (s) {
+                              if (s == 'modifica') _modifica(v);
+                              if (s == 'elimina') _confermaElimina(v);
+                            },
+                            itemBuilder: (_) => const [
+                              PopupMenuItem(
+                                value: 'modifica',
+                                child: Text('Modifica'),
+                              ),
+                              PopupMenuItem(
+                                value: 'elimina',
+                                child: Text('Elimina'),
+                              ),
+                            ],
+                          ),
+                  ),
+                );
+              },
             ),
-          );
-        },
-      ),
     );
   }
 }
@@ -246,7 +305,8 @@ class _DialogSelezioneGenere extends StatelessWidget {
     return FutureBuilder<List<Genere>>(
       future: DatabaseHelper.instance.getGeneri(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+        if (!snapshot.hasData)
+          return const Center(child: CircularProgressIndicator());
         final generi = snapshot.data!;
 
         return AlertDialog(

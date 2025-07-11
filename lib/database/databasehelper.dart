@@ -9,11 +9,12 @@ import '../vinile/vinile.dart';
 final logger = Logger();
 
 class DatabaseHelper {
-
   DatabaseHelper._privateConstructor();
+
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
 
   static Database? _database;
+
   Future<Database> get database async => _database ??= await _initDatabase();
 
   Future<Database> _initDatabase() async {
@@ -64,7 +65,7 @@ class DatabaseHelper {
           batch.insert('generi', {'nome': g});
         }
         await batch.commit(noResult: true);
-  },
+      },
       version: 1,
     );
   }
@@ -78,40 +79,36 @@ class DatabaseHelper {
     );
     if (exists.isNotEmpty) throw Exception('Vinile già presente');
 
-    db.insert('collezioneVinili', {
-      ...v.toMap(),
-    });
+    db.insert('collezioneVinili', {...v.toMap()});
   }
 
-  Future<Vinile?> getVinile(int id)async{
-    final db  = await database;
-    final maps= await db.query('collezioneVinili',
+  Future<Vinile?> getVinile(int id) async {
+    final db = await database;
+    final maps = await db.query(
+      'collezioneVinili',
       where: 'id = ?',
       whereArgs: [id],
     );
-    if(maps.isNotEmpty){
+    if (maps.isNotEmpty) {
       return Vinile.fromMap(maps.first);
-    }
-    else{
+    } else {
       return null;
     }
   }
 
   Future<List<Vinile>> getCollezione() async {
     final db = await database;
-    final maps = await db.query('collezioneVinili',
-        orderBy: 'LOWER(titolo) ASC',
+    final maps = await db.query(
+      'collezioneVinili',
+      orderBy: 'LOWER(titolo) ASC',
     );
 
-
-    List<Vinile> lista= maps.map(Vinile.fromMap).toList();
-    if(lista.isEmpty){
+    List<Vinile> lista = maps.map(Vinile.fromMap).toList();
+    if (lista.isEmpty) {
       logger.e("è vuota!\n\n\n");
+    } else {
+      logger.i("La lista è : ${lista.length} + ${lista.toString()} ");
     }
-    else
-      {
-        logger.i("La lista è : ${lista.length} + ${lista.toString()} ");
-      }
     return lista;
   }
 
@@ -123,12 +120,10 @@ class DatabaseHelper {
       orderBy: 'datetime("creato_il") DESC',
       limit: limit,
     );
-    List<Vinile> lista=maps.map(Vinile.fromMap).toList();
-    if(lista.isEmpty){
+    List<Vinile> lista = maps.map(Vinile.fromMap).toList();
+    if (lista.isEmpty) {
       logger.e("è vuota!\n\n\n");
-    }
-    else
-    {
+    } else {
       logger.i("La lista è : ${lista.length} + ${lista.toString()} ");
     }
 
@@ -145,21 +140,25 @@ class DatabaseHelper {
     return maps.map(Vinile.fromMap).toList();
   }
 
-
-
   Future<int> eliminaVinile(Vinile vinile) async {
     final db = await database;
-    return db.delete('collezioneVinili', where: 'id = ?', whereArgs: [vinile.id]);
+    return db.delete(
+      'collezioneVinili',
+      where: 'id = ?',
+      whereArgs: [vinile.id],
+    );
   }
 
   Future<bool> modificaVinile(Vinile v) async {
     final db = await database;
-    final result= await db.update('collezioneVinili', v.toMap(),
-        where: 'id = ?',
-        whereArgs: [v.id]);
-   return result == 1;
+    final result = await db.update(
+      'collezioneVinili',
+      v.toMap(),
+      where: 'id = ?',
+      whereArgs: [v.id],
+    );
+    return result == 1;
   }
-
 
   /*Future<List<Vinile>> getViniliPreferiti() async {
     final db = DatabaseHelper.instance;
@@ -174,18 +173,19 @@ class DatabaseHelper {
   }*/
 
   Future<bool> vinileEsiste(Vinile vinile) async {
-    final db= await DatabaseHelper.instance.database;
-    final result= await db.query('collezioneVinili',
+    final db = await DatabaseHelper.instance.database;
+    final result = await db.query(
+      'collezioneVinili',
       where: 'titolo = ? AND artista = ? AND anno =?',
-      whereArgs:[vinile.titolo,vinile.artista,vinile.anno],
+      whereArgs: [vinile.titolo, vinile.artista, vinile.anno],
     );
     return result.isNotEmpty;
   }
 
-  Future<List<Genere>> getGeneri() async{
+  Future<List<Genere>> getGeneri() async {
     final db = await database;
     final maps = await db.query("generi");
-    List<Genere> lista= maps.map(Genere.fromMap).toList();
+    List<Genere> lista = maps.map(Genere.fromMap).toList();
     return lista;
   }
 
@@ -244,11 +244,11 @@ class DatabaseHelper {
     return null;
   }
 
-
   Future<List<Vinile>> getViniliByGenere(int idGenere) async {
     final maps = await (await database).query(
       'collezioneVinili',
-      where: 'genere = ?', whereArgs: [idGenere],
+      where: 'genere = ?',
+      whereArgs: [idGenere],
       orderBy: 'creato_il DESC',
     );
     return maps.map(Vinile.fromMap).toList();
@@ -261,18 +261,29 @@ class DatabaseHelper {
 
   Future<void> rinominaCategoria(int id, String nuovoNome) async {
     final db = await DatabaseHelper.instance.database;
-    await db.update('generi', {'nome': nuovoNome}, where: 'id = ?', whereArgs: [id]);
+    await db.update(
+      'generi',
+      {'nome': nuovoNome},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
-
 
   Future<void> aggiornaGenereVinile(int vinileId, int nuovoGenereId) async {
     final db = await database;
-    await db.update('collezioneVinili', {'genere': nuovoGenereId},
-        where: 'id = ?', whereArgs: [vinileId]);
+    await db.update(
+      'collezioneVinili',
+      {'genere': nuovoGenereId},
+      where: 'id = ?',
+      whereArgs: [vinileId],
+    );
   }
 
   /// Restituisce fino a 4 URL di copertine per un determinato genere, ordinate per data di inserimento (più recenti prima).
-  Future<List<String>> getCopertineViniliByGenere(int idGenere, {int limit = 4}) async {
+  Future<List<String>> getCopertineViniliByGenere(
+    int idGenere, {
+    int limit = 4,
+  }) async {
     final db = await database;
     final result = await db.query(
       'collezioneVinili',
@@ -321,8 +332,7 @@ class DatabaseHelper {
   }
 
   Future<List<Map<String, dynamic>>> generiFiltrati() async {
-    List<Map<String, dynamic>> listaCompleta =
-    await getCategorieConConteggio();
+    List<Map<String, dynamic>> listaCompleta = await getCategorieConConteggio();
 
     List<Map<String, dynamic>> listaFiltrata = [];
     for (final Map<String, dynamic> genere in listaCompleta) {
@@ -333,14 +343,15 @@ class DatabaseHelper {
     return listaFiltrata;
   }
 
-  Future<bool> genereEsiste(String nome) async{
+  Future<bool> genereEsiste(String nome) async {
     final db = await database;
-    final result= await db.query('generi',
+    final result = await db.query(
+      'generi',
       where: 'nome = ?',
       whereArgs: [nome],
-      limit: 1,);
+      limit: 1,
+    );
 
     return result.isNotEmpty;
   }
-
 }

@@ -7,11 +7,7 @@ class SuggestionTile extends StatelessWidget {
   final Vinile vinile;
   final VoidCallback onTap;
 
-  const SuggestionTile({
-    super.key,
-    required this.vinile,
-    required this.onTap,
-  });
+  const SuggestionTile({super.key, required this.vinile, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -20,14 +16,15 @@ class SuggestionTile extends StatelessWidget {
     // Esempio: larghezza della card come 30% della larghezza dello schermo
     // final double responsiveCardWidth = context.screenWidth * 0.3; // Usa questa se vuoi che la larghezza sia calcolata qui
     // oppure semplicemente usa 'cardWidth' se lo calcoli dal genitore (come fai in HomeScreen)
-    final double cardWidth=context.screenWidth * 0.3;
+    final double cardWidth = context.screenWidth * 0.3;
     // L'altezza dell'immagine dovrebbe essere proporzionale alla larghezza della card
     final double imageHeight = cardWidth; // Per avere un'immagine quadrata
 
     // Dimensione del font può essere proporzionale al lato più corto dello schermo
-    final double titleFontSize = context.shortestSide * 0.04; // Esempio: 4% del lato più corto
-    final double artistFontSize = context.shortestSide * 0.03; // Esempio: 3% del lato più corto
-
+    final double titleFontSize =
+        context.shortestSide * 0.04; // Esempio: 4% del lato più corto
+    final double artistFontSize =
+        context.shortestSide * 0.03; // Esempio: 3% del lato più corto
 
     return Container(
       // La larghezza del Container ora si adatta al cardWidth fornito o calcolato
@@ -41,31 +38,31 @@ class SuggestionTile extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: SizedBox(
-                width: imageHeight, // Usa l'altezza calcolata in base alla larghezza della card
+                width: imageHeight,
+                // Usa l'altezza calcolata in base alla larghezza della card
                 height: imageHeight,
                 child: vinile.immagine != null
                     ? (vinile.immagine!.startsWith('assets/')
-                    ? Image.asset(
-                  vinile.immagine!,
-                  fit: BoxFit.cover,
-                )
-                    : vinile.immagine!.startsWith('file://')
-                    ? Image.file(
-                  File(vinile.immagine!.substring(7)), // rimuovo 'file://'
-                  fit: BoxFit.cover,
-                )
-                    : Image.network(
-                  vinile.immagine!,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Image.asset(
-                    'assets/immagini/vinilee.png',
-                    fit: BoxFit.cover,
-                  ),
-                ))
+                          ? Image.asset(vinile.immagine!, fit: BoxFit.cover)
+                          : vinile.immagine!.startsWith('file://')
+                          ? Image.file(
+                              File(
+                                vinile.immagine!.substring(7),
+                              ), // rimuovo 'file://'
+                              fit: BoxFit.cover,
+                            )
+                          : Image.network(
+                              vinile.immagine!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Image.asset(
+                                'assets/immagini/vinilee.png',
+                                fit: BoxFit.cover,
+                              ),
+                            ))
                     : Image.asset(
-                  'assets/immagini/vinilee.png',
-                  fit: BoxFit.cover,
-                ),
+                        'assets/immagini/vinilee.png',
+                        fit: BoxFit.cover,
+                      ),
               ),
             ),
             const SizedBox(height: 6),
@@ -80,7 +77,10 @@ class SuggestionTile extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     // Usa la dimensione del font calcolata
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: titleFontSize),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: titleFontSize,
+                    ),
                   ),
                   const SizedBox(height: 2),
                   Text(
@@ -88,7 +88,10 @@ class SuggestionTile extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     // Usa la dimensione del font calcolata
-                    style: TextStyle(color: Colors.grey, fontSize: artistFontSize),
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: artistFontSize,
+                    ),
                   ),
                 ],
               ),

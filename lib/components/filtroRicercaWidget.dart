@@ -6,12 +6,13 @@ import '../vinile/condizione.dart';
 
 class FiltroRicercaWidget extends StatefulWidget {
   final Function({
-  String query,
-  int? genere,
-  Condizione? condizione,
-  int? anno,
-  bool soloPreferiti,
-  }) onFiltra;
+    String query,
+    int? genere,
+    Condizione? condizione,
+    int? anno,
+    bool soloPreferiti,
+  })
+  onFiltra;
 
   final String initialQuery;
   final int? initialGenere;
@@ -46,7 +47,9 @@ class _FiltroRicercaWidgetState extends State<FiltroRicercaWidget> {
   void initState() {
     super.initState();
     _queryController = TextEditingController(text: widget.initialQuery);
-    _annoController = TextEditingController(text: widget.initialAnno?.toString() ?? '');
+    _annoController = TextEditingController(
+      text: widget.initialAnno?.toString() ?? '',
+    );
     _genere = widget.initialGenere;
     _condizione = widget.initialCondizione;
     _anno = widget.initialAnno;
@@ -96,7 +99,9 @@ class _FiltroRicercaWidgetState extends State<FiltroRicercaWidget> {
       children: [
         TextField(
           controller: _queryController,
-          decoration: const InputDecoration(labelText: 'Cerca titolo, artista, etichetta'),
+          decoration: const InputDecoration(
+            labelText: 'Cerca titolo, artista, etichetta',
+          ),
           onChanged: (_) => _applicaFiltro(),
         ),
         const SizedBox(height: 8.0),
@@ -105,16 +110,24 @@ class _FiltroRicercaWidgetState extends State<FiltroRicercaWidget> {
             Expanded(
               child: DropdownButtonFormField<String>(
                 decoration: const InputDecoration(labelText: 'Genere'),
-                value: _genere != null && _listaGeneri.any((g) => g.id == _genere)
+                value:
+                    _genere != null && _listaGeneri.any((g) => g.id == _genere)
                     ? _listaGeneri.firstWhere((g) => g.id == _genere).nome
                     : null,
                 items: _listaGeneri
-                    .map((g) => DropdownMenuItem(value: g.nome, child: Text(g.nome)))
+                    .map(
+                      (g) =>
+                          DropdownMenuItem(value: g.nome, child: Text(g.nome)),
+                    )
                     .toList(),
                 onChanged: (val) {
-                  final genereSelezionato = _listaGeneri.where((g) => g.nome == val).toList();
+                  final genereSelezionato = _listaGeneri
+                      .where((g) => g.nome == val)
+                      .toList();
                   setState(() {
-                    _genere = genereSelezionato.isNotEmpty ? genereSelezionato.first.id : null;
+                    _genere = genereSelezionato.isNotEmpty
+                        ? genereSelezionato.first.id
+                        : null;
                     _applicaFiltro();
                   });
                 },
@@ -126,10 +139,12 @@ class _FiltroRicercaWidgetState extends State<FiltroRicercaWidget> {
                 decoration: const InputDecoration(labelText: 'Condizione'),
                 value: _condizione,
                 items: Condizione.values
-                    .map((c) => DropdownMenuItem(
-                  value: c,
-                  child: Text(c.descrizione),
-                ))
+                    .map(
+                      (c) => DropdownMenuItem(
+                        value: c,
+                        child: Text(c.descrizione),
+                      ),
+                    )
                     .toList(),
                 onChanged: (val) {
                   setState(() => _condizione = val);

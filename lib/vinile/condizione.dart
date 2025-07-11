@@ -1,5 +1,7 @@
-enum Condizione{
-  nuovo, usato, daRestaurare;
+enum Condizione {
+  nuovo,
+  usato,
+  daRestaurare;
 
   String get descrizione {
     switch (this) {
@@ -11,9 +13,9 @@ enum Condizione{
         return 'Da restaurare';
     }
   }
-  static Condizione fromDb(String? s) =>
-      Condizione.values.firstWhere(
-            (e) => e.name == s,
-        orElse: () => Condizione.nuovo,
-      );
+
+  static Condizione fromDb(String? s) => Condizione.values.firstWhere(
+    (e) => e.name == s,
+    orElse: () => Condizione.nuovo,
+  );
 }

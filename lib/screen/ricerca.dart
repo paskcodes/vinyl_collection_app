@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:vinyl_collection_app/screen/dettagliovinilesuggested.dart';
 import 'package:vinyl_collection_app/vinile/vinile.dart';
 import '../service/discogs_service.dart';
+
 // Importa la tua estensione per le dimensioni dello schermo
 import '../utils/dimensionischermo.dart'; // Assicurati che il percorso sia corretto
 
@@ -69,21 +70,25 @@ class _SearchScreenState extends State<SearchScreen> {
       onTap: () async {
         await Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => DettaglioVinileSuggested(vinile: vinile)),
+          MaterialPageRoute(
+            builder: (_) => DettaglioVinileSuggested(vinile: vinile),
+          ),
         );
       },
-      leading: SizedBox( // Avvolgi l'immagine in un SizedBox per controllare le dimensioni
+      leading: SizedBox(
+        // Avvolgi l'immagine in un SizedBox per controllare le dimensioni
         width: leadingImageSize,
         height: leadingImageSize,
         child: vinile.immagine != null && vinile.immagine!.isNotEmpty
-            ? Image.network(
-          vinile.immagine!,
-          fit: BoxFit.cover,
-        )
-            : const Icon(Icons.album), // Considera di dare una dimensione all'icona
+            ? Image.network(vinile.immagine!, fit: BoxFit.cover)
+            : const Icon(
+                Icons.album,
+              ), // Considera di dare una dimensione all'icona
       ),
       title: Text(vinile.titolo),
-      subtitle: Text('${vinile.artista} - ${vinile.anno?.toString() ?? 'Anno sconosciuto'}'),
+      subtitle: Text(
+        '${vinile.artista} - ${vinile.anno?.toString() ?? 'Anno sconosciuto'}',
+      ),
     );
   }
 
@@ -108,20 +113,19 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: _search,
-                  child: const Text('Cerca'),
-                ),
+                ElevatedButton(onPressed: _search, child: const Text('Cerca')),
               ],
             ),
             const SizedBox(height: 16),
             if (_isLoading) const CircularProgressIndicator(),
-            if (_error != null) Text(_error!, style: const TextStyle(color: Colors.red)),
+            if (_error != null)
+              Text(_error!, style: const TextStyle(color: Colors.red)),
             if (!_isLoading && _results.isNotEmpty)
               Expanded(
                 child: ListView.builder(
                   itemCount: _results.length,
-                  itemBuilder: (context, index) => _buildResultItem(_results[index]),
+                  itemBuilder: (context, index) =>
+                      _buildResultItem(_results[index]),
                 ),
               ),
           ],

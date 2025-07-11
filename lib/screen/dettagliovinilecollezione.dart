@@ -7,10 +7,12 @@ import '../database/databasehelper.dart';
 
 class DettaglioVinileCollezione extends StatefulWidget {
   final Vinile vinile;
+
   const DettaglioVinileCollezione({super.key, required this.vinile});
 
   @override
-  State<DettaglioVinileCollezione> createState() => _DettaglioVinileCollezioneState();
+  State<DettaglioVinileCollezione> createState() =>
+      _DettaglioVinileCollezioneState();
 }
 
 class _DettaglioVinileCollezioneState extends State<DettaglioVinileCollezione> {
@@ -24,7 +26,9 @@ class _DettaglioVinileCollezioneState extends State<DettaglioVinileCollezione> {
 
   Future<void> _refreshVinileData() async {
     if (_vinileCorrente.id != null) {
-      final updated = await DatabaseHelper.instance.getVinile(_vinileCorrente.id!);
+      final updated = await DatabaseHelper.instance.getVinile(
+        _vinileCorrente.id!,
+      );
       if (updated != null && mounted) {
         setState(() => _vinileCorrente = updated);
       }
@@ -38,12 +42,12 @@ class _DettaglioVinileCollezioneState extends State<DettaglioVinileCollezione> {
     final double horizontalPadding = context.screenWidth * 0.05;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_vinileCorrente.titolo),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: Text(_vinileCorrente.titolo), centerTitle: true),
       body: ListView(
-        padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: spacing),
+        padding: EdgeInsets.symmetric(
+          horizontal: horizontalPadding,
+          vertical: spacing,
+        ),
         children: [
           // Cover con effetto vetrina
           Center(
@@ -60,23 +64,49 @@ class _DettaglioVinileCollezioneState extends State<DettaglioVinileCollezione> {
           ),
           SizedBox(height: spacing),
 
-          _ModernInfoBox(icon: Icons.person, label: 'Artista', value: _vinileCorrente.artista),
-          _ModernInfoBox(icon: Icons.calendar_today, label: 'Anno', value: _vinileCorrente.anno?.toString() ?? '–'),
-          _ModernInfoBox(icon: Icons.album, label: 'Etichetta', value: _vinileCorrente.etichettaDiscografica ?? '–'),
+          _ModernInfoBox(
+            icon: Icons.person,
+            label: 'Artista',
+            value: _vinileCorrente.artista,
+          ),
+          _ModernInfoBox(
+            icon: Icons.calendar_today,
+            label: 'Anno',
+            value: _vinileCorrente.anno?.toString() ?? '–',
+          ),
+          _ModernInfoBox(
+            icon: Icons.album,
+            label: 'Etichetta',
+            value: _vinileCorrente.etichettaDiscografica ?? '–',
+          ),
           FutureBuilder<String?>(
             future: _vinileCorrente.genereNome,
             builder: (context, snap) {
               final genere = snap.data ?? 'Non specificato';
-              return _ModernInfoBox(icon: Icons.category, label: 'Genere', value: genere);
+              return _ModernInfoBox(
+                icon: Icons.category,
+                label: 'Genere',
+                value: genere,
+              );
             },
           ),
-          _ModernInfoBox(icon: Icons.library_music, label: 'Copie possedute', value: _vinileCorrente.copie?.toString() ?? '–'),
-          _ModernInfoBox(icon: Icons.build, label: 'Condizione', value: _vinileCorrente.condizione?.descrizione ?? '–'),
+          _ModernInfoBox(
+            icon: Icons.library_music,
+            label: 'Copie possedute',
+            value: _vinileCorrente.copie?.toString() ?? '–',
+          ),
+          _ModernInfoBox(
+            icon: Icons.build,
+            label: 'Condizione',
+            value: _vinileCorrente.condizione?.descrizione ?? '–',
+          ),
           _ModernInfoBox(
             icon: Icons.star,
             label: 'Preferito',
             value: _vinileCorrente.preferito ? 'Sì' : 'No',
-            iconColor: _vinileCorrente.preferito ? Colors.amber : theme.colorScheme.outline,
+            iconColor: _vinileCorrente.preferito
+                ? Colors.amber
+                : theme.colorScheme.outline,
           ),
         ],
       ),
@@ -117,10 +147,18 @@ class _DettaglioVinileCollezioneState extends State<DettaglioVinileCollezione> {
                   context: context,
                   builder: (_) => AlertDialog(
                     title: const Text('Conferma eliminazione'),
-                    content: const Text('Sei sicuro di voler eliminare questo vinile?'),
+                    content: const Text(
+                      'Sei sicuro di voler eliminare questo vinile?',
+                    ),
                     actions: [
-                      TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Annulla')),
-                      TextButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Elimina')),
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: const Text('Annulla'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        child: const Text('Elimina'),
+                      ),
                     ],
                   ),
                 );
@@ -172,14 +210,18 @@ class _ModernInfoBox extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label,
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    )),
+                Text(
+                  label,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
                 SizedBox(height: context.screenHeight * 0.004),
                 Text(
                   value,
-                  style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
             ),

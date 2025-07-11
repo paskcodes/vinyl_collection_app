@@ -5,10 +5,10 @@ import '../database/databasehelper.dart';
 
 class DialogSelezioneGenere extends StatefulWidget {
   const DialogSelezioneGenere({super.key});
+
   @override
   State<DialogSelezioneGenere> createState() => _DialogSelezioneGenereState();
 }
-
 
 class _DialogSelezioneGenereState extends State<DialogSelezioneGenere> {
   int? _genereSelezionato;
@@ -32,19 +32,24 @@ class _DialogSelezioneGenereState extends State<DialogSelezioneGenere> {
       content: _generi.isEmpty
           ? const CircularProgressIndicator()
           : DropdownButton<int>(
-        value: _genereSelezionato,
-        hint: const Text('Seleziona genere'),
-        isExpanded: true,
-        items: _generi
-            .map((genere) => DropdownMenuItem(
-          value: genere.id,
-          child: Text(genere.nome),
-        ))
-            .toList(),
-        onChanged: (val) => setState(() => _genereSelezionato = val),
-      ),
+              value: _genereSelezionato,
+              hint: const Text('Seleziona genere'),
+              isExpanded: true,
+              items: _generi
+                  .map(
+                    (genere) => DropdownMenuItem(
+                      value: genere.id,
+                      child: Text(genere.nome),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (val) => setState(() => _genereSelezionato = val),
+            ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annulla')),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Annulla'),
+        ),
         TextButton(
           onPressed: _genereSelezionato == null
               ? null

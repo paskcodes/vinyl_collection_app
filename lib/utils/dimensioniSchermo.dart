@@ -14,8 +14,10 @@ extension Dimensionischermo on BuildContext {
   double get longestSide => MediaQuery.of(this).size.longestSide;
 
   /// Controlla se il dispositivo è in modalità orizzontale
-  bool get isLandscape => MediaQuery.of(this).orientation == Orientation.landscape;
+  bool get isLandscape =>
+      MediaQuery.of(this).orientation == Orientation.landscape;
 
   /// Controlla se il dispositivo è in modalità verticale
-  bool get isPortrait => MediaQuery.of(this).orientation == Orientation.portrait;
+  bool get isPortrait =>
+      MediaQuery.of(this).orientation == Orientation.portrait;
 }

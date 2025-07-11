@@ -210,7 +210,7 @@ class HomeScreenState extends State<HomeScreen> {
           ),
         ),
         Material(
-          color: theme.colorScheme.surfaceContainerHighest,
+          color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.1),
           borderRadius: BorderRadius.circular(16),
           child: Padding(
             padding: const EdgeInsets.all(4.0),

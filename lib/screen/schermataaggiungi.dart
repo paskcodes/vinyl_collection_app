@@ -48,11 +48,9 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
     if (picked != null) setState(() => _coverFile = File(picked.path));
   }
 
-  bool get _formValid =>
-      _formKey.currentState?.validate() == true && _genereId != null;
-
   Future<void> _aggiungi() async {
-    if (!_formValid) return;
+    final valid = _formKey.currentState?.validate() ?? false;
+    if (!valid || _genereId == null) return;
 
     final nuovo = Vinile(
       titolo: _titolo.text.trim(),
@@ -189,7 +187,7 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
               Center(
                 child:SizedBox(width: context.screenWidth * 0.8,
                   child: FilledButton.icon(
-                    onPressed: _formValid ? _aggiungi : null,
+                    onPressed: _aggiungi, // sempre attivo
                     icon: const Icon(Icons.add),
                     label: const Text('Aggiungi alla collezione'),
                   ),

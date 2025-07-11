@@ -33,7 +33,7 @@ class _DettaglioVinileSuggestedState extends State<DettaglioVinileSuggested> {
               elevation: 8,
               borderRadius: BorderRadius.circular(20),
               clipBehavior: Clip.antiAlias,
-              child: Container(
+              child: SizedBox(
                 width: context.screenWidth * 0.8,
                 height: context.screenWidth * 0.8,
                 child: widget.vinile.coverWidget,

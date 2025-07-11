@@ -119,7 +119,10 @@ class _SchermataViniliPerCategoriaState
         builder: (_) => SchermataModifica(vinile: v, suggested: false),
       ),
     );
-    if (mod == true) await _carica();
+    if (mod == true) {
+      await _carica();
+      Navigator.pop(context, true);
+    }
   }
 
   Future<void> _apriDettaglio(Vinile v) async {
@@ -127,7 +130,10 @@ class _SchermataViniliPerCategoriaState
       context,
       MaterialPageRoute(builder: (_) => DettaglioVinileCollezione(vinile: v)),
     );
-    if (modElim == true) await _carica();
+    if (modElim == true) {
+      await _carica();
+      Navigator.pop(context, true);
+    }
   }
 
   Future<void> _confermaElimina(Vinile v) async {
@@ -148,7 +154,10 @@ class _SchermataViniliPerCategoriaState
         ],
       ),
     );
-    if (ok == true) await DatabaseHelper.instance.eliminaVinile(v);
+    if (ok == true) {
+      await DatabaseHelper.instance.eliminaVinile(v);
+      Navigator.pop(context, true);
+    }
     await _carica();
   }
 
@@ -208,6 +217,11 @@ class _SchermataViniliPerCategoriaState
 
   @override
   Widget build(BuildContext context) {
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final selectedBackgroundColor = isDarkMode
+        ? Theme.of(context).colorScheme.primary.withOpacity(0.4)
+        : Theme.of(context).colorScheme.primary.withOpacity(0.2);
+    final selectedTextColor = isDarkMode ? Colors.white : Colors.black;
     final double leadingSize = context.screenWidth * 0.12;
 
     return Scaffold(
@@ -256,24 +270,39 @@ class _SchermataViniliPerCategoriaState
                     horizontal: 10,
                     vertical: 6,
                   ),
+                  color: selezionato ? selectedBackgroundColor : null,
                   child: ListTile(
                     onTap: () => _modalitaSelezione
                         ? _toggleSelezione(v.id!)
                         : _apriDettaglio(v),
                     onLongPress: () => _toggleSelezione(v.id!),
-                    selected: selezionato,
-                    selectedTileColor: Colors.blue.withValues(),
                     leading: SizedBox(
                       width: leadingSize,
                       height: leadingSize,
                       child: v.coverWidget,
                     ),
-                    title: Text(v.titolo),
-                    subtitle: Text('${v.artista} (${v.anno ?? '—'})'),
+                    title: Text(
+                      v.titolo,
+                      style: TextStyle(
+                        color: selezionato
+                            ? selectedTextColor
+                            : (isDarkMode ? Colors.white : null),
+                      ),
+                    ),
+                    subtitle: Text(
+                      '${v.artista} (${v.anno ?? '—'})',
+                      style: TextStyle(
+                        color: selezionato
+                            ? selectedTextColor
+                            : (isDarkMode ? Colors.white70 : null),
+                      ),
+                    ),
                     trailing: _modalitaSelezione
-                        ? Checkbox(
-                            value: selezionato,
-                            onChanged: (_) => _toggleSelezione(v.id!),
+                        ? Icon(
+                            selezionato
+                                ? Icons.check_circle
+                                : Icons.radio_button_unchecked,
+                            color: selezionato ? Theme.of(context).colorScheme.primary : Colors.grey,
                           )
                         : PopupMenuButton<String>(
                             onSelected: (s) {

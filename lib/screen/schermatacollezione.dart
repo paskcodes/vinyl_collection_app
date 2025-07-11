@@ -54,27 +54,44 @@ class SchermataCollezioneState extends State<SchermataCollezione> {
     bool soloPreferiti = false,
   }) {
     setState(() {
-      _query = query;
-      _genereId = genere;
-      _condizione = condizione;
-      _anno = anno;
-      _soloPreferiti = soloPreferiti;
+      int? annoMin;
+      int? annoMax;
+
+      if (anno != null) {
+        final lunghezza = anno.toString().length;
+        if (lunghezza == 1) {
+          annoMin = anno * 1000;
+          annoMax = annoMin + 999;
+        } else if (lunghezza == 2) {
+          annoMin = anno * 100;
+          annoMax = annoMin + 99;
+        } else if (lunghezza == 3) {
+          annoMin = anno * 10;
+          annoMax = annoMin + 9;
+        } else if (lunghezza == 4) {
+          annoMin = anno;
+          annoMax = anno;
+        }
+      }
 
       _listaVinili = _tuttiIVinili.where((vinile) {
         final matchQuery =
-            _query.isEmpty ||
-            vinile.titolo.toLowerCase().contains(_query.toLowerCase()) ||
-            vinile.artista.toLowerCase().contains(_query.toLowerCase()) ||
+            query.isEmpty ||
+            vinile.titolo.toLowerCase().contains(query.toLowerCase()) ||
+            vinile.artista.toLowerCase().contains(query.toLowerCase()) ||
             vinile.etichettaDiscografica?.toLowerCase().contains(
-                  _query.toLowerCase(),
+                  query.toLowerCase(),
                 ) ==
                 true;
 
-        final matchGenere = _genereId == null || vinile.genere == _genereId;
+        final matchGenere = genere == null || vinile.genere == genere;
         final matchCondizione =
-            _condizione == null || vinile.condizione == _condizione;
-        final matchAnno = _anno == null || vinile.anno == _anno;
-        final matchPreferiti = !_soloPreferiti || vinile.preferito == true;
+            condizione == null || vinile.condizione == condizione;
+        final matchAnno =
+            anno == null ||
+            (vinile.anno! >= (annoMin ?? 0) &&
+                vinile.anno! <= (annoMax ?? 9999));
+        final matchPreferiti = !soloPreferiti || vinile.preferito == true;
 
         return matchQuery &&
             matchGenere &&
@@ -200,6 +217,11 @@ class SchermataCollezioneState extends State<SchermataCollezione> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final selectedBackgroundColor = isDarkMode
+        ? Theme.of(context).colorScheme.primary.withOpacity(0.4)
+        : Theme.of(context).colorScheme.primary.withOpacity(0.2);
+    final selectedTextColor = isDarkMode ? Colors.white : Colors.black;
     final double leadingImageSize = context.screenWidth * 0.12;
     return Scaffold(
       appBar: AppBar(
@@ -277,13 +299,12 @@ class SchermataCollezioneState extends State<SchermataCollezione> {
                     itemBuilder: (context, indice) {
                       final vinile = _listaVinili[indice];
                       final selezionato = _viniliSelezionati.contains(vinile);
-
                       return Card(
                         margin: const EdgeInsets.symmetric(
                           horizontal: 10,
                           vertical: 6,
                         ),
-                        color: selezionato ? Colors.blue.shade100 : null,
+                        color: selezionato ? selectedBackgroundColor : null,
                         child: ListTile(
                           onTap: () {
                             if (_modalitaSelezione) {
@@ -298,15 +319,25 @@ class SchermataCollezioneState extends State<SchermataCollezione> {
                             height: leadingImageSize,
                             child: vinile.coverWidget,
                           ),
-                          title: Text(vinile.titolo),
-                          subtitle: Text('${vinile.artista} (${vinile.anno})'),
+                          title: Text(
+                            vinile.titolo,
+                            style: TextStyle(
+                              color: selezionato ? selectedTextColor : null,
+                            ),
+                          ),
+                          subtitle: Text(
+                            '${vinile.artista} (${vinile.anno})',
+                            style: TextStyle(
+                              color: selezionato ? selectedTextColor : null,
+                            ),
+                          ),
                           trailing: _modalitaSelezione
                               ? Icon(
                                   selezionato
                                       ? Icons.check_circle
                                       : Icons.radio_button_unchecked,
                                   color: selezionato
-                                      ? Colors.blue
+                                      ? Theme.of(context).colorScheme.primary
                                       : Colors.grey,
                                 )
                               : Row(

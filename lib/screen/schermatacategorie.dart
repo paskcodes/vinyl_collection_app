@@ -349,7 +349,7 @@ class SchermataCategorieState extends State<SchermataCategorie> {
                             _categorieSelezionate.contains(id)
                                 ? Icons.check_circle
                                 : Icons.radio_button_unchecked,
-                            color: Theme.of(context).colorScheme.primary,
+                            color: _categorieSelezionate.contains(id) ? Theme.of(context).colorScheme.primary : Colors.grey,
                           ),
                         ),
                     ],

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:vinyl_collection_app/utils/dimensioniSchermo.dart';
 import '../categoria/genere.dart';
 import '../database/databasehelper.dart';
 import '../vinile/condizione.dart';
@@ -99,8 +100,10 @@ class _SchermataModificaState extends State<SchermataModifica> {
     if (widget.suggested) {
       final esiste = await DatabaseHelper.instance.vinileEsiste(nuovo);
       if (esiste) {
-        if (mounted) _showAlert(
+        if (mounted) {
+          _showAlert(
             'Attenzione', 'Hai già questo vinile nella tua collezione.');
+        }
         return;
       }
       await DatabaseHelper.instance.aggiungiVinile(nuovo);
@@ -149,8 +152,8 @@ class _SchermataModificaState extends State<SchermataModifica> {
                 child: GestureDetector(
                   onTap: _pickImage,
                   child: Container(
-                    width: 160,
-                    height: 160,
+                    width: context.screenWidth * 0.7,
+                    height: context.screenHeight * 0.3,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
                       color: theme.colorScheme.surfaceContainerHighest,

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:vinyl_collection_app/screen/dettagliovinilecollezione.dart';
 import 'package:vinyl_collection_app/utils/dimensionischermo.dart';
 import '../components/suggestion_tile.dart';
@@ -211,7 +210,7 @@ class HomeScreenState extends State<HomeScreen> {
           ),
         ),
         Material(
-          color: theme.colorScheme.surfaceVariant.withOpacity(0.1),
+          color: theme.colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(16),
           child: Padding(
             padding: const EdgeInsets.all(4.0),

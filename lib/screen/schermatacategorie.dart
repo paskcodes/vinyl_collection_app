@@ -205,7 +205,7 @@ class SchermataCategorieState extends State<SchermataCategorie> {
 
     if (conferma) {
       for (var genere in eliminabili) {
-        await DatabaseHelper.instance.elimina(genere['id']);
+        await DatabaseHelper.instance.eliminaCategoria(genere['id']);
       }
       _categorieSelezionate.clear();
       _modalitaSelezione = false;
@@ -257,7 +257,7 @@ class SchermataCategorieState extends State<SchermataCategorie> {
         return;
       }
 
-      await DatabaseHelper.instance.rinomina(id, nuovoNome);
+      await DatabaseHelper.instance.rinominaCategoria(id, nuovoNome);
       _categorieSelezionate.clear();
       _modalitaSelezione = false;
       aggiornaGeneri();

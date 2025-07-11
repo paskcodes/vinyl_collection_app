@@ -8,7 +8,7 @@ enum Condizione{
       case Condizione.usato:
         return 'Usato';
       case Condizione.daRestaurare:
-        return 'Da restaurare'; // Ho corretto la capitalizzazione per una migliore visualizzazione
+        return 'Da restaurare';
     }
   }
   static Condizione fromDb(String? s) =>

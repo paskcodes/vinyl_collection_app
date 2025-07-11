@@ -3,24 +3,21 @@ library;
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:vinyl_collection_app/vinile/condizione.dart';
-
 import '../database/databasehelper.dart';
 
 class Vinile {
-  /* ---------- campi ---------- */
-  int? id;                    // PK autoincrement
+  int? id;
   final String titolo;
   final String artista;
   final int? anno;
-  final int? genere;                // FK verso tabella generi
+  final int? genere;
   final String? etichettaDiscografica;
   final int? copie;
   final Condizione? condizione;
-  final String? immagine;           // asset, file locale o URL
+  final String? immagine;
   bool preferito;
-  final String creatoIl;            // ISO‑8601
+  final String creatoIl;// ISO‑8601
 
-  /* ---------- costruttore ---------- */
   Vinile({
     this.id,
     required this.titolo,
@@ -35,7 +32,7 @@ class Vinile {
     String? creatoIl,
   }) : creatoIl = creatoIl ?? DateTime.now().toIso8601String();
 
-  /* ---------- helper per la UI ---------- */
+
   Widget get coverWidget {
     if (immagine == null) {
       return const Icon(Icons.album, size: 40);
@@ -50,7 +47,7 @@ class Vinile {
     return Image.asset(immagine!, fit: BoxFit.cover);
   }
 
-  /* ---------- serializzazione ---------- */
+
   Map<String, Object?> toMap() => {
     'id': id,
     'titolo': titolo,
@@ -59,7 +56,7 @@ class Vinile {
     'genere': genere,
     'etichetta_discografica': etichettaDiscografica,
     'quantita': copie,
-    'condizione': condizione?.name,    // salva la stringa
+    'condizione': condizione?.name,
     'immagine': immagine,
     'preferito': preferito ? 1 : 0,
     'creato_il': creatoIl,
@@ -81,9 +78,8 @@ class Vinile {
 
   Future<String?> get genereNome async {
     if (genere == null) {
-      return null; // O una stringa come 'Nessun Genere'
+      return null;
     }
-    // Chiama il metodo di DatabaseHelper per ottenere il nome del genere
     return await DatabaseHelper.instance.getGenereNomeById(genere!);
   }
 
@@ -92,22 +88,19 @@ class Vinile {
     if (identical(this, other)) return true; // Stessa istanza
     if (other.runtimeType != runtimeType) return false; // Tipi diversi
 
-    // Cast sicuro dell'altro oggetto a Vinile
-    final Vinile otherVinile = other as Vinile;
+    // Cast
+    final Vinile altroVinile = other as Vinile;
 
-    // Confronta tutti i campi rilevanti per l'uguaglianza logica
-    // L'ID non viene confrontato qui, perché due vinili possono essere logicamente uguali
-    // anche se uno ha un ID (già salvato) e l'altro no (appena creato/modificato)
-    return titolo == otherVinile.titolo &&
-        artista == otherVinile.artista &&
-        anno == otherVinile.anno &&
-        genere == otherVinile.genere &&
-        etichettaDiscografica == otherVinile.etichettaDiscografica &&
-        copie == otherVinile.copie &&
-        condizione == otherVinile.condizione &&
-        immagine == otherVinile.immagine && // Confronta anche l'immagine
-        preferito == otherVinile.preferito;
-    // creatoIl non viene confrontato perché è un timestamp di creazione
+
+    return titolo == altroVinile.titolo &&
+        artista == altroVinile.artista &&
+        anno == altroVinile.anno &&
+        genere == altroVinile.genere &&
+        etichettaDiscografica == altroVinile.etichettaDiscografica &&
+        copie == altroVinile.copie &&
+        condizione == altroVinile.condizione &&
+        immagine == altroVinile.immagine && // Confronta anche l'immagine
+        preferito == altroVinile.preferito;// creatoIl non viene confrontato perché è un timestamp di creazione
   }
 
   @override

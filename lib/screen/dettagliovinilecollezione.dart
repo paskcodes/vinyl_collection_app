@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:vinyl_collection_app/screen/schermatamodifica.dart';
+import 'package:vinyl_collection_app/utils/dimensioniSchermo.dart';
 import '../vinile/vinile.dart';
 import '../database/databasehelper.dart';
 
@@ -33,6 +34,8 @@ class _DettaglioVinileCollezioneState extends State<DettaglioVinileCollezione> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final double spacing = context.screenHeight * 0.03;
+    final double horizontalPadding = context.screenWidth * 0.05;
 
     return Scaffold(
       appBar: AppBar(
@@ -40,7 +43,7 @@ class _DettaglioVinileCollezioneState extends State<DettaglioVinileCollezione> {
         centerTitle: true,
       ),
       body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: spacing),
         children: [
           // Cover con effetto vetrina
           Center(
@@ -48,13 +51,14 @@ class _DettaglioVinileCollezioneState extends State<DettaglioVinileCollezione> {
               elevation: 8,
               borderRadius: BorderRadius.circular(20),
               clipBehavior: Clip.antiAlias,
-              child: AspectRatio(
-                aspectRatio: 1,
+              child: SizedBox(
+                width: context.screenWidth * 0.8,
+                height: context.screenWidth * 0.8,
                 child: _vinileCorrente.coverWidget,
               ),
             ),
           ),
-          const SizedBox(height: 32),
+          SizedBox(height: spacing),
 
           _ModernInfoBox(icon: Icons.person, label: 'Artista', value: _vinileCorrente.artista),
           _ModernInfoBox(icon: Icons.calendar_today, label: 'Anno', value: _vinileCorrente.anno?.toString() ?? '–'),
@@ -77,7 +81,10 @@ class _DettaglioVinileCollezioneState extends State<DettaglioVinileCollezione> {
         ],
       ),
       bottomNavigationBar: BottomAppBar(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        padding: EdgeInsets.symmetric(
+          horizontal: horizontalPadding,
+          vertical: context.screenHeight * 0.015,
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -151,8 +158,8 @@ class _ModernInfoBox extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      padding: const EdgeInsets.all(14),
+      margin: EdgeInsets.symmetric(vertical: context.screenHeight * 0.01),
+      padding: EdgeInsets.all(context.screenWidth * 0.035),
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12),
@@ -160,7 +167,7 @@ class _ModernInfoBox extends StatelessWidget {
       child: Row(
         children: [
           Icon(icon, size: 24, color: iconColor ?? theme.colorScheme.primary),
-          const SizedBox(width: 12),
+          SizedBox(width: context.screenWidth * 0.03),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -169,7 +176,7 @@ class _ModernInfoBox extends StatelessWidget {
                     style: theme.textTheme.labelMedium?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     )),
-                const SizedBox(height: 4),
+                SizedBox(height: context.screenHeight * 0.004),
                 Text(
                   value,
                   style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),

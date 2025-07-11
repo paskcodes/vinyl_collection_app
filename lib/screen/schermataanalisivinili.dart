@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:vinyl_collection_app/utils/dimensioniSchermo.dart';
 import '../database/databasehelper.dart';
 import '../vinile/vinile.dart';
 
@@ -49,7 +50,15 @@ class _AnalisiViniliScreenState extends State<AnalisiViniliScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final headline = GoogleFonts.roboto(fontSize: 22, fontWeight: FontWeight.bold);
+    final double padding = context.screenWidth * 0.04;
+    final double spacing = context.screenHeight * 0.03;
+    final double chartHeight = context.screenHeight * 0.3;
+    final double titleSize = context.screenWidth * 0.055;
+
+    final headline = GoogleFonts.roboto(
+      fontSize: titleSize,
+      fontWeight: FontWeight.bold,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -60,10 +69,11 @@ class _AnalisiViniliScreenState extends State<AnalisiViniliScreen> {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : ListView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(padding),
         children: [
           Text('Statistiche Generali', style: headline),
-          const SizedBox(height: 16),
+          SizedBox(height: spacing),
+
           _StatCard(
             icon: Icons.album_rounded,
             label: 'Totale Vinili',
@@ -71,22 +81,22 @@ class _AnalisiViniliScreenState extends State<AnalisiViniliScreen> {
             color: theme.colorScheme.primary,
           ),
 
-          const SizedBox(height: 24),
-          _SectionTitle('Distribuzione per genere'),
+          SizedBox(height: spacing),
+          _SectionTitle('Distribuzione per genere', fontSize: titleSize * 0.85),
           Card(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             elevation: 3,
             child: SizedBox(
-              height: 250,
+              height: chartHeight,
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(padding),
                 child: _PieChartWidget(generi: generi),
               ),
             ),
           ),
 
-          const SizedBox(height: 24),
-          _SectionTitle('Vinili più vecchi'),
+          SizedBox(height: spacing),
+          _SectionTitle('Vinili più vecchi', fontSize: titleSize * 0.85),
           ...piuVecchi.map(
                 (v) => ListTile(
               leading: const Icon(Icons.history_edu_rounded),
@@ -95,15 +105,15 @@ class _AnalisiViniliScreenState extends State<AnalisiViniliScreen> {
             ),
           ),
 
-          const SizedBox(height: 24),
-          _SectionTitle('Crescita della collezione'),
+          SizedBox(height: spacing),
+          _SectionTitle('Crescita della collezione', fontSize: titleSize * 0.85),
           Card(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             elevation: 3,
             child: SizedBox(
-              height: 250,
+              height: chartHeight,
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(padding),
                 child: _BarChartWidget(crescita: crescita),
               ),
             ),
@@ -118,13 +128,14 @@ class _AnalisiViniliScreenState extends State<AnalisiViniliScreen> {
 
 class _SectionTitle extends StatelessWidget {
   final String text;
-  const _SectionTitle(this.text);
+  final double fontSize;
+  const _SectionTitle(this.text, {required this.fontSize});
 
   @override
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: GoogleFonts.roboto(fontSize: 18, fontWeight: FontWeight.w600),
+      style: GoogleFonts.roboto(fontSize: fontSize, fontWeight: FontWeight.w600),
     );
   }
 }
@@ -145,21 +156,28 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final width = context.screenWidth;
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 3,
       color: theme.colorScheme.surfaceContainerHighest,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+        padding: EdgeInsets.symmetric(
+          horizontal: width * 0.04,
+          vertical: context.screenHeight * 0.025,
+        ),
         child: Row(
           children: [
-            Icon(icon, size: 40, color: color),
-            const SizedBox(width: 16),
+            Icon(icon, size: width * 0.1, color: color),
+            SizedBox(width: width * 0.04),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(label, style: theme.textTheme.titleMedium),
-                Text(value, style: GoogleFonts.roboto(fontSize: 22, fontWeight: FontWeight.bold)),
+                Text(value, style: GoogleFonts.roboto(
+                  fontSize: width * 0.06,
+                  fontWeight: FontWeight.bold,
+                )),
               ],
             )
           ],
@@ -171,7 +189,6 @@ class _StatCard extends StatelessWidget {
 
 class _PieChartWidget extends StatelessWidget {
   final Map<String, int> generi;
-
   const _PieChartWidget({required this.generi});
 
   @override
@@ -182,34 +199,39 @@ class _PieChartWidget extends StatelessWidget {
       Colors.blue,
       Colors.purple,
       Colors.amber,
-      Colors.green
+      Colors.green,
     ];
 
     final entries = generi.entries.toList();
     final total = entries.fold<int>(0, (sum, e) => sum + e.value);
 
-    return PieChart(PieChartData(
-      sections: List.generate(entries.length, (i) {
-        final e = entries[i];
-        final percent = (e.value / total) * 100;
-        return PieChartSectionData(
-          value: e.value.toDouble(),
-          color: colors[i % colors.length],
-          title: '${e.key}\n${percent.toStringAsFixed(1)}%',
-          radius: 70,
-          titleStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
-          titlePositionPercentageOffset: 0.6,
-        );
-      }),
-      sectionsSpace: 2,
-      centerSpaceRadius: 30,
-    ));
+    return PieChart(
+      PieChartData(
+        sections: List.generate(entries.length, (i) {
+          final e = entries[i];
+          final percent = (e.value / total) * 100;
+          return PieChartSectionData(
+            value: e.value.toDouble(),
+            color: colors[i % colors.length],
+            title: '${e.key}\n${percent.toStringAsFixed(1)}%',
+            radius: context.screenWidth * 0.18,
+            titleStyle: TextStyle(
+              fontSize: context.screenWidth * 0.03,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+            titlePositionPercentageOffset: 0.6,
+          );
+        }),
+        sectionsSpace: 2,
+        centerSpaceRadius: context.screenWidth * 0.08,
+      ),
+    );
   }
 }
 
 class _BarChartWidget extends StatelessWidget {
   final Map<String, int> crescita;
-
   const _BarChartWidget({required this.crescita});
 
   @override
@@ -219,18 +241,28 @@ class _BarChartWidget extends StatelessWidget {
       BarChartData(
         barGroups: crescita.entries.map((e) {
           final i = keys.indexOf(e.key);
-          return BarChartGroupData(x: i, barRods: [
-            BarChartRodData(toY: e.value.toDouble(), color: Theme.of(context).colorScheme.primary)
-          ]);
+          return BarChartGroupData(
+            x: i,
+            barRods: [
+              BarChartRodData(
+                toY: e.value.toDouble(),
+                color: Theme.of(context).colorScheme.primary,
+                width: context.screenWidth * 0.06,
+              )
+            ],
+          );
         }).toList(),
         titlesData: FlTitlesData(
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
-              reservedSize: 30,
+              reservedSize: context.screenHeight * 0.04,
               getTitlesWidget: (value, _) {
                 final year = value.toInt() < keys.length ? keys[value.toInt()] : '';
-                return Text(year, style: const TextStyle(fontSize: 10));
+                return Text(
+                  year,
+                  style: TextStyle(fontSize: context.screenWidth * 0.025),
+                );
               },
             ),
           ),

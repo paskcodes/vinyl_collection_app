@@ -161,7 +161,7 @@ class DatabaseHelper {
   }
 
 
-  Future<List<Vinile>> getViniliPreferiti() async {
+  /*Future<List<Vinile>> getViniliPreferiti() async {
     final db = DatabaseHelper.instance;
 
     final List<Map<String, dynamic>> maps = await db.database.then( (db) => db.query(
@@ -171,7 +171,7 @@ class DatabaseHelper {
     ));
 
     return maps.map((map)=> Vinile.fromMap(map)).toList();
-  }
+  }*/
 
   Future<bool> vinileEsiste(Vinile vinile) async {
     final db= await DatabaseHelper.instance.database;
@@ -179,7 +179,6 @@ class DatabaseHelper {
       where: 'titolo = ? AND artista = ? AND anno =?',
       whereArgs:[vinile.titolo,vinile.artista,vinile.anno],
     );
-
     return result.isNotEmpty;
   }
 
@@ -191,22 +190,18 @@ class DatabaseHelper {
   }
 
   Future<String?> getGenereNomeById(int idGenere) async {
-    final db = await database; // Ottieni l'istanza del database
-
-    // Esegui una query sulla tabella 'generi' filtrando per 'id'
+    final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       'generi',
-      columns: ['nome'], // Seleziona solo la colonna 'nome'
+      columns: ['nome'],
       where: 'id = ?',
       whereArgs: [idGenere],
-      limit: 1, // Ci aspettiamo solo un risultato per un dato ID
+      limit: 1,
     );
 
-    // Se troviamo un risultato, estrai il nome e restituiscilo
     if (maps.isNotEmpty) {
       return maps.first['nome'] as String;
     } else {
-      // Se nessun genere con quell'ID è stato trovato, ritorna null
       return null;
     }
   }
@@ -224,14 +219,14 @@ class DatabaseHelper {
       ORDER BY g.nome;
     ''');
 
-  Future<String> getGenere(int id) async{
+  /*Future<String> getGenere(int id) async{
     final db= await DatabaseHelper.instance.database;
     final maps= await db.query('generi',
       where:"id = ?",
       whereArgs:[id] ,
     );
     return maps.map(Genere.fromMap).first.nome;
-  }
+  }*/
 
   Future<int?> controlloGenere(String? nome) async {
     if (nome == null || nome.trim().isEmpty) return null;
@@ -243,14 +238,13 @@ class DatabaseHelper {
       whereArgs: [nome.trim()],
       limit: 1,
     );
-
     if (res.isNotEmpty) {
       return res.first['id'] as int; // già esiste
     }
     return null;
   }
 
-  //Visto che ogni genere quando viene inserito nel DB riceve un proprio ID, possiamo gestirci gli ID come se fossero parte di un ENUM
+
   Future<List<Vinile>> getViniliByGenere(int idGenere) async {
     final maps = await (await database).query(
       'collezioneVinili',
@@ -260,12 +254,12 @@ class DatabaseHelper {
     return maps.map(Vinile.fromMap).toList();
   }
 
-  Future<void> elimina(int id) async {
+  Future<void> eliminaCategoria(int id) async {
     final db = await DatabaseHelper.instance.database;
     await db.delete('generi', where: 'id = ?', whereArgs: [id]);
   }
 
-  Future<void> rinomina(int id, String nuovoNome) async {
+  Future<void> rinominaCategoria(int id, String nuovoNome) async {
     final db = await DatabaseHelper.instance.database;
     await db.update('generi', {'nome': nuovoNome}, where: 'id = ?', whereArgs: [id]);
   }

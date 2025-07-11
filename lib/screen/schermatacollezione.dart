@@ -189,7 +189,23 @@ class SchermataCollezioneState extends State<SchermataCollezione> {
             ? IconButton(icon: const Icon(Icons.close), onPressed: _deselezionaTutti)
             : null,
         actions: [
-          if (_modalitaSelezione) ...[
+          if (!_modalitaSelezione) ...[
+            IconButton(
+              icon: const Icon(Icons.analytics),
+              tooltip: 'Analisi vinili',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AnalisiViniliScreen()),
+                );
+              },
+            ),
+            IconButton(
+              icon: Icon(_mostraFiltri ? Icons.close : Icons.search),
+              tooltip: 'Filtri di ricerca',
+              onPressed: _toggleFiltroRicerca,
+            ),
+          ] else ...[
             IconButton(
               tooltip: 'Seleziona tutti',
               icon: const Icon(Icons.select_all),
@@ -205,14 +221,10 @@ class SchermataCollezioneState extends State<SchermataCollezione> {
               icon: const Icon(Icons.delete),
               onPressed: _eliminaSelezionati,
             ),
-          ] else ...[
-            IconButton(
-              icon: Icon(_mostraFiltri ? Icons.close : Icons.search),
-              onPressed: _toggleFiltroRicerca,
-            ),
           ]
         ],
       ),
+
       body: Column(
         children: [
           if (_listaVinili.isNotEmpty || _tuttiIVinili.isNotEmpty)

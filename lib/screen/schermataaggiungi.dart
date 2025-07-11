@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:vinyl_collection_app/utils/dimensioniSchermo.dart';
 import '../categoria/genere.dart';
 import '../database/databasehelper.dart';
 import '../vinile/condizione.dart';
@@ -97,7 +98,10 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.symmetric(
+            horizontal: context.screenWidth * 0.05,
+            vertical: 24,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -105,8 +109,8 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
                 child: GestureDetector(
                   onTap: _pickImage,
                   child: Container(
-                    width: 160,
-                    height: 160,
+                    width: context.screenWidth * 0.7,
+                    height: context.screenHeight * 0.3,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
                       color: theme.colorScheme.surfaceContainerHighest,
@@ -183,10 +187,12 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
               ),
               const SizedBox(height: 32),
               Center(
-                child: FilledButton.icon(
-                  onPressed: _formValid ? _aggiungi : null,
-                  icon: const Icon(Icons.add),
-                  label: const Text('Aggiungi alla collezione'),
+                child:SizedBox(width: context.screenWidth * 0.8,
+                  child: FilledButton.icon(
+                    onPressed: _formValid ? _aggiungi : null,
+                    icon: const Icon(Icons.add),
+                    label: const Text('Aggiungi alla collezione'),
+                  ),
                 ),
               ),
             ],

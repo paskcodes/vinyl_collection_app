@@ -168,7 +168,7 @@ class _SchermataViniliPerCategoriaState extends State<SchermataViniliPerCategori
     return;
     }
 
-    await DatabaseHelper.instance.rinomina(widget.genereId, nuovoNome);
+    await DatabaseHelper.instance.rinominaCategoria(widget.genereId, nuovoNome);
     setState(() => _nomeGenere = nuovoNome);
   }
   }

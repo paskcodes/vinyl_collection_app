@@ -160,7 +160,7 @@ class HomeScreenState extends State<HomeScreen>
                 vinili: _ultimeAggiunte,
                 onTap: (v) => _apriDettaglioSuggested(context, v),
               ),
-            ])
+            ].where((section) => section.vinili.isNotEmpty))
               _buildSection(
                 title: section.title,
                 vinili: section.vinili,

@@ -37,9 +37,13 @@ class _SchermataViniliPerCategoriaState
   }
 
   Future<void> _carica() async {
-    final list = await DatabaseHelper.instance.getViniliByGenere(
-      widget.genereId,
-    );
+    List<Vinile> list;
+    if (widget.genereId == -1) {
+      list = await DatabaseHelper.instance.getViniliPreferiti();
+      if (mounted) setState(() => _nomeGenere = 'Preferiti');
+    } else {
+      list = await DatabaseHelper.instance.getViniliByGenere(widget.genereId);
+    }
     if (mounted) setState(() => _vinili = list);
   }
 

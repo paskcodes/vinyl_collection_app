@@ -21,7 +21,13 @@ class _DettaglioVinileSuggestedState extends State<DettaglioVinileSuggested> {
     final double horizontalPadding = context.screenWidth * 0.05;
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.vinile.titolo), centerTitle: true),
+      appBar: AppBar(
+        title: Text(
+          widget.vinile.titolo,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+      ),
       body: ListView(
         padding: EdgeInsets.symmetric(
           horizontal: horizontalPadding,

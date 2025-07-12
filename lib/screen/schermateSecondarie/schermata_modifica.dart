@@ -147,7 +147,11 @@ class _SchermataModificaState extends State<SchermataModifica> {
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
-        title: Text(widget.suggested ? 'Aggiungi vinile' : 'Modifica vinile'),
+        title: Text(
+          widget.suggested ? 'Aggiungi vinile' : 'Modifica vinile',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
       ),
       body: Form(
         key: _formKey,

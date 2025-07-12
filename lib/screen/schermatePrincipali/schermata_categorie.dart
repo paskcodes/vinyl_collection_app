@@ -296,6 +296,7 @@ class SchermataCategorieState extends State<SchermataCategorie> {
           _modalitaSelezione
               ? '${_genereSelezionate.length} categorie selezionate'
               : 'Categorie',
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         leading: _modalitaSelezione
             ? IconButton(

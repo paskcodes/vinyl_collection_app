@@ -42,7 +42,13 @@ class _DettaglioVinileCollezioneState extends State<DettaglioVinileCollezione> {
     final double horizontalPadding = context.screenWidth * 0.05;
 
     return Scaffold(
-      appBar: AppBar(title: Text(_vinileCorrente.titolo), centerTitle: true),
+      appBar: AppBar(
+        title: Text(
+          _vinileCorrente.titolo,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+         ),
+        centerTitle: true,
+      ),
       body: ListView(
         padding: EdgeInsets.symmetric(
           horizontal: horizontalPadding,

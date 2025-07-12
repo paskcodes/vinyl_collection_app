@@ -224,10 +224,11 @@ class SchermataCollezioneState extends State<SchermataCollezione> {
     final double leadingImageSize = context.screenWidth * 0.12;
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          _modalitaSelezione
-              ? '${_viniliSelezionati.length} selezionati'
-              : 'La tua collezione',
+        title: _modalitaSelezione
+            ? Text('${_viniliSelezionati.length} selezionati')
+            : const Text(
+          'La tua collezione',
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
         leading: _modalitaSelezione
             ? IconButton(
@@ -292,7 +293,16 @@ class SchermataCollezioneState extends State<SchermataCollezione> {
               ),
             ),
           if (_listaVinili.isEmpty)
-            const Center(child: Text("Aggiungi un vinile")),
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.6,
+              child: const Center(
+                child: Text(
+                  "Aggiungi un vinile",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
           ..._listaVinili.map((vinile) {
             final selezionato = _viniliSelezionati.contains(vinile);
             return Card(

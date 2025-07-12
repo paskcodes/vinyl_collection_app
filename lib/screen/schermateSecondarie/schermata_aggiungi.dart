@@ -126,7 +126,11 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
     final theme = Theme.of(context);
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
-      appBar: AppBar(title: const Text('Aggiungi Vinile'), centerTitle: true),
+      appBar: AppBar(
+          title: const Text(style: TextStyle(fontWeight: FontWeight.bold), 'Aggiungi Vinile'),
+          centerTitle: true
+
+      ),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(

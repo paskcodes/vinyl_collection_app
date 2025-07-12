@@ -62,7 +62,11 @@ class _AnalisiViniliScreenState extends State<AnalisiViniliScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Analisi della Collezione'),
+        title: const Text(
+          'Analisi della Collezione',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
         backgroundColor: theme.colorScheme.surface,
         elevation: 0,
       ),

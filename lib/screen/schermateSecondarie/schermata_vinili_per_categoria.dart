@@ -234,7 +234,9 @@ class _SchermataViniliPerCategoriaState
           _modalitaSelezione
               ? '${_viniliSelezionati.length} selezionati'
               : _nomeGenere,
+              style: TextStyle(fontWeight: FontWeight.bold)
         ),
+        centerTitle: true,
         actions: _modalitaSelezione
             ? [
                 IconButton(

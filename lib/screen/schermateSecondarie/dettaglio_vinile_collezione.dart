@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:vinyl_collection_app/screen/schermateSecondarie/schermatamodifica.dart';
-import 'package:vinyl_collection_app/utils/dimensionischermo.dart';
+import 'package:vinyl_collection_app/screen/schermateSecondarie/schermata_modifica.dart';
+import 'package:vinyl_collection_app/utils/dimensioni_schermo.dart';
 import '../../vinile/vinile.dart';
-import '../../database/databasehelper.dart';
+import '../../database/database_helper.dart';
 
 class DettaglioVinileCollezione extends StatefulWidget {
   final Vinile vinile;

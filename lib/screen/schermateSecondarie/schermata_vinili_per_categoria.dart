@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../components/selezionegenere.dart';
-import '../../database/databasehelper.dart';
+import '../../components/selezione_genere.dart';
+import '../../database/database_helper.dart';
 import '../../vinile/vinile.dart';
-import 'schermatamodifica.dart';
-import 'dettagliovinilecollezione.dart';
-import '../../utils/dimensionischermo.dart';
+import 'schermata_modifica.dart';
+import 'dettaglio_vinile_collezione.dart';
+import '../../utils/dimensioni_schermo.dart';
 
 class SchermataViniliPerCategoria extends StatefulWidget {
   final int genereId;

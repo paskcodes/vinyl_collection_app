@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../vinile/genere.dart';
-import '../database/databasehelper.dart';
+import '../database/database_helper.dart';
 
 class DialogSelezioneGenere extends StatelessWidget {
   const DialogSelezioneGenere({super.key});

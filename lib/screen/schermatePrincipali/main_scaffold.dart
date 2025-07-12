@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'homepage.dart';
-import 'schermataricerca.dart';
-import 'schermatacategorie.dart';
-import 'schermatacollezione.dart';
+import 'schermata_ricerca.dart';
+import 'schermata_categorie.dart';
+import 'schermata_collezione.dart';
 
 class MainScaffold extends StatefulWidget {
   const MainScaffold({super.key});

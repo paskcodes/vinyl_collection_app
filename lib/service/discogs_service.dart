@@ -4,7 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import '../vinile/vinile.dart';
 import '../vinile/condizione.dart';
-import '../database/databasehelper.dart';
+import '../database/database_helper.dart';
 
 class DiscogsService {
   static final String? _token = dotenv.env['DISCOGS_TOKEN'];

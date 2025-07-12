@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import '../vinile/vinile.dart';
-import '../utils/dimensionischermo.dart';
+import '../utils/dimensioni_schermo.dart';
 
 class SuggeritoTile extends StatelessWidget {
   final Vinile vinile;

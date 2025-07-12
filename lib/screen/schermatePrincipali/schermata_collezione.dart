@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:vinyl_collection_app/database/databasehelper.dart';
-import 'package:vinyl_collection_app/screen/schermateSecondarie/schermataanalisivinili.dart';
-import 'package:vinyl_collection_app/screen/schermateSecondarie/schermatamodifica.dart';
-import 'package:vinyl_collection_app/screen/schermateSecondarie/dettagliovinilecollezione.dart';
-import 'package:vinyl_collection_app/utils/dimensionischermo.dart';
+import 'package:vinyl_collection_app/database/database_helper.dart';
+import 'package:vinyl_collection_app/screen/schermateSecondarie/schermata_analisi_vinili.dart';
+import 'package:vinyl_collection_app/screen/schermateSecondarie/schermata_modifica.dart';
+import 'package:vinyl_collection_app/screen/schermateSecondarie/dettaglio_vinile_collezione.dart';
+import 'package:vinyl_collection_app/utils/dimensioni_schermo.dart';
 import 'package:vinyl_collection_app/vinile/vinile.dart';
-import '../../components/filtroricercawidget.dart';
+import '../../components/filtro_ricerca_widget.dart';
 import '../../vinile/condizione.dart';
 
 class SchermataCollezione extends StatefulWidget {

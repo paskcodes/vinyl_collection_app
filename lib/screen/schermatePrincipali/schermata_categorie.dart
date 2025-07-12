@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vinyl_collection_app/components/genere_tile.dart';
-import 'package:vinyl_collection_app/screen/schermateSecondarie/schermatavinilipercategoria.dart';
-import '../../database/databasehelper.dart';
+import 'package:vinyl_collection_app/screen/schermateSecondarie/schermata_vinili_per_categoria.dart';
+import '../../database/database_helper.dart';
 import '../../vinile/vinile.dart';
 
 class SchermataCategorie extends StatefulWidget {

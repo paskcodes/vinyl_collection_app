@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:vinyl_collection_app/vinile/condizione.dart';
-import '../database/databasehelper.dart';
+import '../database/database_helper.dart';
 
 class Vinile {
   int? id;

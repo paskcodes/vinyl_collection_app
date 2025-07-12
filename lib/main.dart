@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-
-import 'screen/schermatePrincipali/mainscaffold.dart';
-import 'screen/schermateSecondarie/schermataaggiungi.dart';
+import 'screen/schermatePrincipali/main_scaffold.dart';
+import 'screen/schermateSecondarie/schermata_aggiungi.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -20,12 +20,14 @@ class SchermataCollezioneState extends State<SchermataCollezione> {
   late List<Vinile> _tuttiIVinili = [];
   bool _mostraFiltri = false;
 
+
   // Filtri
-  final String _query = '';
+  String _query = '';
   int? _genereId;
   Condizione? _condizione;
   int? _anno;
-  final bool _soloPreferiti = false;
+  bool _soloPreferiti = false;
+
 
   // Selezione multipla
   bool _modalitaSelezione = false;
@@ -54,6 +56,13 @@ class SchermataCollezioneState extends State<SchermataCollezione> {
     bool soloPreferiti = false,
   }) {
     setState(() {
+      // 🔥 SALVO I FILTRI PER FARLI PERSISTERE
+      _query = query;
+      _genereId = genere;
+      _condizione = condizione;
+      _anno = anno;
+      _soloPreferiti = soloPreferiti;
+
       int? annoMin;
       int? annoMax;
 
@@ -77,30 +86,20 @@ class SchermataCollezioneState extends State<SchermataCollezione> {
       _listaVinili = _tuttiIVinili.where((vinile) {
         final matchQuery =
             query.isEmpty ||
-            vinile.titolo.toLowerCase().contains(query.toLowerCase()) ||
-            vinile.artista.toLowerCase().contains(query.toLowerCase()) ||
-            vinile.etichettaDiscografica?.toLowerCase().contains(
-                  query.toLowerCase(),
-                ) ==
-                true;
+                vinile.titolo.toLowerCase().contains(query.toLowerCase()) ||
+                vinile.artista.toLowerCase().contains(query.toLowerCase()) ||
+                vinile.etichettaDiscografica?.toLowerCase().contains(query.toLowerCase()) == true;
 
         final matchGenere = genere == null || vinile.genere == genere;
-        final matchCondizione =
-            condizione == null || vinile.condizione == condizione;
-        final matchAnno =
-            anno == null ||
-            (vinile.anno! >= (annoMin ?? 0) &&
-                vinile.anno! <= (annoMax ?? 9999));
+        final matchCondizione = condizione == null || vinile.condizione == condizione;
+        final matchAnno = anno == null || (vinile.anno! >= (annoMin ?? 0) && vinile.anno! <= (annoMax ?? 9999));
         final matchPreferiti = !soloPreferiti || vinile.preferito == true;
 
-        return matchQuery &&
-            matchGenere &&
-            matchCondizione &&
-            matchAnno &&
-            matchPreferiti;
+        return matchQuery && matchGenere && matchCondizione && matchAnno && matchPreferiti;
       }).toList();
     });
   }
+
 
   void _toggleFiltroRicerca() {
     setState(() {
@@ -277,7 +276,8 @@ class SchermataCollezioneState extends State<SchermataCollezione> {
         ],
       ),
 
-      body: Column(
+      body: ListView(
+        padding: const EdgeInsets.only(bottom: 16),
         children: [
           if (_mostraFiltri)
             Padding(
@@ -291,107 +291,93 @@ class SchermataCollezioneState extends State<SchermataCollezione> {
                 onFiltra: _filtraLocalmente,
               ),
             ),
-          Expanded(
-            child: _listaVinili.isEmpty
-                ? const Center(child: Text("Aggiungi un vinile"))
-                : ListView.builder(
-                    itemCount: _listaVinili.length,
-                    itemBuilder: (context, indice) {
-                      final vinile = _listaVinili[indice];
-                      final selezionato = _viniliSelezionati.contains(vinile);
-                      return Card(
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 6,
-                        ),
-                        color: selezionato ? selectedBackgroundColor : null,
-                        child: ListTile(
-                          onTap: () {
-                            if (_modalitaSelezione) {
-                              _toggleSelezioneVinile(vinile);
-                            } else {
-                              _apriDettaglioVinile(vinile);
-                            }
-                          },
-                          onLongPress: () => _toggleSelezioneVinile(vinile),
-                          leading: SizedBox(
-                            width: leadingImageSize,
-                            height: leadingImageSize,
-                            child: vinile.coverWidget,
-                          ),
-                          title: Text(
-                            vinile.titolo,
-                            style: TextStyle(
-                              color: selezionato ? selectedTextColor : null,
-                            ),
-                          ),
-                          subtitle: Text(
-                            '${vinile.artista} (${vinile.anno})',
-                            style: TextStyle(
-                              color: selezionato ? selectedTextColor : null,
-                            ),
-                          ),
-                          trailing: _modalitaSelezione
-                              ? Icon(
-                                  selezionato
-                                      ? Icons.check_circle
-                                      : Icons.radio_button_unchecked,
-                                  color: selezionato
-                                      ? Theme.of(context).colorScheme.primary
-                                      : Colors.grey,
-                                )
-                              : Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      icon: Icon(
-                                        vinile.preferito
-                                            ? Icons.star_rounded
-                                            : Icons.star_border_rounded,
-                                        color: vinile.preferito
-                                            ? Colors.amber
-                                            : Colors.grey,
-                                      ),
-                                      onPressed: () async {
-                                        setState(
-                                          () => vinile.preferito =
-                                              !vinile.preferito,
-                                        );
-                                        await DatabaseHelper.instance
-                                            .aggiornaPreferito(
-                                              vinile.id!,
-                                              vinile.preferito,
-                                            );
-                                      },
-                                    ),
-                                    PopupMenuButton<String>(
-                                      onSelected: (scelta) {
-                                        if (scelta == 'modifica') {
-                                          _modificaVinile(vinile);
-                                        } else if (scelta == 'elimina') {
-                                          _confermaEliminaVinile(vinile);
-                                        }
-                                      },
-                                      itemBuilder: (context) => const [
-                                        PopupMenuItem(
-                                          value: 'modifica',
-                                          child: Text('Modifica'),
-                                        ),
-                                        PopupMenuItem(
-                                          value: 'elimina',
-                                          child: Text('Elimina'),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                        ),
-                      );
-                    },
+          if (_listaVinili.isEmpty)
+            const Center(child: Text("Aggiungi un vinile")),
+          ..._listaVinili.map((vinile) {
+            final selezionato = _viniliSelezionati.contains(vinile);
+            return Card(
+              margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              color: selezionato ? selectedBackgroundColor : null,
+              child: ListTile(
+                onTap: () {
+                  if (_modalitaSelezione) {
+                    _toggleSelezioneVinile(vinile);
+                  } else {
+                    _apriDettaglioVinile(vinile);
+                  }
+                },
+                onLongPress: () => _toggleSelezioneVinile(vinile),
+                leading: SizedBox(
+                  width: leadingImageSize,
+                  height: leadingImageSize,
+                  child: vinile.coverWidget,
+                ),
+                title: Text(
+                  vinile.titolo,
+                  style: TextStyle(
+                    color: selezionato ? selectedTextColor : null,
                   ),
-          ),
+                ),
+                subtitle: Text(
+                  '${vinile.artista} (${vinile.anno})',
+                  style: TextStyle(
+                    color: selezionato ? selectedTextColor : null,
+                  ),
+                ),
+                trailing: _modalitaSelezione
+                    ? Icon(
+                  selezionato
+                      ? Icons.check_circle
+                      : Icons.radio_button_unchecked,
+                  color: selezionato
+                      ? Theme.of(context).colorScheme.primary
+                      : Colors.grey,
+                )
+                    : Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        vinile.preferito
+                            ? Icons.star_rounded
+                            : Icons.star_border_rounded,
+                        color: vinile.preferito ? Colors.amber : Colors.grey,
+                      ),
+                      onPressed: () async {
+                        setState(() => vinile.preferito = !vinile.preferito);
+                        await DatabaseHelper.instance.aggiornaPreferito(
+                          vinile.id!,
+                          vinile.preferito,
+                        );
+                      },
+                    ),
+                    PopupMenuButton<String>(
+                      onSelected: (scelta) {
+                        if (scelta == 'modifica') {
+                          _modificaVinile(vinile);
+                        } else if (scelta == 'elimina') {
+                          _confermaEliminaVinile(vinile);
+                        }
+                      },
+                      itemBuilder: (context) => const [
+                        PopupMenuItem(
+                          value: 'modifica',
+                          child: Text('Modifica'),
+                        ),
+                        PopupMenuItem(
+                          value: 'elimina',
+                          child: Text('Elimina'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
         ],
       ),
+
     );
   }
 }

@@ -50,9 +50,9 @@ class _AnalisiViniliScreenState extends State<AnalisiViniliScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isLandscape = context.isLandscape;
     final double padding = context.screenWidth * 0.04;
     final double spacing = context.screenHeight * 0.03;
-    final double chartHeight = context.screenHeight * 0.3;
     final double titleSize = context.screenWidth * 0.055;
 
     final headline = GoogleFonts.roboto(
@@ -68,60 +68,50 @@ class _AnalisiViniliScreenState extends State<AnalisiViniliScreen> {
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              padding: EdgeInsets.all(padding),
+          : Padding(
+        padding: EdgeInsets.all(padding),
+        child: ListView(
+          children: [
+            Text('Statistiche Generali', style: headline),
+            SizedBox(height: spacing),
+            _StatCard(
+              icon: Icons.album_rounded,
+              label: 'Totale Vinili',
+              value: '$totale',
+              color: theme.colorScheme.primary,
+            ),
+            SizedBox(height: spacing),
+
+            /// GENERE + CRESCITA (in LANDSCAPE uno accanto all’altro)
+            SizedBox(height: spacing * 0.5),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Statistiche Generali', style: headline),
-                SizedBox(height: spacing),
-
-                _StatCard(
-                  icon: Icons.album_rounded,
-                  label: 'Totale Vinili',
-                  value: '$totale',
-                  color: theme.colorScheme.primary,
-                ),
-
-                SizedBox(height: spacing),
-                _SectionTitle(
-                  'Distribuzione per genere',
-                  fontSize: titleSize * 0.85,
-                ),
+                _SectionTitle('Distribuzione per genere', fontSize: titleSize * 0.85),
+                SizedBox(height: spacing * 0.5),
                 Card(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
                   elevation: 3,
-                  child: SizedBox(
-                    height: chartHeight,
+                  child: AspectRatio(
+                    aspectRatio: context.isLandscape ? 2 : 1.6,
                     child: Padding(
                       padding: EdgeInsets.all(padding),
                       child: _PieChartWidget(generi: generi),
                     ),
                   ),
                 ),
-
                 SizedBox(height: spacing),
-                _SectionTitle('Vinili più vecchi', fontSize: titleSize * 0.85),
-                ...piuVecchi.map(
-                  (v) => ListTile(
-                    leading: const Icon(Icons.history_edu_rounded),
-                    title: Text('${v.titolo} - ${v.artista}'),
-                    subtitle: Text('Anno: ${v.anno ?? 'Sconosciuto'}'),
-                  ),
-                ),
-
-                SizedBox(height: spacing),
-                _SectionTitle(
-                  'Crescita della collezione',
-                  fontSize: titleSize * 0.85,
-                ),
+                _SectionTitle('Crescita della collezione', fontSize: titleSize * 0.85),
+                SizedBox(height: spacing * 0.5),
                 Card(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
                   elevation: 3,
-                  child: SizedBox(
-                    height: chartHeight,
+                  child: AspectRatio(
+                    aspectRatio: context.isLandscape ? 2 : 1.6,
                     child: Padding(
                       padding: EdgeInsets.all(padding),
                       child: _BarChartWidget(crescita: crescita),
@@ -130,6 +120,59 @@ class _AnalisiViniliScreenState extends State<AnalisiViniliScreen> {
                 ),
               ],
             ),
+
+
+
+            SizedBox(height: spacing),
+            _SectionTitle('Vinili più vecchi', fontSize: titleSize * 0.85),
+            SizedBox(height: spacing * 0.5),
+            isLandscape
+                ? Row(
+              children: piuVecchi
+                  .map(
+                    (v) => Expanded(
+                  child: Card(
+                    margin: EdgeInsets.symmetric(horizontal: 4),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.history_edu_rounded,
+                              size: 28),
+                          SizedBox(height: 8),
+                          Text('${v.titolo} - ${v.artista}',
+                              textAlign: TextAlign.center),
+                          Text('Anno: ${v.anno ?? 'Sconosciuto'}',
+                              style: TextStyle(
+                                  color: Colors.grey.shade700)),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              )
+                  .toList(),
+            )
+                : Column(
+              children: piuVecchi
+                  .map(
+                    (v) => ListTile(
+                  leading:
+                  const Icon(Icons.history_edu_rounded),
+                  title: Text('${v.titolo} - ${v.artista}'),
+                  subtitle:
+                  Text('Anno: ${v.anno ?? 'Sconosciuto'}'),
+                ),
+              )
+                  .toList(),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -232,7 +275,7 @@ class _PieChartWidget extends StatelessWidget {
             value: e.value.toDouble(),
             color: colors[i % colors.length],
             title: '${e.key}\n${percent.toStringAsFixed(1)}%',
-            radius: context.screenWidth * 0.18,
+            radius: context.isLandscape?context.screenWidth * 0.13 :context.screenWidth * 0.18,
             titleStyle: TextStyle(
               fontSize: context.screenWidth * 0.03,
               fontWeight: FontWeight.bold,
@@ -275,7 +318,7 @@ class _BarChartWidget extends StatelessWidget {
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
-              reservedSize: context.screenHeight * 0.04,
+              reservedSize: context.isLandscape? context.screenHeight * 0.1 : context.screenHeight * 0.04,
               getTitlesWidget: (value, _) {
                 final year = value.toInt() < keys.length
                     ? keys[value.toInt()]

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vinyl_collection_app/database/database_helper.dart';
+import 'package:vinyl_collection_app/utils/dimensioni_schermo.dart';
 import '../vinile/genere.dart';
 import '../vinile/condizione.dart';
 
@@ -36,6 +37,7 @@ class FiltroRicercaWidget extends StatefulWidget {
 class _FiltroRicercaWidgetState extends State<FiltroRicercaWidget> {
   late TextEditingController _queryController;
   late TextEditingController _annoController;
+
   int? _genere;
   Condizione? _condizione;
   int? _anno;
@@ -61,6 +63,51 @@ class _FiltroRicercaWidgetState extends State<FiltroRicercaWidget> {
     _queryController.dispose();
     _annoController.dispose();
     super.dispose();
+  }
+
+  Widget _buildGenereDropdown() {
+    return DropdownButtonFormField<String>(
+      decoration: const InputDecoration(labelText: 'Genere'),
+      value: _genere != null && _listaGeneri.any((g) => g.id == _genere)
+          ? _listaGeneri.firstWhere((g) => g.id == _genere).nome
+          : null,
+      items: _listaGeneri
+          .map((g) => DropdownMenuItem(value: g.nome, child: Text(g.nome)))
+          .toList(),
+      onChanged: (val) {
+        final genereSelezionato = _listaGeneri.where((g) => g.nome == val).toList();
+        setState(() {
+          _genere = genereSelezionato.isNotEmpty ? genereSelezionato.first.id : null;
+          _applicaFiltro();
+        });
+      },
+    );
+  }
+
+  Widget _buildCondizioneDropdown() {
+    return DropdownButtonFormField<Condizione>(
+      decoration: const InputDecoration(labelText: 'Condizione'),
+      value: _condizione,
+      items: Condizione.values
+          .map((c) => DropdownMenuItem(value: c, child: Text(c.descrizione)))
+          .toList(),
+      onChanged: (val) {
+        setState(() => _condizione = val);
+        _applicaFiltro();
+      },
+    );
+  }
+
+  Widget _buildAnnoTextField() {
+    return TextField(
+      controller: _annoController,
+      decoration: const InputDecoration(labelText: 'Anno'),
+      keyboardType: TextInputType.number,
+      onChanged: (val) {
+        setState(() => _anno = int.tryParse(val));
+        _applicaFiltro();
+      },
+    );
   }
 
   Future<void> aggiornaGeneri() async {
@@ -94,93 +141,73 @@ class _FiltroRicercaWidgetState extends State<FiltroRicercaWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TextField(
-          controller: _queryController,
-          decoration: const InputDecoration(
-            labelText: 'Cerca titolo, artista, etichetta',
-          ),
-          onChanged: (_) => _applicaFiltro(),
-        ),
-        const SizedBox(height: 8.0),
-        Row(
+    final isLandscape = context.isLandscape;
+
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Expanded(
-              child: DropdownButtonFormField<String>(
-                decoration: const InputDecoration(labelText: 'Genere'),
-                value:
-                    _genere != null && _listaGeneri.any((g) => g.id == _genere)
-                    ? _listaGeneri.firstWhere((g) => g.id == _genere).nome
-                    : null,
-                items: _listaGeneri
-                    .map(
-                      (g) =>
-                          DropdownMenuItem(value: g.nome, child: Text(g.nome)),
-                    )
-                    .toList(),
-                onChanged: (val) {
-                  final genereSelezionato = _listaGeneri
-                      .where((g) => g.nome == val)
-                      .toList();
-                  setState(() {
-                    _genere = genereSelezionato.isNotEmpty
-                        ? genereSelezionato.first.id
-                        : null;
-                    _applicaFiltro();
-                  });
-                },
+            TextField(
+              controller: _queryController,
+              decoration: const InputDecoration(
+                labelText: 'Cerca titolo, artista, etichetta',
               ),
+              onChanged: (_) => _applicaFiltro(),
             ),
-            const SizedBox(width: 8.0),
-            Expanded(
-              child: DropdownButtonFormField<Condizione>(
-                decoration: const InputDecoration(labelText: 'Condizione'),
-                value: _condizione,
-                items: Condizione.values
-                    .map(
-                      (c) => DropdownMenuItem(
-                        value: c,
-                        child: Text(c.descrizione),
-                      ),
-                    )
-                    .toList(),
-                onChanged: (val) {
-                  setState(() => _condizione = val);
-                  _applicaFiltro();
-                },
+            const SizedBox(height: 8.0),
+            if (isLandscape)
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: context.screenWidth * 0.3,
+                      child: _buildGenereDropdown(),
+                    ),
+                    const SizedBox(width: 8),
+                    SizedBox(
+                      width: context.screenWidth * 0.3,
+                      child: _buildCondizioneDropdown(),
+                    ),
+                    const SizedBox(width: 8),
+                    SizedBox(
+                      width: context.screenWidth * 0.2,
+                      child: _buildAnnoTextField(),
+                    ),
+                  ],
+                ),
+              )
+            else
+              Column(
+                children: [
+                  _buildGenereDropdown(),
+                  const SizedBox(height: 8),
+                  _buildCondizioneDropdown(),
+                  const SizedBox(height: 8),
+                  _buildAnnoTextField(),
+                ],
               ),
+            const SizedBox(height: 8.0),
+            SwitchListTile(
+              title: const Text('Solo preferiti'),
+              value: _soloPreferiti,
+              onChanged: (val) {
+                setState(() => _soloPreferiti = val);
+                _applicaFiltro();
+              },
             ),
-            const SizedBox(width: 8.0),
-            Expanded(
-              child: TextField(
-                controller: _annoController,
-                decoration: const InputDecoration(labelText: 'Anno'),
-                keyboardType: TextInputType.number,
-                onChanged: (val) {
-                  setState(() => _anno = int.tryParse(val));
-                  _applicaFiltro();
-                },
-              ),
+            TextButton.icon(
+              onPressed: _resetFiltri,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Reset filtri'),
             ),
+            const Divider(thickness: 1),
           ],
         ),
-        // Sostituisci CheckboxListTile con SwitchListTile
-        SwitchListTile(
-          title: const Text('Solo preferiti'),
-          value: _soloPreferiti,
-          onChanged: (val) {
-            setState(() => _soloPreferiti = val); // 'val' qui non sarà mai null
-            _applicaFiltro();
-          },
-        ),
-        TextButton.icon(
-          onPressed: _resetFiltri,
-          icon: const Icon(Icons.refresh),
-          label: const Text('Reset filtri'),
-        ),
-        const Divider(thickness: 1),
-      ],
+      ),
     );
+
   }
 }

@@ -45,7 +45,7 @@ class _MainScaffoldState extends State<MainScaffold> {
     _categorieKey.currentState?.aggiornaGeneri();
   }
 
-  // se devi richiamare ricariche dopo un’aggiunta
+
   void _vaiSchermataAggiunta() async {
     final aggiunto = await Navigator.pushNamed(context, '/aggiunta') as bool?;
     if (aggiunto == true) {
@@ -56,10 +56,9 @@ class _MainScaffoldState extends State<MainScaffold> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // 🔄 PageView = transizione slide
       body: PageView(
         controller: _pageController,
-        physics: const NeverScrollableScrollPhysics(), // se non vuoi swipe
+        physics: const NeverScrollableScrollPhysics(), //no swipe
         onPageChanged: (index) => setState(() => _currentIndex = index),
         children: _pages,
       ),

@@ -374,10 +374,9 @@ class SchermataCollezioneState extends State<SchermataCollezione> {
                 ),
               ),
             );
-          }).toList(),
+          })
         ],
       ),
-
     );
   }
 }

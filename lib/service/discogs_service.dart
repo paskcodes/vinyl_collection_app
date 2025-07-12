@@ -12,7 +12,7 @@ class DiscogsService {
 
   // Ricerche libere (titolo / artista / label *full‑text*)
   Future<List<Vinile>> ricerca(String query) async {
-    final uri = _buildUri({'q': query, 'type': 'release'});
+    final uri = _buildUri({'q': query, 'type': 'master'}); // Usa 'master' invece di 'release'
     final res = await http.get(uri);
     _checkResponse(res);
     final List results = (jsonDecode(res.body)['results'] as List?) ?? [];
@@ -23,7 +23,7 @@ class DiscogsService {
   // Release «hot» su Discogs
   Future<List<Vinile>> cercaViniliTendenza({int limit = 10}) async {
     final uri = _buildUri({
-      'type': 'release',
+      'type': 'master', // Usa 'master' per evitare duplicati
       'sort': 'hot',
       'per_page': '$limit',
     });
@@ -90,7 +90,7 @@ class DiscogsService {
 
   Future<List<Vinile>> cercaPerGenere(String genere, {int limit = 10}) async {
     final uri = Uri.parse(
-      'https://api.discogs.com/database/search?genre=$genere&type=release&per_page=$limit&token=$_token',
+      'https://api.discogs.com/database/search?genre=$genere&type=master&per_page=$limit&token=$_token', // Usa 'master'
     );
     final res = await http.get(uri);
     if (res.statusCode != 200) throw Exception('Errore: ${res.statusCode}');
@@ -134,7 +134,7 @@ class DiscogsService {
 
   Future<List<Vinile>> iPiuCollezionati({int limit = 10}) async {
     final uri = _buildUri({
-      'type': 'release',
+      'type': 'master', // Usa 'master' per evitare duplicati
       'sort': 'have', // ordinati per numero di persone che lo possiedono
       'per_page': '$limit',
     });
@@ -148,23 +148,7 @@ class DiscogsService {
 
   Future<List<Vinile>> prossimeUscite({int limit = 10}) async {
     final uri = _buildUri({
-      'type': 'release',
-      'sort': 'year',
-      'sort_order': 'desc',
-      'per_page': '$limit',
-    });
-
-    final res = await http.get(uri);
-    _checkResponse(res);
-    final results = (jsonDecode(res.body)['results'] as List?) ?? [];
-
-    return _mapResults(results);
-  }
-
-  Future<List<Vinile>> ultimeReleaseAggiunte({int limit = 10}) async {
-    final uri = _buildUri({
-      'type': 'release',
-      'year': DateTime.now().year.toString(), // solo release del 2025
+      'type': 'master', // Usa 'master' per evitare duplicati
       'sort': 'year',
       'sort_order': 'desc',
       'per_page': '$limit',

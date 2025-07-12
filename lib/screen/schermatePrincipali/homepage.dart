@@ -25,7 +25,6 @@ class HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMix
   List<Vinile> _piuCollezionati = [];
   List<Vinile> _ultimiInseriti = [];
   List<Vinile> _randomCollection = [];
-  List<Vinile> _ultimeAggiunte = [];
 
   bool _isLoading = true;
 
@@ -53,7 +52,6 @@ class HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMix
 
     final piuCollezionati = await _discogs.iPiuCollezionati(limit: 10);
     final prossimeUscite = await _discogs.prossimeUscite(limit: 10);
-    final ultimeAggiunte = await _discogs.ultimeReleaseAggiunte(limit: 10);
 
     if (!mounted) return;
 
@@ -65,7 +63,6 @@ class HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMix
       _piuCollezionati = piuCollezionati;
       _ultimiInseriti = prossimeUscite;
       _randomCollection = random;
-      _ultimeAggiunte = ultimeAggiunte;
       _isLoading = false;
     });
   }
@@ -152,11 +149,6 @@ class HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMix
               _SectionData(
                 title: 'Le Prossime Uscite',
                 vinili: _ultimiInseriti,
-                onTap: (v) => _apriDettaglioSuggeriti(context, v),
-              ),
-              _SectionData(
-                title: 'Ultime Aggiunte su Discogs',
-                vinili: _ultimeAggiunte,
                 onTap: (v) => _apriDettaglioSuggeriti(context, v),
               ),
             ].where((section) => section.vinili.isNotEmpty))

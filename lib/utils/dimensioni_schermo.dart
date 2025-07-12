@@ -7,7 +7,7 @@ extension Dimensionischermo on BuildContext {
   /// Altezza totale dello schermo
   double get screenHeight => MediaQuery.of(this).size.height;
 
-  /// Lato più corto dello schermo
+  /// Lato più corto dello schermo (utile per layout basati sulla dimensione minore)
   double get shortestSide => MediaQuery.of(this).size.shortestSide;
 
   /// Lato più lungo dello schermo

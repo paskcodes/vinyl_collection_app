@@ -56,7 +56,7 @@ class SchermataCollezioneState extends State<SchermataCollezione> {
     bool soloPreferiti = false,
   }) {
     setState(() {
-      //per rendere i filtri "persistenti"
+      // 🔥 SALVO I FILTRI PER FARLI PERSISTERE
       _query = query;
       _genereId = genere;
       _condizione = condizione;
@@ -238,7 +238,7 @@ class SchermataCollezioneState extends State<SchermataCollezione> {
         actions: [
           if (!_modalitaSelezione) ...[
             if (_tuttiIVinili
-                .isNotEmpty) //solo se ci sono vinili nella collezione
+                .isNotEmpty) // <-- solo se ci sono vinili nella collezione
               IconButton(
                 icon: const Icon(Icons.analytics),
                 tooltip: 'Analisi vinili',

@@ -14,13 +14,14 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => HomeScreenState();
 }
 
-class HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMixin {
+class HomeScreenState extends State<HomeScreen>
+    with AutomaticKeepAliveClientMixin {
   final _db = DatabaseHelper.instance;
   final _discogs = DiscogsService();
 
-  List<Vinile> _recenti = [];
+  List<Vinile> _recent = [];
   List<Vinile> _preferiti = [];
-  List<Vinile> _suggeriti = [];
+  List<Vinile> _suggested = [];
   List<Vinile> _potrebberoPiacerti = [];
   List<Vinile> _piuCollezionati = [];
   List<Vinile> _ultimiInseriti = [];
@@ -58,9 +59,9 @@ class HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMix
     if (!mounted) return;
 
     setState(() {
-      _recenti = recent;
+      _recent = recent;
       _preferiti = preferiti;
-      _suggeriti = suggested;
+      _suggested = suggested;
       _potrebberoPiacerti = consigliati;
       _piuCollezionati = piuCollezionati;
       _ultimiInseriti = prossimeUscite;
@@ -70,7 +71,7 @@ class HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMix
     });
   }
 
-  Future<void> _apriDettaglioSuggeriti(BuildContext ctx, Vinile v) async {
+  Future<void> _apriDettaglioSuggested(BuildContext ctx, Vinile v) async {
     final aggiorna = await Navigator.push<bool>(
       ctx,
       MaterialPageRoute(builder: (_) => DettaglioVinileSuggested(vinile: v)),
@@ -121,13 +122,13 @@ class HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMix
             for (final section in [
               _SectionData(
                 title: 'Ultimi Vinili Aggiunti',
-                vinili: _recenti,
+                vinili: _recent,
                 onTap: _apriDettaglioCollezione,
               ),
               _SectionData(
                 title: 'Ultimi Trend',
-                vinili: _suggeriti,
-                onTap: (v) => _apriDettaglioSuggeriti(context, v),
+                vinili: _suggested,
+                onTap: (v) => _apriDettaglioSuggested(context, v),
               ),
               _SectionData(
                 title: 'I tuoi Preferiti',
@@ -137,7 +138,7 @@ class HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMix
               _SectionData(
                 title: 'Potrebbero Piacerti',
                 vinili: _potrebberoPiacerti,
-                onTap: (v) => _apriDettaglioSuggeriti(context, v),
+                onTap: (v) => _apriDettaglioSuggested(context, v),
               ),
               _SectionData(
                 title: 'Scelte Casuali dalla tua Collezione',
@@ -147,21 +148,21 @@ class HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMix
               _SectionData(
                 title: 'I Più Collezionati',
                 vinili: _piuCollezionati,
-                onTap: (v) => _apriDettaglioSuggeriti(context, v),
+                onTap: (v) => _apriDettaglioSuggested(context, v),
               ),
               _SectionData(
                 title: 'Le Prossime Uscite',
                 vinili: _ultimiInseriti,
-                onTap: (v) => _apriDettaglioSuggeriti(context, v),
+                onTap: (v) => _apriDettaglioSuggested(context, v),
               ),
               _SectionData(
                 title: 'Ultime Aggiunte su Discogs',
                 vinili: _ultimeAggiunte,
-                onTap: (v) => _apriDettaglioSuggeriti(context, v),
+                onTap: (v) => _apriDettaglioSuggested(context, v),
               ),
             ].where((section) => section.vinili.isNotEmpty))
               _buildSection(
-                titolo: section.title,
+                title: section.title,
                 vinili: section.vinili,
                 cardWidth: cardWidth,
                 listHeight: listHeight,
@@ -174,7 +175,7 @@ class HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMix
   }
 
   Widget _buildSection({
-    required String titolo,
+    required String title,
     required List<Vinile> vinili,
     required double cardWidth,
     required double listHeight,
@@ -189,7 +190,7 @@ class HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMix
         Padding(
           padding: const EdgeInsets.only(bottom: 12),
           child: Text(
-            titolo,
+            title,
             style: theme.textTheme.headlineMedium?.copyWith(
               fontWeight: FontWeight.w700,
               color: textColor,

@@ -17,7 +17,7 @@ class SchermataCategorieState extends State<SchermataCategorie> {
   bool _modalitaSelezione = false;
   bool _mostraTutte = false;
 
-  // Getter per _mostraTutte
+  // Getter pubblico per _mostraTutte
   bool get mostraTutte => _mostraTutte;
 
   @override
@@ -36,7 +36,7 @@ class SchermataCategorieState extends State<SchermataCategorie> {
         ? await db.getCategorieConConteggio()
         : await db.generiFiltrati();
 
-    // lista completa con copertine
+    // Crea lista completa con copertine
     List<Map<String, dynamic>> listaCompleta = [];
 
     // Se ci sono preferiti, aggiungi la tile "Preferiti" in cima

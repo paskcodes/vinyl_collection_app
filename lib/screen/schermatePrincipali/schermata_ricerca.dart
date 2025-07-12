@@ -24,6 +24,7 @@ class _SearchScreenState extends State<SearchScreen> {
   Future<void> _search() async {
     final query = _controller.text.trim();
     if (query.isEmpty) {
+      // Se la query è vuota, potresti voler pulire i risultati o mostrare un messaggio
       setState(() {
         _results = [];
         _error = null;
@@ -59,7 +60,11 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildResultItem(Vinile vinile) {
+    // Calcola una dimensione per l'immagine leading basata sulla larghezza dello schermo
+    // Ad esempio, il 12% della larghezza dello schermo, o un valore minimo/massimo
     final double leadingImageSize = context.screenWidth * 0.12; // Esempio
+    // Puoi anche usare context.shortestSide per una dimensione che si adatti meglio
+    // final double leadingImageSize = context.shortestSide * 0.1;
 
     return ListTile(
       onTap: () async {
@@ -71,14 +76,14 @@ class _SearchScreenState extends State<SearchScreen> {
         );
       },
       leading: SizedBox(
-        //immagine in un SizedBox per controllarne le dimensioni
+        // Avvolgi l'immagine in un SizedBox per controllare le dimensioni
         width: leadingImageSize,
         height: leadingImageSize,
         child: vinile.immagine != null && vinile.immagine!.isNotEmpty
             ? Image.network(vinile.immagine!, fit: BoxFit.cover)
             : const Icon(
                 Icons.album,
-              ),
+              ), // Considera di dare una dimensione all'icona
       ),
       title: Text(vinile.titolo),
       subtitle: Text(

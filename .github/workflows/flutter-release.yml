@@ -1,22 +1,33 @@
-name: Flutter Release APK
+name: Build and Release APK
 
 on:
   push:
     tags:
-      - 'v*'   # Attiva solo su tag che iniziano con "v"
+      - 'v*'  # Trigger solo per tag che iniziano con "v"
 
 jobs:
-  build_and_release:
+  build:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Setup Flutter
+    - name: Setup Java (required by Flutter)
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+
+    - name: Setup Flutter SDK
       uses: subosito/flutter-action@v2
       with:
         flutter-version: 'stable'
+
+    - name: Accept Android licenses
+      run: yes | sdkmanager --licenses
+      env:
+        ANDROID_HOME: ${{ env.ANDROID_HOME }}
 
     - name: Flutter pub get
       run: flutter pub get
@@ -24,9 +35,23 @@ jobs:
     - name: Build APK release
       run: flutter build apk --release
 
-    - name: Upload Release Asset
-      uses: softprops/action-gh-release@v1
-      with:
-        files: build/app/outputs/flutter-apk/app-release.apk
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref_name }}
+        release_name: Release ${{ github.ref_name }}
+        draft: false
+        prerelease: false
+
+    - name: Upload APK to Release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: build/app/outputs/flutter-apk/app-release.apk
+        asset_name: app-release.apk
+        asset_content_type: application/vnd.android.package-archive

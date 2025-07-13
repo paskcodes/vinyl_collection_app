@@ -3,55 +3,46 @@ name: Build and Release APK
 on:
   push:
     tags:
-      - 'v*'  # Trigger solo per tag che iniziano con "v"
+      - 'v*'  # Trigger su tag che iniziano con "v"
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Setup Java (required by Flutter)
-      uses: actions/setup-java@v3
-      with:
-        distribution: 'temurin'
-        java-version: '11'
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
 
-    - name: Setup Flutter SDK
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: 'stable'
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 'stable'
 
-    - name: Accept Android licenses
-      run: yes | sdkmanager --licenses
-      env:
-        ANDROID_HOME: ${{ env.ANDROID_HOME }}
+      - name: Accept Android licenses
+        run: yes | sdkmanager --licenses
 
-    - name: Flutter pub get
-      run: flutter pub get
+      - name: Flutter pub get
+        run: flutter pub get
 
-    - name: Build APK release
-      run: flutter build apk --release
+      - name: Build APK release
+        run: flutter build apk --release
 
-    - name: Create GitHub Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref_name }}
-        release_name: Release ${{ github.ref_name }}
-        draft: false
-        prerelease: false
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          body: Release automatica generata da workflow
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Upload APK to Release
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: build/app/outputs/flutter-apk/app-release.apk
-        asset_name: app-release.apk
-        asset_content_type: application/vnd.android.package-archive
+      - name: Upload APK asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/app/outputs/flutter-apk/app-release.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

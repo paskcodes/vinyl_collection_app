@@ -19,7 +19,10 @@ class HomeScreen extends StatefulWidget {
 
 Future<bool> isOnline() async {
   final result = await Connectivity().checkConnectivity();
-  return result != ConnectivityResult.none;
+  return result.any((connectivity) => 
+    connectivity == ConnectivityResult.mobile || 
+    connectivity == ConnectivityResult.wifi
+  );
 }
 
 class HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMixin {

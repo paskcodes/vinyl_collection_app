@@ -29,10 +29,3 @@ Per utilizzare l'app:
 
 Questa repository contiene il codice sorgente dell'app **Vynil Collection**.  
 Il progetto è attualmente in fase di sviluppo e miglioramento continuo.
-
----
-
-## 📬 Contatti
-
-Per domande o segnalazioni puoi aprire una Issue direttamente nella repository.
-

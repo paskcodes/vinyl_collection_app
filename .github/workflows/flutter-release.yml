@@ -3,7 +3,7 @@ name: Build and Release APK
 on:
   push:
     tags:
-      - 'v*'  # Trigger su tag che iniziano con "v"
+      - '*'  # Trigger su tag che iniziano con "v"
 
 jobs:
   build:

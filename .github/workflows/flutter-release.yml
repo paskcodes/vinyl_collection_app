@@ -1,0 +1,32 @@
+name: Flutter Release APK
+
+on:
+  push:
+    tags:
+      - 'v*'   # Attiva solo su tag che iniziano con "v"
+
+jobs:
+  build_and_release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: 'stable'
+
+    - name: Flutter pub get
+      run: flutter pub get
+
+    - name: Build APK release
+      run: flutter build apk --release
+
+    - name: Upload Release Asset
+      uses: softprops/action-gh-release@v1
+      with:
+        files: build/app/outputs/flutter-apk/app-release.apk
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

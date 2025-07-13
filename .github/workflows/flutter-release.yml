@@ -19,6 +19,18 @@ jobs:
           flutter-version: 3.32.6
           
       - run: flutter pub get
+
+      - name: Create .env file
+        run: |
+          echo "# Environment variables for production build" > .env
+          echo "DISCOGS_TOKEN=${{ secrets.DISCOGS_TOKEN }}" >> .env
+      - name: Verify .env file
+        run: |
+          echo "Verifying .env file exists and has content:"
+          ls -la .env
+          echo "File content (without sensitive data):"
+          grep -v "API_KEY\|DATABASE_URL" .env || true
+
       - run: flutter build apk
       
       - name: Create GitHub Release

@@ -1,17 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:vinyl_collection_app/screen/schermateSecondarie/dettaglio_vinile_collezione.dart';
 import 'package:vinyl_collection_app/utils/dimensioni_schermo.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+
 import '../../components/suggestion_tile.dart';
 import '../../database/database_helper.dart';
 import '../../service/discogs_service.dart';
 import '../../vinile/vinile.dart';
 import '../schermateSecondarie/dettaglio_vinile_suggerito.dart';
 
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => HomeScreenState();
+}
+
+Future<bool> isOnline() async {
+  final result = await Connectivity().checkConnectivity();
+  return result != ConnectivityResult.none;
 }
 
 class HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMixin {
@@ -31,6 +39,8 @@ class HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMix
   @override
   bool get wantKeepAlive => true;
 
+  bool _online = true;
+
   @override
   void initState() {
     super.initState();
@@ -38,30 +48,47 @@ class HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMix
   }
 
   Future<void> caricaDati() async {
-    final recent = await _db.getLastVinili(limit: 5);
-    final preferiti = await _db.getPreferiti();
-    final suggested = await _discogs.cercaViniliTendenza(limit: 10);
+    _online = await isOnline();
+    if (_online) {
+      await _caricaDatiDaApi();
+    }
+    await _caricaDatiLocali();
+    setState(() {});
+  }
+
+  Future<void> _caricaDatiDaApi() async {
     final generePreferito = await _db.getGenerePiuComune();
     final consigliati = generePreferito != null
         ? await _discogs.cercaPerGenere(generePreferito, limit: 10)
         : <Vinile>[];
 
-    final collezione = await _db.getCollezione();
-    collezione.shuffle();
-    final random = collezione.take(10).toList();
-
+    final suggested = await _discogs.cercaViniliTendenza(limit: 10);
     final piuCollezionati = await _discogs.iPiuCollezionati(limit: 10);
     final prossimeUscite = await _discogs.prossimeUscite(limit: 10);
 
     if (!mounted) return;
 
     setState(() {
-      _recenti = recent;
-      _preferiti = preferiti;
       _suggeriti = suggested;
       _potrebberoPiacerti = consigliati;
       _piuCollezionati = piuCollezionati;
       _ultimiInseriti = prossimeUscite;
+    });
+  }
+
+
+  Future<void> _caricaDatiLocali() async {
+    final recent = await _db.getLastVinili(limit: 5);
+    final preferiti = await _db.getPreferiti();
+    final collezione = await _db.getCollezione();
+    collezione.shuffle();
+    final random = collezione.take(10).toList();
+
+    if (!mounted) return;
+
+    setState(() {
+      _recenti = recent;
+      _preferiti = preferiti;
       _randomCollection = random;
       _isLoading = false;
     });

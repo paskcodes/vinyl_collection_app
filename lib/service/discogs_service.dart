@@ -81,7 +81,7 @@ class DiscogsService {
           condizione: Condizione.nuovo,
           immagine: (r['cover_image'] as String?)?.isNotEmpty == true
               ? r['cover_image']
-              : 'assets/immagini/vinilee.png',
+              : 'assets/immagini/vinile.png',
           preferito: false,
         );
       }).toList(),

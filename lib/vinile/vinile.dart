@@ -35,7 +35,13 @@ class Vinile {
       return const Icon(Icons.album, size: 40);
     }
     if (immagine!.startsWith('http')) {
-      return Image.network(immagine!, fit: BoxFit.cover);
+      return Image.network(
+        immagine!,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Image.asset('assets/immagini/vinile.png', fit: BoxFit.cover);
+        },
+      );
     }
     if (immagine!.startsWith('/') || immagine!.startsWith('file://')) {
       return Image.file(

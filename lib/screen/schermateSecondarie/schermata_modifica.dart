@@ -23,7 +23,7 @@ class SchermataModifica extends StatefulWidget {
 
 ImageProvider _buildImageProvider(String? path) {
   if (path == null || path.isEmpty) {
-    return const AssetImage('assets/immagini/vinilee.png');
+    return const AssetImage('assets/immagini/vinile.png');
   }
 
   if (path.startsWith('file://')) {
@@ -76,9 +76,9 @@ class _SchermataModificaState extends State<SchermataModifica> {
     });
   }
 
-  Future<void> _pickImage() async {
-    final picked = await _picker.pickImage(source: ImageSource.gallery);
-    if (picked != null && mounted) {
+  Future<void> _pickImage(ImageSource source) async {
+    final picked = await _picker.pickImage(source: source);
+    if (picked != null) {
       setState(() => _coverFile = File(picked.path));
     }
   }
@@ -126,6 +126,40 @@ class _SchermataModificaState extends State<SchermataModifica> {
     }
   }
 
+  Widget _buildImageWithFallback(String? path) {
+    if (path == null || path.isEmpty) {
+      return Image.asset('assets/immagini/vinile.png', fit: BoxFit.cover);
+    }
+
+    if (path.startsWith('http')) {
+      return Image.network(
+        path,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Image.asset('assets/immagini/vinile.png', fit: BoxFit.cover);
+        },
+      );
+    }
+
+    if (path.startsWith('file://')) {
+      return Image.file(
+        File(Uri.parse(path).toFilePath()),
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Image.asset('assets/immagini/vinile.png', fit: BoxFit.cover);
+        },
+      );
+    }
+
+    return Image.asset(
+      path,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        return Image.asset('assets/immagini/vinile.png', fit: BoxFit.cover);
+      },
+    );
+  }
+
   void _showAlert(String title, String msg) => showDialog(
     context: context,
     builder: (_) => AlertDialog(
@@ -139,6 +173,36 @@ class _SchermataModificaState extends State<SchermataModifica> {
       ],
     ),
   );
+
+  Future<void> _showImageSourceActionSheet() async {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Galleria'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _pickImage(ImageSource.gallery);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.camera_alt),
+                title: const Text('Fotocamera'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _pickImage(ImageSource.camera);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -162,19 +226,23 @@ class _SchermataModificaState extends State<SchermataModifica> {
             children: [
               Center(
                 child: GestureDetector(
-                  onTap: _pickImage,
-                  child: Container(
-                    width: context.screenWidth * 0.7,
-                    height: context.screenHeight * 0.3,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      color: theme.colorScheme.surfaceContainerHighest,
-                      image: DecorationImage(
+                  onTap: _showImageSourceActionSheet,
+                  child: Material(
+                    elevation: 8,
+                    borderRadius: BorderRadius.circular(20),
+                    clipBehavior: Clip.antiAlias,
+                    child: SizedBox(
+                      width: context.screenWidth * 0.8,
+                      height: context.screenWidth * 0.8,
+                      child: _coverFile != null
+                          ? Image.file(
+                        _coverFile!,
                         fit: BoxFit.cover,
-                        image: _coverFile != null
-                            ? FileImage(_coverFile!)
-                            : _buildImageProvider(widget.vinile.immagine),
-                      ),
+                        errorBuilder: (context, error, stackTrace) {
+                          return Image.asset('assets/immagini/vinile.png', fit: BoxFit.cover);
+                        },
+                      )
+                          : _buildImageWithFallback(widget.vinile.immagine),
                     ),
                   ),
                 ),

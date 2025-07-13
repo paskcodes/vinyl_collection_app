@@ -81,13 +81,13 @@ class GenereTile extends StatelessWidget {
         return Image.file(
           File(copertina.substring(7)),
           fit: BoxFit.cover,
-          errorBuilder: (_, _, _) => Container(color: Colors.grey),
+          errorBuilder: (_, _, _) => Container(child: Image.asset('assets/immagini/vinile.png')),
         );
       } else {
         return Image.network(
           copertina,
           fit: BoxFit.cover,
-          errorBuilder: (_, _, _) => Container(color: Colors.grey),
+          errorBuilder: (_, _, _) => Container(child: Image.asset('assets/immagini/vinile.png')),
         );
       }
     }
@@ -97,7 +97,7 @@ class GenereTile extends StatelessWidget {
       return ClipRRect(
         borderRadius: BorderRadius.circular(12),
         child: Image.asset(
-          'assets/immagini/vinilee.png',
+          'assets/immagini/vinile.png',
           width: dimensione,
           height: dimensione,
           fit: BoxFit.cover,

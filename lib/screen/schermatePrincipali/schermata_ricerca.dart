@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:vinyl_collection_app/screen/schermateSecondarie/dettaglio_vinile_suggerito.dart';
 import 'package:vinyl_collection_app/vinile/vinile.dart';
@@ -36,6 +37,18 @@ class _SearchScreenState extends State<SearchScreen> {
       _error = null;
     });
 
+    final connectivityResult = await Connectivity().checkConnectivity();
+    final isOnline = connectivityResult != ConnectivityResult.none;
+
+    if (!isOnline) {
+      setState(() {
+        _isLoading = false;
+        _results = [];
+        _error = 'Funzionalità non disponibile offline';
+      });
+      return;
+    }
+
     try {
       List<Vinile> results = await _discogsService.ricerca(query);
       setState(() {
@@ -43,7 +56,8 @@ class _SearchScreenState extends State<SearchScreen> {
       });
     } catch (e) {
       setState(() {
-        _error = 'Errore durante la ricerca: ${e.toString()}';
+        _error = 'Errore durante la ricerca';
+        _results = [];
       });
     } finally {
       setState(() {
@@ -51,6 +65,7 @@ class _SearchScreenState extends State<SearchScreen> {
       });
     }
   }
+
 
   @override
   void dispose() {
@@ -113,8 +128,31 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
             const SizedBox(height: 16),
             if (_isLoading) const CircularProgressIndicator(),
-            if (_error != null)
-              Text(_error!, style: const TextStyle(color: Colors.red)),
+            if (_error != null && _results.isEmpty)
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.wifi_off,
+                        size: 48,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        _error!,
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             if (!_isLoading && _results.isNotEmpty)
               Expanded(
                 child: ListView.builder(

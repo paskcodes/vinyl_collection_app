@@ -46,12 +46,12 @@ class SuggeritoTile extends StatelessWidget {
                               vinile.immagine!,
                               fit: BoxFit.cover,
                               errorBuilder: (_, _, _) => Image.asset(
-                                'assets/immagini/vinilee.png',
+                                'assets/immagini/vinile.png',
                                 fit: BoxFit.cover,
                               ),
                             ))
                     : Image.asset(
-                        'assets/immagini/vinilee.png',
+                        'assets/immagini/vinile.png',
                         fit: BoxFit.cover,
                       ),
               ),

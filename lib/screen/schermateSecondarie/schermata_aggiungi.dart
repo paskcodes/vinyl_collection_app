@@ -155,7 +155,7 @@ class _SchermataAggiungiState extends State<SchermataAggiungi> {
                       child: _coverFile != null
                           ? Image.file(_coverFile!, fit: BoxFit.cover)
                           : Image.asset(
-                              'assets/immagini/vinilee.png',
+                              'assets/immagini/vinile.png',
                               fit: BoxFit.cover,
                             ),
                     ),

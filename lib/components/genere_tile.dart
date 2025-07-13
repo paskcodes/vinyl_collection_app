@@ -81,13 +81,13 @@ class GenereTile extends StatelessWidget {
         return Image.file(
           File(copertina.substring(7)),
           fit: BoxFit.cover,
-          errorBuilder: (_, _, _) => Container(child: Image.asset('assets/immagini/vinile.png')),
+          errorBuilder: (_, _, _) => Image.asset('assets/immagini/vinile.png'),
         );
       } else {
         return Image.network(
           copertina,
           fit: BoxFit.cover,
-          errorBuilder: (_, _, _) => Container(child: Image.asset('assets/immagini/vinile.png')),
+          errorBuilder: (_, _, _) => Image.asset('assets/immagini/vinile.png'),
         );
       }
     }

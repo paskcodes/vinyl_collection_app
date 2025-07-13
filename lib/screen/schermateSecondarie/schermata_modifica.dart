@@ -21,21 +21,6 @@ class SchermataModifica extends StatefulWidget {
   State<SchermataModifica> createState() => _SchermataModificaState();
 }
 
-ImageProvider _buildImageProvider(String? path) {
-  if (path == null || path.isEmpty) {
-    return const AssetImage('assets/immagini/vinile.png');
-  }
-
-  if (path.startsWith('file://')) {
-    return FileImage(File(Uri.parse(path).toFilePath()));
-  }
-
-  if (path.startsWith('http')) {
-    return NetworkImage(path);
-  }
-
-  return AssetImage(path);
-}
 
 class _SchermataModificaState extends State<SchermataModifica> {
   final _formKey = GlobalKey<FormState>();
